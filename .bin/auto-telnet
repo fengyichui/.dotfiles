@@ -1,0 +1,20 @@
+#!/usr/bin/expect --
+
+set SERVER "192.168.5.10"
+set USER "liqiang"
+set PASSWD "lq123"
+
+# execute
+spawn telnet $SERVER
+
+# Expect something send something
+expect "login:"
+send "$USER\n"
+
+# Expect something send something
+expect "Password:"
+send "$PASSWD\n"
+
+# exit
+interact
+

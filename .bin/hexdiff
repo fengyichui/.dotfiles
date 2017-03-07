@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#
+# hexdiff by liqinag
+#
+
+# check param
+if [ $# != 2 ]; then
+    echo "hexdiff: please give 2 param!"
+    exit 1
+fi
+
+# tempfile
+a=$(mktemp)".$1"
+b=$(mktemp)".$2"
+
+# hexdump
+hexdump -v -C $1 >$a
+hexdump -v -C $2 >$b
+
+# diff
+diff -u --color=auto $a $b
+
+# remove temp file
+rm -rf $a $b
+

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+E_BADARGS=65
+
+if [ $# == 1 ]; then
+    address=$1
+    keyword=""
+elif [ $# == 2 ]; then
+    address=$1
+    keyword=$(echo "$2" | sed "s/ /%20/g")
+else
+    echo "Usage: `basename $0` address keyword"
+    exit $E_BADARGS
+fi
+
+w3m "${address}${keyword}"
+

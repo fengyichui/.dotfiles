@@ -1,0 +1,70 @@
+
+# ls
+alias ls='ls --color=auto'                             # classify files in colour
+alias ll='ls -al --color=auto --time-style=long-iso'   # long list all file
+alias l='ls -l --color=auto --time-style=long-iso'     # long list file
+
+# grep file
+alias grep='grep --color'  # show differences in color
+alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
+
+# dumpbin with windows
+alias dumpbin-dependents='dumpbin_func dependents'
+alias dumpbin-exports='dumpbin_func exports'
+
+# For windows: explorer the current directory
+alias window='explorer .'
+
+# For window: explorer
+alias open='explorer'
+
+# Interactive operation...
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+alias cpx='rsync --info=progress2'
+
+# grep
+alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
+
+# diff
+alias diff='diff --color=auto'
+
+# Stopwatch
+alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
+
+# gbk2utf8
+alias gbk2utf8='iconv -f GBK -t UTF8'
+
+# web
+#alias dict="webx 'http://dict.youdao.com/search?q='"
+alias dict="webx 'http://cn.bing.com/dict/search?q='"
+alias wiki="webx 'http://en.wikipedia.org/wiki/'"
+alias baidu="webx 'http://m.baidu.com/s?wd='"
+alias baike="webx 'http://wapbaike.baidu.com/item/'"
+alias qsbk="webx 'http://www.qiushibaike.com/text/'"
+alias news="webx 'http://news.sina.cn/?pos=1&vt=1&ttp=f1|1|1'"
+alias zhihu="webx 'http://www.zhihu.com/explore'"
+
+#
+# Function
+#
+# Dumpbin function for windows
+dumpbin_func ()
+{
+    mode=$1
+    shift
+    while (($#!=0))
+    do
+        case $mode in
+            'machine')      dumpbin /HEADERS $1 | awk "/machine \(/{print \$3 \": $1\"}"
+            ;;
+            'dependents')   dumpbin /DEPENDENTS $1
+            ;;
+            'exports')      dumpbin /EXPORTS $1
+            ;;
+        esac
+        shift
+    done
+}
+

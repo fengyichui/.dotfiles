@@ -1,0 +1,90 @@
+
+[user]
+    email = fengyichui@gmail.com
+    name = fengyichui
+
+[credential]
+    helper = store
+
+[core]
+    editor   = vim
+    autocrlf = false
+    filemode = false
+
+[diff]
+    tool = vimdiff
+    algorithm = patience
+    mnemonicPrefix = true
+    compactionHeuristic = true
+
+[difftool "vim-diff"]
+    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
+
+[merge]
+    tool = vimdiff
+    conflictstyle = diff3
+
+[mergetool "vim-merge"]
+    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
+    trustExitCode = true
+
+[alias]
+    a     = add
+    b     = branch
+    bi    = bisect
+    bl    = blame
+    c     = commit
+    ca    = commit --amend
+    cf    = commit --fixup
+    cl    = clone
+    co    = checkout
+    cp    = cherry-pick
+    d     = diff --color --no-ext-diff
+    dc    = !git d --cached
+    dcs   = !git d --cached --stat
+    ds    = !git d --stat
+    dw    = !git d --word-diff=color
+    des   = describe --contains
+    dt    = difftool
+    f     = fetch
+    g     = grep
+    h     = help
+    lfp   = !git l --first-parent
+    ln    = !git l @{1}..
+    lso   = ls-files --others --exclude-standard
+    lsr   = ls-remote
+    m     = merge
+    ma    = merge --abort
+    n     = name-rev --name-only
+    p     = push
+    pl    = pull --ff-only
+    r     = reset
+    ra    = rebase --abort
+    rc    = rebase --continue
+    re    = rebase
+    rem   = remote
+    ri    = rebase -i
+    ru    = remote update
+    rs    = rebase --skip
+    s     = status -sb -uno
+    sh    = show
+    shs   = show --stat
+    snapshot = !git stash save "snapshot: $(date)" && git stash apply "stash@{0}"
+    st    = stash
+    stl   = stash list
+    sts   = stash show -p
+    t     = tag
+    tr    = trail
+    unmerged = branch --no-merged master
+    wt    = worktree
+
+    ours   = !git checkout --ours $@ && git add $@
+    theirs = !git checkout --theirs $@ && git add $@
+
+    rank    = shortlog -sn --no-merges
+    authors = "!f() { git log --no-merges --pretty='format:%<(26)%an <%ae>' --author \"$*\" | sort | uniq; }; f"
+    by      = "!f() { IFS=$'\n'; select a in `git authors \"$*\"`; do git l --no-merges --author \"${a%%  *<*}\"; break; done; }; f"
+
+    upstream = !git for-each-ref --format='%(upstream:short)' $(git symbolic-ref -q HEAD)
+    upstream-remote = !git upstream | sed -e 's/\\/.*$//g'
+

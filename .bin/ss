@@ -1,0 +1,44 @@
+#!/bin/bash
+
+######################################################################
+# @file ss
+# @brief auto sslocal
+# @date 2017/2/28 22:57:47
+# @author liqiang
+#
+# 127.0.0.1:1080 will be as the proxy server
+#
+# In chrome, use SwitchyOmega plugin to proxy (socks5)
+#
+# @addtogroup 
+# @ingroup 
+# @details 
+#
+# @{
+######################################################################
+
+pic='/tmp/ssqr.png'
+
+wget -nv 'http://free.shadowsocks8.cc/images/server01.png' -O $pic
+
+if [ $? != 0 ]; then
+    exit 1
+fi
+
+# like: rc4-md5:52918214@138.68.61.42:23456
+serverinfo=$(zbarimg -q --raw $pic | sed 's#^ss://##' | base64 -d)
+
+# link: -m rc4-md5 -k 52918214 -s 138.68.61.42 -p 23456
+serverparam=$(echo $serverinfo | sed 's/^/-m /; s/:/ -k /; s/@/ -s /; s/:/ -p /')
+
+localparam='-b 127.0.0.1 -l 1080'
+
+echo -e "\e[31mServer: $serverinfo\e[0m"
+echo -e "\e[31mProxy: 127.0.0.1:1080\e[0m"
+
+set -x
+
+shadowsocks --http-proxy -t 600 $localparam $serverparam
+
+# @} #
+

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# usage
+function usage()
+{
+    echo "-------------------------------"
+    echo "Converts the INPUTFILE in place"
+    echo "-------------------------------"
+    echo ""
+    iconv --help
+}
+
+# Help
+if [ $# == 0 ] || [ "$1" == '--help' ] || [ "$1" == '-h' ]; then
+    usage
+    exit 1
+fi
+
+# check params
+last1=$#
+last2=$(($#-1))
+
+eval file=\${$last1}
+eval xile=\${$last2}
+
+if [ ! -f "$file" ]; then
+    echo "iconvx: $file: No such file"
+    exit 1
+fi
+
+if [ -f "$xile" ]; then
+    echo "iconvx: more than one files"
+    exit 1
+fi
+
+# tempfile
+tmp=`mktemp`
+
+# conv and mv it
+echo "iconvx: converting $file ..."
+iconv $@ >$tmp && mv -f "$tmp" "$file"
+

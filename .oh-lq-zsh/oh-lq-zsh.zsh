@@ -1,0 +1,5 @@
+
+# Autosuggest config
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=black,bold'
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=10
+

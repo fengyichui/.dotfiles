@@ -1,0 +1,55 @@
+
+define sii
+si
+x/i $pc
+end
+
+define connect2local
+target remote localhost:2331
+end
+
+define connect2remote
+target remote 192.168.2.66:2331
+end
+
+define connect
+#connect2remote
+connect2local
+end
+
+#remap RAM to 0x00000000
+define remap2ram
+set *0x400e003c=0x336
+set *0x400e003c=0x336
+end
+
+#remap ROM to 0x00000000
+define remap2rom
+set *0x400e003c=0x335
+set *0x400e003c=0x335
+end
+
+define rc
+mon reset
+load
+c
+end
+
+define rc1
+remap2ram
+#reset core only
+mon reset 1
+load
+c
+end
+
+define rst
+set *0=0
+set *4=0
+mon reset 2
+end
+
+#mon speed 1000
+#mon flash device = STM32F103VE
+#mon flash download = 1
+

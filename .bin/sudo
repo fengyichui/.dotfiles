@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+
+#
+# sudo
+#
+# Only for cygwin
+#
+
+dir=`pwd`
+echo cd \"$dir\" > /tmp/.init.tmp
+echo $@ >> /tmp/.init.tmp
+cygstart -w --action=runas mintty --exec $SHELL --login -i
+kill -9 $PPID
+

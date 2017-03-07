@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#
+# For cygwin QR generate
+#
+
+# check param
+if [ $# != 1 ]; then
+    echo "showqr: please give 1 param!"
+    exit 1
+fi
+
+# check cygpath
+command -v cygpath >/dev/null
+if [ $? != 0 ]; then
+    echo "showqr: only support cygwin!"
+    exit 1
+fi
+
+# pic
+piccyg="/tmp/qr.tmp.png"
+
+# to window absolute path
+picwin=$(cygpath -p $piccyg -a -w)
+
+# qrencode
+qrencode -o $piccyg "$1"
+
+# open the picture
+explorer $picwin
+
+# exit successfully
+exit 0
+

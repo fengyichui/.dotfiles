@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+#
+# New a new bash
+#
+# Only for cygwin
+#
+
+dir=`pwd`
+echo cd \"$dir\" > /tmp/.init.tmp
+echo $@ >> /tmp/.init.tmp
+cygstart -w --action=open mintty --exec $SHELL --login -i
+
