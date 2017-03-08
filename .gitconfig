@@ -20,14 +20,11 @@
     mnemonicPrefix = true
     compactionHeuristic = true
 
-[difftool "vim-merge-3way"]
-    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
-
 [merge]
     tool = vimdiff
     conflictstyle = diff3
 
-[mergetool "vim-merge-3way"]
+[mergetool "vim-merge3way"]
     cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
     trustExitCode = true
 
