@@ -11,6 +11,9 @@
     autocrlf = false
     filemode = false
 
+[color]
+    ui = auto
+
 [diff]
     tool = vimdiff
     algorithm = patience
