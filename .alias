@@ -24,6 +24,9 @@ alias mv='mv -i'
 alias cp='cp -i'
 alias cpx='rsync --info=progress2'
 
+# vim stdin
+alias vim-='vim -c "silent file stdin | set nomodified" -'
+
 # grep
 alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
 
