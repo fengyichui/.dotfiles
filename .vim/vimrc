@@ -1,0 +1,886 @@
+"
+"                         ███████████████████████████
+"                         ███████▀▀▀░░░░░░░▀▀▀███████
+"                         ████▀░░░░░░░░░░░░░░░░░▀████
+"                         ███│░░░░░░░░░░░░░░░░░░░│███
+"                         ██▌│░░░░░░░░░░░░░░░░░░░│▐██
+"                         ██░└┐░░░░░░░░░░░░░░░░░┌┘░██
+"                         ██░░└┐░░░░░░░░░░░░░░░┌┘░░██
+"                         ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██
+"                         ██▌░│██████▌░░░▐██████│░▐██
+"                         ███░│▐███▀▀░░▄░░▀▀███▌│░███
+"                         ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██
+"                         ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██
+"                         ████▄─┘██▌░░░░░░░▐██└─▄████
+"                         █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████
+"                         ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████
+"                         █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████
+"                         ███████▄░░░░░░░░░░░▄███████
+"                         ██████████▄▄▄▄▄▄▄██████████
+"                         ███████████████████████████
+"
+"                ╔══════════════════════════════════════════╗
+"                ║           > HERE BE VIMPIRES <           ║
+"                ╚══════════════════════════════════════════╝
+"
+
+" Helper {{{1
+"
+"
+" Movement
+"                            gg
+"                            #
+"                          n ?text N
+"                            C-b
+"                            C-u
+"                            H zt
+"                            { (
+"         ;       B  gE      k                 ,
+"   0  ^  Fx  Tx  b  ge  h  M zz  l  e  w  tx  fx  $
+"         ,                  j       E  W      ;
+"                          ) }
+"                            L zb
+"                            C-d
+"                            C-f
+"                          N /text n
+"                            *
+"                            G
+"
+" 插入模式快捷键
+"   CTRL+D  #减少缩进
+"   CTRL+T  #增加缩进
+"   CTRL+Y  #复制上一行的相同列的字符
+"   CTRL+E  #复制下一行的相同列的字符
+"   CTRL+W  #删除光标左侧的单词
+"   CTRL+U  #删除光标左侧的行
+"
+" 目录
+"   :cd      #更改当前工作目录
+"   :cd -    #更改当前工作目录为上一个工作目录
+"   :cd %:h  #更改当前工作目录为当前文件所在目录
+"   :pwd     #显示vim的工作目录
+"
+" 书签
+"   mz  #设置书签z(或其它字母)
+"   'z  #跳到书签z (line)
+"   `z  #跳到书签z (line and colume)
+"   '0  #打开上一次关闭的文件, '1 :打开上上次关闭的文件 ...
+"
+" 文件加解密
+"   vim -x file  #开始编辑一个加密的文件。
+"   :X           #加密 为当前文件设置密码。
+"   :set key=    #解密 去除文件的密码。
+"
+" 屏幕
+"   zt  #使当前行位于屏幕的上面
+"   zz  #使当前行位于屏幕的中间
+"   zb  #使当前行位于屏幕的下面
+"
+" folder
+"   za          #open/close toggle (under cursor)
+"   zR          #open (all)
+"   zM          #close (all)
+"   zv          #update
+"   {visual}zf  #create folder in visual ({{{xxx}}})
+"   {visual}zd  #delete folder in visual
+"
+" 分屏 split
+"   1. :sp[lit]  file.c    #水平分屏打开新文件
+"      :vsp[lit] file.c    #垂直分屏打开新文件
+"   2. <C-w> c [:close]    #关闭当前分屏窗口
+"   3. <C-w> ↑[↓←→]        #切换光标在哪个分屏窗口
+"      <C-w> k [j h l ]    #同上
+"   4. <C-w> K [J H L ]    #切换分屏窗口的位置, 可以更改垂直和水平分屏
+"   5. <C-w> =             #使分屏的窗口一样高
+"   6. $ gvim -on 1.c 2.c  #以水平分屏方式打开两个文件
+"      $ gvim -On 1.c 2.c  #以垂直分屏方式打开两个文件
+"
+" 缓冲区 buffer
+"   1. :bn[ext]           #跳到下一个buffer
+"   2. :bd[elete]         #删除[当前]buffer
+"   3. :ls                #列出所有buffer
+"   4. :b[uffer] file.c   #打开某个buffer
+"      :sb[uffer] file.c  #分屏打开某个buffer
+"      :sbn[ext]          #分屏打开下个buffer
+"      :sball             #分屏打开所有buffer
+"      :vert[ical] sbn    #垂直
+"      :vert[ical] sball  #垂直
+"
+" 命令行历史记录 q:
+" 搜索历史记录   q/ q?
+"
+" :retab<cr>  #把所有tab转换为空白
+"
+" 位置
+"   ctrl+o  #回到上一个位置.
+"   ctrl+i  #回到下一个位置.
+"
+" 批量操作
+"   :args **/*.[ch]                   #把当前目录和子目录下的的所有c和h文件放入参数列表中
+"   :argdo execute 'Format' | update  #对参数列表中的所有文件执行格式转换命令
+"   :argdo normal ggVG= | update      #对参数列表中的所有文件执行格式化
+"   :bufdo s/a//g | update            #对当前打开的所有buff进行批量操作
+"   :windo s/a//g | update            #对当前的窗口进行批量操作
+"   附加说明: ** 这个标志表示遍历当前目录和子目录
+"
+" 使用16进制
+"   %s/\%x17/\="\x20"/g         #替换掉所有二进制为0x17的数为0x20
+"   /\%x17                      #查找二进制0x17
+"   echo "\x31\x31"             #显示二进制0x31、0x31对应的显示字符
+"   <Ctrl-r>="\u2122"           #插入模式下插入Unicode码
+"
+" 高级搜索
+"   :g/^\s*$/d                  #搜索所有空行, 并删除(d) (g是global的意思, 反义为: g!/.../d)
+"   :%s/abc//gn                 #搜索abc, 并统计它出现的次数
+"   :g/^#define/ | s/$/abc/gc   #搜索所有的以#define开始的行，并把这些行的末尾加上abc ==> 巧用 “|”: 如果前面的条件成立则执行后面的命令
+"
+" 使用NERD_tree 搜索文件
+"   e:浏览文件夹 => O:打开所有子文件夹 => /:搜索 => q:关闭NERD_tree
+"
+" 监测VIM启动和执行时间
+"   1. 监测启动时间
+"      $ gvim --startuptime timecost.txt a.c
+"      $ gvim -c "profile start vim.log" -c "profile func *" -c "q"
+"   2. 检测执行时间
+"      :profile start profile.log
+"      :profile func *
+"      :profile file *
+"      " At this point do slow actions
+"      :profile pause
+"      :noautocmd qall!
+"
+" vimdiff
+"   ]c           #跳转到下一个不同
+"   [c           #跳转到上一个不同
+"   dp           #diff put 把当前差异行复制到另一个文件中去
+"   do           #diff get 把另一个文件的内容复制到当前行中
+"   :diffupdate  #更新diff
+"
+"
+" Example
+"
+"   格式化由特殊符号格式化的列表（如逗号分隔符文件）
+"   %s/,/\t/ge | set tabstop=50 | retab
+"
+"   转换驼峰风格到linux风格: GetBufferSize() => get_buffer_size()
+"   %s/\%(\<[A-Za-z_]\i*\)\@<=\(\l\)\(\u\)/\L\1_\2/ge | %s/\<\(\i*\l\i*\)\>/\L\1/ge | nohl
+"
+"   寄存器文档转数据结构
+"   set tabstop=22 | retab | %s/^\(\S\+\)\s\+\(\S\+\)\s\+$/\r__IO uint32_t \2; \/\/ offset: \1/g | %s/^\s\+/    \/\//g | nohl |normal ggVG>>
+"
+"   [3]=>0x00000008
+"   %s/\[\(\d\+\)\]/\=printf("0x%08X", float2nr(eval("pow(2,".submatch(1).")")))/g
+"
+"   [3:0]=>0x0000000F
+"   %s/\[\(\d\+\):\(\d\+\)\]/\=printf("0x%08X", eval("float2nr(pow(2,".submatch(1)."+1-".submatch(2)."))-1") * eval("float2nr(pow(2,".submatch(2)."))"))/g
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" }}}1
+
+" Custom {{{1
+
+let g:sys_path = 'C:/Python35;C:/cygwin64/bin;'
+let g:cygwin_path = 'C:/cygwin64/cygwin.bat'
+let g:jlink_path = 'D:/Keil_v520/ARM/Segger/Jlink.exe'
+let g:gdb_path = 'arm-none-eabi-gdb'
+let g:learn_path = fnamemodify('E:/4-other/OneDrive/Skill/Harvest/learn.txt', ":p")
+
+
+" Option {{{1
+
+set nocompatible                " Not compatibe Vi
+let $LANG = 'en_US.UTF-8'       " Disable language translations
+set langmenu=en_US.UTF-8        " sets the language of the menu
+color lucius_qli                " Color
+filetype plugin indent on       " Enable filetype plugins
+syntax on                       " syntax on
+
+if has('win32')
+set guifont=Consolas:h11  " Font:Consolas size:h11
+set guifontwide=Microsoft\ YaHei\ Mono:h11  " for double-wide characters
+"set renderoptions=type:directx  " Use Directx to render
+set shellpipe=\|\ tee           " shell pipe to tee
+set noshelltemp                 " Use pipe to instead temp file and avoid the console window flash
+let $PATH=$HOME.'\\vimfiles\\res;' . $PATH . ';' . g:sys_path
+if !exists("g:load_vimrc")
+set lines=46 columns=85         " Startup window size
+endif
+else
+set guifont=DejaVu\ Sans\ Mono\ 10.5
+endif
+
+set formatoptions=tcroqlnj      " Automatic formatting
+set noequalalways               " Don't automatically made the same size after close a window
+set number                      " show line number
+set cursorline                  " highlight current line
+set cindent                     " use c language indent
+set tabstop=4                   " indent is 4 space
+set shiftwidth=4                " auto indent is 4 space
+set expandtab                   " use space instead tab
+set clipboard=unnamed,unnamedplus " use system clopboard (reg:*,+)
+set list                        " show tab
+set listchars=tab:>-,trail:-,nbsp:. " show tab, trail space
+set virtualedit=block           " block select to any place
+set undofile                    " Enable undofile
+set undodir=~/.vimundo          " Set undodir
+set nomore                      " NO -- More --
+set complete-=i                 " disable scanning included files
+set synmaxcol=600               " syntax max colume
+set timeout                     " for mappings
+set timeoutlen=1000             " default value
+set ttimeout                    " for key codes
+set ttimeoutlen=10              " unnoticeable small value
+set winminheight=0              " The minimal height of a window
+set winminwidth=0               " The minimal width of a window
+"set foldmethod=syntax           " fold !slow!
+"set foldcolumn=0                " fold !slow!
+"set foldlevel=100               " fold !slow!
+set history=700                 " Sets how many lines of history VIM has to remember
+set autoread                    " Set to auto read when a file is changed from the outside
+set scrolloff=0                 " Minimal number of screen lines to keep above and below the cursor
+set wildmenu                    " Turn on the WiLd menu
+set wildmode=list:longest       " Completion mode
+set wildignore=*.o,*.d,*~,*.pyc,*/obj/* " Ignore compiled files
+let &path='.,,,'.getcwd().'/**' " add pwd and all sub dir to path for: find, gf ...
+set hidden                      " A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent  " Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l          " Configure backspace so it acts as it should act
+set grepprg=ag\ --vimgrep       " grep for AG command
+set grepformat=%f:%l:%c:%m      " vimgrep message format
+set ignorecase                  " Ignore case when searching, override by \c or \C
+set smartcase                   " When searching try to be smart about cases
+set tagcase=match               " Tags file searching match case
+set hlsearch                    " Highlight search results
+set incsearch                   " Makes search act like search in modern browsers
+set lazyredraw                  " Don't redraw while executing macros (good performance config)
+set magic                       " For regular expressions turn magic on
+set showmatch                   " Show matching brackets when text indicator is over them
+set matchtime=2                 " How many tenths of a second to blink when matching brackets
+set noerrorbells                " No annoying sound on errors
+set novisualbell                " No annoying sound on errors
+set t_vb=                       " No annoying sound on errors
+set tm=500                      " No annoying sound on errors
+set nobackup                    " Turn backup off, since most stuff is in SVN, git et.c anyway...
+set nowritebackup               " Turn backup off, since most stuff is in SVN, git et.c anyway...
+set noswapfile                  " Turn backup off, since most stuff is in SVN, git et.c anyway...
+set smarttab                    " Be smart when using tabs ;)
+set linebreak                   " Linebreak on 500 characters
+set textwidth=500               " Linebreak on 500 characters
+set autoindent                  " Auto indent
+set smartindent                 " Smart indent
+"set viminfo^=%                  " Remember info about open buffers on close
+set nowrap                      " Not auto wrap
+set completeopt=menuone,longest " options for Insert mode completion
+set switchbuf=useopen           " Specify the behavior when switching between buffers
+set showtabline=1               " No tab line
+set guioptions-=T               " Remove Toolbar
+set guioptions+=b               " Show bottom scrollbar
+set t_Co=256                    " number of colors
+set mouse=a                     " Use mouse in any mode
+let mapleader = ","             " loeader
+set encoding=utf-8              " Sets the character encoding used inside Vim
+set fileencoding=utf-8          " Sets the character encoding for the file of this buffer
+set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1 " This gives the character encoding that will be tried
+set fileformat=unix             " This gives the <EOL> of the current buffer, which is used for reading/writing the buffer from/to a file
+set fileformats=unix,dos,mac    " This gives the end-of-line (<EOL>) formats that will be tried
+set laststatus=2                " Always show the status line
+set ruler                       " Show the line and column number of the cursor position
+set tags=tags,./tags,./../tags,./../../tags,./../../../tags,./../../../../tags,./../../../../../tags,./../../../../../../tags
+set title titlestring=%{has('gui_running')?'':'[Vim]\ '}%{split(getcwd(),\'/\\\|\\\\')[-1]}\ \|\ %t%r%m%w%h\ %<(%{getcwd()})
+set statusline=%1*%{&modified?\"[+]\":\"\"}
+set statusline+=%0*%h%r%w%{&modifiable?\"\":\"[-]\"}\ %f
+set statusline+=\ %{&binary?\"[binary]\":\"\"}
+set statusline+=%<%=
+set statusline+=%Bh
+set statusline+=\ %{&fenc==\"\"?&enc:&fenc}%{&bomb?\",bom\":\"\"}
+set statusline+=/%{&fileformat}
+set statusline+=/%{&filetype==\"\"?\"?\":&filetype}
+set statusline+=\ %c:%l/%L\ %P
+
+if &term =~ 'xterm'
+" cursor
+" 1 or 0 -> blinking block
+" 3 -> blinking underscore
+" 4 -> solid underscore
+" 5 -> blinking vertical bar
+" 6 -> solid vertical bar
+let &t_ti .= "\<esc>[1 q"
+let &t_SI .= "\<esc>[5 q"
+let &t_SR .= "\<esc>[3 q"
+let &t_EI .= "\<esc>[1 q"
+let &t_te .= "\<esc>[0 q"
+endif
+
+" For set undodir=~/.vimundo
+if !isdirectory($HOME."/.vimundo")
+call mkdir($HOME."/.vimundo")
+endif
+
+
+" Autocmd {{{1
+
+augroup vimrc
+
+" Remove all autocommands of vimrc
+autocmd!
+
+" Source vimrc after written
+autocmd BufWritePost $MYVIMRC source $MYVIMRC
+
+" Maximize window in diff mode
+autocmd GUIEnter * if &diff | call lq#MaximizeWindow() | endif
+
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"zvzz' | endif
+
+" For quickfix command
+autocmd QuickFixCmdPost [^l]* nested copen
+autocmd QuickFixCmdPost    l* nested lopen
+"autocmd QuickFixCmdPost make,lmake call lq#QfMakeConv()
+autocmd BufReadPost quickfix nnoremap <buffer> [ :cold<cr> | nnoremap <buffer> ] :cnew<cr> | nnoremap <buffer> q :q<cr>
+autocmd BufReadPost quickfix nnoremap <buffer> <C-c> :AsyncStop<cr>
+autocmd BufReadPost quickfix setlocal statusline=%t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}%<%=%c:%l/%L\ %P
+
+" For Listchars
+"autocmd InsertEnter * set listchars-=trail:-
+"autocmd InsertLeave * set listchars+=trail:-
+
+" For new file type detect
+autocmd BufNewFile,BufRead *.jlink  set filetype=jlink
+autocmd BufNewFile,BufRead *.gdb    set filetype=gdb
+autocmd BufNewFile,BufRead *.sct    set filetype=scatter
+autocmd BufNewFile,BufRead rfc*.txt set filetype=rfc
+
+" FileType, For document "K"
+autocmd FileType python
+    \ nnoremap <buffer> K :call lq#Scratch("!python -m pydoc ".expand("<cword>"))<cr> |
+    \ vnoremap <buffer> K :call lq#Scratch("!python -m pydoc ".lq#GetVisualSelectText())<cr>
+autocmd FileType sh,make
+    \ nnoremap <buffer> K :call lq#Scratch("!man ".expand("<cword>"),"man")<cr> |
+    \ vnoremap <buffer> K :call lq#Scratch("!man ".lq#GetVisualSelectText(),"man")<cr>
+autocmd FileType dosbatch
+    \ nnoremap <buffer> K :call lq#Scratch("!help ".expand("<cword>"),"text",1)<cr> |
+    \ vnoremap <buffer> K :call lq#Scratch("!help ".lq#GetVisualSelectText(),"text",1)<cr>
+autocmd FileType vim setlocal keywordprg=:help
+
+" FileType, For format "gq", I map "gq" to "Q"
+autocmd FileType c,cpp let &l:formatprg = 'astyle --mode=c --lineend=linux --style=ansi --indent-switches --convert-tabs --align-reference=name --break-blocks --pad-oper --pad-first-paren-out --pad-header'
+autocmd FileType java let &l:formatprg = 'astyle --mode=java --lineend=linux --style=ansi --indent-switches --convert-tabs --align-reference=name --break-blocks --pad-oper --pad-first-paren-out --pad-header'
+autocmd FileType python let &l:formatprg = 'yapf'
+autocmd FileType xml let &l:formatprg = 'tidy -quiet -xml -indent --indent-spaces 4 --newline LF'
+
+" Custom Make
+autocmd BufReadPost *.uvproj setlocal makeprg=makekeil    | compiler keil
+autocmd BufReadPost *.ewp    setlocal makeprg=makeiar     | compiler iar
+autocmd FileType sh          setlocal makeprg=bash\ -n\ % | compiler sh
+
+" For binary file, xxd
+autocmd BufNewFile   *.bin setlocal binary | setlocal filetype=xxd
+autocmd BufReadPre   *.bin setlocal binary
+autocmd BufReadPost  * if &binary | call lq#BinaryBufReadPost() | endif
+autocmd BufWritePre  * if &binary | silent! exe 'normal mz' | silent! exe '%!xxd -r' | endif
+autocmd BufWritePost * if &binary | silent! exe '%!xxd' | setlocal nomodified | silent! exe 'normal `z' | endif
+
+" Cursorline
+autocmd WinEnter    * if mode()=='i' | set nocursorline | else | set cursorline | endif
+autocmd InsertEnter * set nocursorline
+autocmd InsertLeave * set cursorline
+
+" q for help file quit
+autocmd FileType help if &readonly | nnoremap <buffer> q :q<cr> | endif
+
+" Avoid silent shell command lead screen mess up
+autocmd ShellCmdPost * if !has('gui_running') | redraw! | endif
+
+augroup END
+
+
+" Menu {{{1
+
+" Misc
+menu liqiang.misc.delele-repeat-line :g/^\(.*\)$\n^\1$/d<cr>
+menu liqiang.misc.[3:0]\\[3]=>0x0000000X :silent! %s/\[\(\d\+\):\(\d\+\)\]/\=printf("0x%08X", eval("float2nr(pow(2,".submatch(1)."+1-".submatch(2)."))-1") * eval("float2nr(pow(2,".submatch(2)."))"))/g \| silent! %s/\[\(\d\+\)\]/\=printf("0x%08X", float2nr(eval("pow(2,".submatch(1).")")))/g<cr>
+menu liqiang.misc.GetBufferSize=>get_buffer_size :silent %s/\%(\<[A-Za-z_]\i*\)\@<=\(\l\)\(\u\)/\L\1_\2/ge \| %s/\<\(\i*\l\i*\)\>/\L\1/ge \| nohl<cr>
+
+" Common
+menu liqiang.startify<TAB>:Startify :Startify<cr>
+menu liqiang.undo-tree<TAB>:UndotreeToggle :UndotreeToggle<cr>
+menu liqiang.syntax-attribute<TAB>synIDattr :echo synIDattr(synID(line('.'),col('.'),1),'name')<cr>
+menu liqiang.colorizer<TAB>:ColorToggle :ColorToggle<cr>
+menu liqiang.matrix<TAB>:Matrix :Matrix<cr>
+menu liqiang.switch-vcs-root<TAB>SwitchVCSRoot :call lq#SwitchVCSRoot()<cr>
+menu liqiang.hex(endian)<TAB>HexEndianToggle :call lq#HexEndianToggle()<cr>
+menu liqiang.tail<TAB>:TailToggle :TailToggle<cr>
+
+" Command line
+menu liqiang.-Sep1- :
+menu liqiang.bash<TAB>:Bash :Bash<cr>
+menu liqiang.cmd<TAB>:Cmd :Cmd<cr>
+menu liqiang.jlink<TAB>:Jlink :Jlink<cr>
+
+" Program
+menu liqiang.-Sep2- :
+menu liqiang.complete-ycm(clang)<TAB>:packadd\ YouCompleteMe :Xycm<cr>
+menu liqiang.complete-omni(ctags)<TAB>:packadd\ OmniCppComplete :Xomni<cr>
+menu liqiang.highlight<TAB>:packadd\ TagHighlight :Xhighlight<cr>
+menu liqiang.signify<TAB>:SignifyEnable :Xsignify<cr>
+
+
+" Register {{{1
+"Note: 插入寄存器x的方法是：<C-r>x 或者 <C-r><C-o>x 前一种插入方法会对原始寄存器数据进行解析并插入解析之后的数据，后一种插入寄存器的原始数据
+
+"C/C++ 不搜索注释的regex
+let @f = "\\(\\(\\/\\*\\|\\/\\/\\|^\\s*\\*\\).*\\)\\@<!"
+
+"C/C++ 插入switch语句 请使用<C-r>s
+let @s = "switch()\n{\ncase A:\nbreak;\n\ncase B:\nbreak;\n\ncase C:\nbreak;\n\ncase D:\nbreak;\n\ndefault:\nbreak;\n}\n"
+
+"C/C++ 插入文件缺省, FIXME:插入h文件缺省信息的时候，现在插入的是 extern “C” {} 但是应该是： extern “C” {
+let @h = "/**\n@file \<C-r>=expand(\"%:t\")\<cr>\n@brief \n@date \<C-r>=strftime(\"%c\")\<cr>\n@author liqiang\n\n@addtogroup \n@ingroup \n@details \n\n@{\n/\n\n#ifndef __\<C-r>=tr(toupper(expand(\"%:t\")),\".\",\"_\")\<cr>__\n#define __\<C-r>=tr(toupper(expand(\"%:t\")),\".\",\"_\")\<cr>__\n\n#ifdef __cplusplus\nextern \"C\"\n{}\n#endif\n\n/*********************************************************************\nINCLUDES\n/\n\n\n/*********************************************************************\nMACROS\n/\n\n\n/*********************************************************************\nTYPEDEFS\n/\n\n\n/*********************************************************************\nEXTERN VARIABLES\n/\n\n\n/*********************************************************************\nEXTERN FUNCTIONS\n/\n\n\n#ifdef __cplusplus\n}\n#endif\n\n#endif\n\n/** @} */\n"
+let @c = "/**\n@file \<C-r>=expand(\"%:t\")\<cr>\n@brief \n@date \<C-r>=strftime(\"%c\")\<cr>\n@author liqiang\n\n@addtogroup \n@ingroup \n@details \n\n@{\n/\n\n/*********************************************************************\nINCLUDES\n/\n\n\n/*********************************************************************\nMACROS\n/\n\n\n/*********************************************************************\nTYPEDEFS\n/\n\n\n/*********************************************************************\nCONSTANTS\n/\n\n\n/*********************************************************************\nLOCAL VARIABLES\n/\n\n\n/*********************************************************************\nGLOBAL VARIABLES\n/\n\n\n/*********************************************************************\nLOCAL FUNCTIONS\n/\n\n\n/*********************************************************************\nPUBLIC FUNCTIONS\n/\n\n\n/** @} */\n"
+let @p = "######################################################################\n# @file \<C-r>=expand(\"%:t\")\<cr>\n@brief \n@date \<C-r>=strftime(\"%c\")\<cr>\n@author liqiang\n\n@addtogroup \n@ingroup \n@details \n\n@{\n\<BACKSPACE>#####################################################################\n\n######################################################################\n# IMPORT\n\<BACKSPACE>#####################################################################\n\n\n######################################################################\n# VARIABLES\n\<BACKSPACE>#####################################################################\n\n\n######################################################################\n# FUNCTIONS\n\<BACKSPACE>#####################################################################\n\n\n######################################################################\n# CLASS\n\<BACKSPACE>#####################################################################\n\n\n\n# @} #\n\<BACKSPACE>\<BACKSPACE>"
+
+
+" Shortcut {{{1
+
+" Shortcut: F {{{2
+
+" nerdtree
+nnoremap <silent> <F1> :NERDTreeToggle<cr>
+nnoremap <silent> <F2> :NERDTreeFind<cr>
+
+" Tagbar
+nnoremap <silent> <F3> :call lq#ShowLists()<cr>
+nnoremap <silent> <F4> :TagbarOpen fj<cr>
+
+" Run it
+nnoremap <F5> :call lq#RunIt()<cr>
+
+" help list
+nnoremap <F6> :HTListToggle<cr>
+
+" Compile it
+nnoremap <F7> :call lq#CompileIt()<cr>
+
+" Create highlist type file, :ts / Ctrl+] / Ctrl+T
+nnoremap <F9> :UpdateTypesFile<cr>
+
+" YouCompleteMe
+nnoremap <F10> :YcmDiags<CR>
+nnoremap <F11> :YcmCompleter GoToDefinitionElseDeclaration<CR>
+vnoremap <F11> :YcmCompleter GoToDefinitionElseDeclaration<CR>
+inoremap <F11> <C-o>:YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <C-F11> :YcmCompleter GoToDefinition<CR>
+vnoremap <C-F11> :YcmCompleter GoToDefinition<CR>
+inoremap <C-F11> <C-o>:YcmCompleter GoToDefinition<CR>
+nnoremap <A-F11> :YcmCompleter GoToDeclaration<CR>
+vnoremap <A-F11> :YcmCompleter GoToDeclaration<CR>
+inoremap <A-F11> <C-o>:YcmCompleter GoToDeclaration<CR>
+
+" Jump to tag
+nmap <F12> <C-]>
+vmap <F12> <C-]>
+imap <F12> <C-o><C-]>
+nmap <C-F12> :tnext<cr>
+vmap <C-F12> :tnext<cr>
+imap <C-F12> <C-o>:tnext<cr>
+nmap <A-F12> :tprevious<cr>
+vmap <A-F12> :tprevious<cr>
+imap <A-F12> <C-o>:tprevious<cr>
+
+
+" Shortcut: Ctrl {{{2
+
+" Windows
+inoremap <C-v> <C-r><C-o>+
+cnoremap <C-v> <C-r><C-o>+
+vnoremap <C-v> "_c<C-r><C-o>+<esc>
+vnoremap <C-c> "+y
+cnoremap <C-c> <C-f>^v$"+y<C-c><C-e>
+vnoremap <C-x> "+x
+cnoremap <C-x> <C-f>^v$"+y<C-c><C-e><C-u>
+inoremap <C-s> <C-o>:update<cr>
+inoremap <C-z> <C-o>u
+inoremap <C-a> <C-o>gg<C-o>gH<C-o>G
+
+" Smart way to move between windows
+noremap <C-j> <C-W>j
+noremap <C-k> <C-W>k
+noremap <C-h> <C-W>h
+noremap <C-l> <C-W>l
+
+" insert mode, move cursor
+inoremap <C-j> <down>
+inoremap <C-k> <up>
+inoremap <C-h> <left>
+inoremap <C-l> <right>
+
+" Relative number toggle
+nnoremap <C-n> :call lq#LineNumberToggle()<cr>
+
+" Execute it
+nnoremap <silent> <C-cr> :call lq#CommandIt()<cr>
+vnoremap <silent> <C-cr> :call lq#CommandItV()<cr>
+
+
+" Shortcut: Alt {{{2
+
+" Repeat last command, like .
+nnoremap <A-.> @:
+
+" Move window
+nnoremap <A-left>   <c-w>>
+nnoremap <A-right>  <c-w><
+nnoremap <A-up>     <c-w>-
+nnoremap <A-down>   <c-w>+
+
+" Like Ctrl-P, Use Alt-P to open buffer explorer
+nnoremap <A-p> :CtrlPBuffer<cr>
+
+" search next quickfix item
+nnoremap <A-n> :cnext<cr>zvzz
+nnoremap <A-S-n> :cprevious<cr>zvzz
+
+
+" Shortcut: Leader {{{2
+
+" Fast saving/quit
+nnoremap <leader>w :update<cr>
+nnoremap <leader>q :q<cr>
+
+" Pressing ,ss will toggle and untoggle spell checking
+noremap <leader>ss :setlocal spell!<cr>
+
+" Format 1.tab->space 2.format=unix 3.remove ^M 4.remove tail space
+noremap <Leader>m mz:retab<cr>:set fileformat=unix<cr>:%s/\r\(\n\@=\)//ge<cr>:%s/\r/\r/ge<cr>:%s/\s\+$//ge<cr>:nohl<cr>'z
+
+" Highlight line and colume (:match to clear hightlight)
+nnoremap <silent> <Leader>c :execute 'match Search /\%'.virtcol('.').'v/'<cr>
+nnoremap <silent> <Leader>l ml:execute 'match Search /\%'.line('.').'l/'<cr>
+
+" paste, but not copy it
+vmap <leader>p <C-v>
+nmap <leader>pw viw<C-v>
+nmap <leader>px vi)<C-v>
+nmap <leader>pd vi}<C-v>
+nmap <leader>pz vi]<C-v>
+
+" Switch in opened file
+nnoremap <leader><tab> :bn<cr>
+
+" Open grep and put the cursor in the right position, <C-R><C-W><cr>
+nnoremap <silent> <leader>g :call lq#GrepAuto("")<cr>
+
+" Vimgreps in the current file
+nnoremap <leader><space> :vimgrep //j %<left><left><left><left>
+
+" When you press gv you grep after the selected text
+vnoremap <silent> <leader>v :call lq#VisualSelect('grep')<cr>
+nnoremap <silent> <leader>v :call lq#GrepAuto("\\b<C-R>=expand('<cword>')<cr>\\b","-s")<cr>
+
+" When you press <leader>r you can search and replace the selected text
+vnoremap <silent> <leader>r :call lq#VisualSelect('replace')<cr>
+vnoremap <silent> <leader>R :call lq#VisualSelect('replace-all')<cr>
+nnoremap <leader>r :%s/\C\<<C-R>=expand('<cword>')<cr>\>//gc<left><left><left>
+nnoremap <silent> <leader>R :call lq#ReplaceAllAuto("\\C\\<<C-R>=expand('<cword>')<cr>\\>")<cr>
+
+" Coding mode: taghighlight, Signify,
+nnoremap <leader>x :call lq#LoadCodingPlugin()<cr>
+
+
+" Shortcut: Other {{{2
+
+" <C-o> from insert mode to insert-virsal mode
+inoremap <S-up>     <left><C-o>v<up>
+inoremap <S-down>   <C-o>v<down>
+inoremap <S-left>   <left><C-o>v
+inoremap <S-right>  <C-o>v
+vnoremap <S-up>     <up>
+vnoremap <S-down>   <down>
+vnoremap <S-left>   <left>
+vnoremap <S-right>  <right>
+
+" Block comment automatically
+nnoremap <silent> = :call lq#OpComment('add', 'n')<cr>
+nnoremap <silent> - :call lq#OpComment('del', 'n')<cr>
+vnoremap <silent> <A-=> :call lq#OpComment('add', 'v')<cr>
+vnoremap <silent> <A--> :call lq#OpComment('del', 'v')<cr>
+
+" Search
+nnoremap <expr> n     'Nn'[v:searchforward].'zvzz'
+nnoremap <expr> N     'nN'[v:searchforward].'zvzz'
+
+" No highlight search
+nnoremap <space><space> :<C-u>nohlsearch<cr>
+
+" Treat long lines as break lines (useful when moving around in them)
+noremap j gj
+noremap k gk
+
+" Visual mode pressing * or # searches for the current selection
+" Super useful! From an idea by Michael Naumann
+vnoremap <silent> * :call lq#VisualSelect('search')<cr>//<cr>
+vnoremap <silent> # :call lq#VisualSelect('search')<cr>??<cr>
+
+" Now you can use >>>>> on your visual selection without any problems
+xnoremap <  <gv
+xnoremap >  >gv
+
+" easymotion: search all window
+nmap s <Plug>(easymotion-s)
+nmap S <Plug>(easymotion-overwin-f)
+
+" Q for format
+vnoremap Q gq
+
+" delete the characters under the cursor until the begin of the line
+nnoremap <BS> v^d
+
+" <TAB> for select the completion suggestions
+inoremap <expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<S-TAB>"
+
+" e/E for extra paste and yank:
+" e normal: paste wowd without yank
+" e virsal: paste without yank
+nmap e viw<C-v>
+vmap e <C-v>
+nmap E viw<C-c>
+vmap E <C-c>
+
+
+" Command {{{1
+
+" Generate doxgen comment
+command! -nargs=0 Dox   call lq#MakeDoxygenComment()
+command! -nargs=0 Doxs  call lq#MakeDoxygenComments()
+
+" Change file coding with utf8 or Unicode
+command! -nargs=? Code  call lq#CodeOp(<f-args>)
+
+" Reopen with some encoding, if the args is '--', will try
+command! -nargs=? Reopen  call lq#ReopenOp(<f-args>)
+
+" Read command to Scratch buffer
+command! -complete=command -nargs=? -bang      S   call lq#Scratch(<q-args>, 'autodetect', <bang>1)
+" First execute command then open scratch buffer
+command! -complete=command -nargs=? -bang      SF  call lq#Scratch(<q-args>, 'autodetect', <bang>1, 0)
+" First open scratch buffer then (last) execute command
+command! -complete=command -nargs=? -bang      SL  call lq#Scratch(<q-args>, 'autodetect', <bang>1, 1)
+" Just open scratch buffer
+command! -nargs=0 -bang -bar SS  call lq#Scratch('', 'text', <bang>1)
+
+" Smart add #if #else #endif comment
+command! -nargs=0 Endif  call lq#SmartPreProcCommenter()
+
+" Sum
+command! -nargs=? -range -register Sum  call lq#SumNumbers("<reg>")
+
+" Bash
+if has('win32')
+exe 'command! -nargs=0 Bash   ConqueTermSplit ' . g:cygwin_path
+exe 'command! -nargs=0 BashV  ConqueTermVSplit ' . g:cygwin_path
+exe 'command! -nargs=0 BashS  ConqueTermSplit ' . g:cygwin_path
+command! -nargs=0 Cmd    ConqueTermSplit cmd
+else
+command! -nargs=0 Bash   ConqueTermSplit bash
+command! -nargs=0 BashV  ConqueTermVSplit bash
+command! -nargs=0 BashS  ConqueTermSplit bash
+endif
+
+" Commands to open conque gdb
+command! -complete=file -nargs=* Gdb    call conque_gdb#open(<q-args>, ['belowright split'])
+command! -complete=file -nargs=* GdbS   call conque_gdb#open(<q-args>, ['belowright split'])
+command! -complete=file -nargs=* GdbV   call conque_gdb#open(<q-args>, ['belowright vsplit'])
+command! -complete=file -nargs=* GdbTS  call conque_gdb#open(<q-args>, ['topleft split'])
+
+" Jlink
+exe 'command! -nargs=0 Jlink  ConqueTermSplit ' . g:jlink_path
+
+" start to show IDE
+command! -nargs=0 IDE  call lq#DoIDE()
+
+" cd and redo the path dir, Only "CD" will change the PWD to current file dir
+command! -complete=file -nargs=* CD  if "<args>"=="" | cd %:h | else | cd <args> | endif | let &path='.,,,'.getcwd().'/**'
+
+" SVN
+command! -complete=file -nargs=+ SVNcommit   exe "!svn commit -m ".<q-args> | SignifyRefresh
+command! -complete=file -nargs=? SVNdiff     call lq#Scratch("!svn diff ".<q-args>, "diff")
+command! -complete=file -nargs=1 SVNmerge    exe "!svn merge -r ".<q-args>
+command! -complete=file -nargs=? SVNlog      call lq#Scratch("!svn log ".<q-args>)
+command! -complete=file -nargs=? SVNupdate   exe "!svn update ".<q-args>
+command! -complete=file -nargs=1 SVNblame    call lq#Scratch("!svn blame ".<q-args>)
+command! -complete=file -nargs=1 SVNrevert   exe "silent :!svn revert ".<q-args>
+command! -complete=file -nargs=1 SVNadd      exe "!svn add ".<q-args>
+command!                -nargs=0 SVNrollback exe "!svn update && svn merge -r COMMITTED:PREV ./"  " also rollbak workspace
+command!                -nargs=0 SVNstatus   call lq#Scratch("!svn status -q")
+command!                -nargs=0 SVNinfo     call lq#Scratch("!svn info")
+command!                -nargs=0 SVNcleanup  exe "!svn cleanup"
+
+" Git
+command! -complete=file -nargs=+ GITcommit   exe "!git commit -a -m ".<q-args> | SignifyRefresh
+command! -complete=file -nargs=? GITdiff     call lq#Scratch("!git diff HEAD ".<q-args>, "git")
+command! -complete=file -nargs=? GITlog      call lq#Scratch("!git log ".<q-args>, "git")
+command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>  " like SVNupdate
+command! -complete=file -nargs=1 GITblame    call lq#Scratch("!git blame ".<q-args>)
+command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout HEAD ".<q-args>  " like SVNrevert
+command! -complete=file -nargs=1 GITadd      exe "!git add ".<q-args>
+command!                -nargs=0 GITrollback exe "!git reset HEAD~1"  " only rollbak local repo
+command!                -nargs=0 GITstatus   call lq#Scratch("!git status")
+command!                -nargs=0 GITinfo     call lq#Scratch("!git remote -v")
+command!                -nargs=0 GITpush     !git push
+command!                -nargs=0 GITfetch    !git fetch
+command!                -nargs=0 GITpull     !git pull
+
+" For Custom make
+command! -nargs=* -complete=file Makekeil  set makeprg=makekeil | compiler! keil | copen | AsyncRun makekeil <args>
+command! -nargs=* -complete=file Makeiar   set makeprg=makeiar  | compiler! iar  | copen | AsyncRun makeiar <args>
+command! -nargs=* -complete=file Makegcc   compiler! gcc | make <args>
+
+" X command
+command! -nargs=* Xcolumn     call lq#ColumnOp(<q-args>)
+command! -nargs=0 Xhex        call lq#HexEndianToggle()
+command! -nargs=0 XrootVCS    call lq#SwitchVCSRoot()
+command! -nargs=0 Xycm        packadd YouCompleteMe
+command! -nargs=0 Xhighlight  packadd TagHighlight | edit
+command! -nargs=0 Xomni       packadd OmniCppComplete | call omni#cpp#complete#Init()
+command! -nargs=0 Xsignify    let g:signify_disable_by_default=0 | SignifyEnable
+command! -nargs=0 Xstartify   Startify
+command! -nargs=0 Xundotree   UndotreeToggle
+command! -nargs=0 Xcolorizer  ColorToggle
+command! -nargs=0 Xtail       TailToggle
+command! -nargs=0 Xmatrix     Matrix
+
+" Plugin {{{1
+
+" Markdown
+let g:vim_markdown_folding_disabled = 1
+
+" YouCompleteMe
+let g:ycm_auto_trigger = 1
+let g:ycm_key_invoke_completion = '<C-q>'
+let g:ycm_confirm_extra_conf = 0
+"let g:ycm_python_binary_path = ''
+let g:ycm_error_symbol = 'x'
+let g:ycm_warning_symbol = 'x'
+let g:ycm_key_list_select_completion = ['<TAB>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<S-TAB>', '<Up>']
+let g:ycm_use_ultisnips_completer = 0
+
+"Maximizer
+let g:maximizer_restore_on_winleave = 1
+let g:maximizer_default_mapping_key = '<A-o>'
+let g:maximizer_set_mapping_with_bang = 1
+
+" Easymotion
+let g:EasyMotion_do_mapping = 0
+let g:EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;'
+
+" Startify
+let g:startify_bookmarks = [
+            \ {'v': $MYVIMRC},
+            \ {'l': expand(g:learn_path)},
+            \ ]
+
+" Colorizer
+let g:colorizer_startup = 0
+
+" Doxygen
+let g:load_doxygen_syntax = 1
+
+" Signify
+let g:signify_disable_by_default = 1
+let g:signify_vcs_list = ['svn', 'git']
+let g:signify_sign_show_count = 0
+let g:signify_skip_filetype = {'xxd':1}
+let g:signify_skip_filename_pattern = ['*.log']
+
+" NEER Tree
+let g:NERDTreeRespectWildIgnore = 1
+let g:NERDTreeWinSize = 30
+let g:NERDTreeDirArrows = 1
+
+" TagHighlight
+let g:TagHighlightSettings = {}
+let g:TagHighlightSettings['DisableStandardLibraries'] = 1
+let g:TagHighlightSettings['SkipPatterns'] = ['\b__anon']
+if has('win32')
+let g:TagHighlightSettings['PythonVariantPriority'] = 'compiled'
+elseif has('win32unix') " cygwin
+let g:TagHighlightSettings['CtagsExecutable'] = 'ctags.exe'
+let g:TagHighlightSettings['PythonVariantPriority'] = 'if_pyth'
+endif
+"let g:TagHighlightSettings['SourceDir'] = getcwd()
+"let g:TagHighlightSettings['DefaultDirModePriority'] = ["CurrentDirectory"]
+
+" CtrlP
+let g:ctrlp_working_path_mode = ''
+let g:ctrlp_follow_symlinks = 1
+let g:ctrlp_lazy_update = 1
+let g:ctrlp_by_filename = 1
+let g:ctrlp_max_height = 100
+
+" conque_term
+let g:ConqueTerm_FastMode = 0
+let g:ConqueTerm_Color = 2
+let g:ConqueTerm_ColorMode = 'conceal'
+let g:ConqueTerm_PyVersion = 3
+let g:ConqueTerm_CloseOnEnd = 1
+let g:ConqueTerm_InsertOnEnter = 0
+let g:ConqueTerm_ReadUnfocused = 0
+let g:ConqueTerm_PyExe = 'python'
+"let g:ConqueTerm_ToggleKey = ''
+let g:ConqueTerm_SendVisKey = '<A-F1>'
+"let g:ConqueTerm_SendFileKey = ''
+"let g:ConqueTerm_ExecFileKey = ''
+
+" conque_gdb
+let g:ConqueGdb_GdbExe = g:gdb_path
+let g:ConqueGdb_Leader = ';'
+let g:ConqueGdb_SaveHistory = 1
+let g:ConqueGdb_SrcSplit = 'right'
+
+" DirDiff
+let g:DirDiffExcludes = "*.svn*,*.o,*.a,*.lib,tags,*.taghl"
+
+" neocomplcache
+let g:neocomplcache_enable_at_startup = 0
+
+" Tagbar
+let g:tagbar_left = 1
+let g:tagbar_sort = 0
+let g:tagbar_width = 30
+let g:tagbar_iconchars = ['▸', '▾']
+
+" Rainbow
+let g:rainbow_active = 1
+let g:rainbow_c_parentheses = [
+            \ 'start=/(/ end=/)/ fold',
+            \ 'start=/\[/ end=/\]/ fold',
+            \ 'start=/{/ end=/}/ fold',
+            \ 'start=/^\s*#\s*\(if\|ifdef\|ifndef\)\( \d\@!\)/ step=/^\s*#\s*\(else\|elif\)/ end=/^\s*#\s*endif/ fold',
+            \ ]
+let g:rainbow_conf = {
+            \ 'guifgs': ['orchid', 'yellow', 'LightSkyBlue', 'green'],
+            \ 'ctermfgs': ['yellow', 'green'],
+            \ 'separately': {
+            \     '*': 0,
+            \     'python':{}, 'sh':{},
+            \     'c': {'parentheses': g:rainbow_c_parentheses},
+            \     'cpp': {'parentheses': g:rainbow_c_parentheses},
+            \     'java': {'parentheses': g:rainbow_c_parentheses},
+            \     }
+            \ }
+
+" Load vimrc flag
+let g:load_vimrc = 1
+
+
+" Function {{{1
+
+" Delay load with:
+" autoload\lq.vim
+
+" }}}1
+
+" vim: fdm=marker
