@@ -10,25 +10,22 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-# check cygpath
-command -v cygpath >/dev/null
-if [ $? != 0 ]; then
-    echo "showqr: only support cygwin!"
-    exit 1
+# check os
+os=$(uname -o)
+if [ "$os" == "Cygwin" ]; then
+    # pic
+    pic="/tmp/qr.tmp.png"
+
+    # qrencode
+    qrencode -o $pic "$1"
+
+    # open the picture
+    open $pic
+
+    # exit successfully
+    exit 0
 fi
 
-# pic
-piccyg="/tmp/qr.tmp.png"
-
-# to window absolute path
-picwin=$(cygpath -p $piccyg -a -w)
-
-# qrencode
-qrencode -o $piccyg "$1"
-
-# open the picture
-explorer $picwin
-
-# exit successfully
-exit 0
+echo "showqr: unsupport os: $os"
+exit 1
 
