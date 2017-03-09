@@ -19,8 +19,21 @@
 
 pic='/tmp/ssqr.png'
 
-wget -nv 'http://free.shadowsocks8.cc/images/server01.png' -O $pic
+i=${1:-0}
 
+res=(http://free.shadowsocks8.cc/images/server01.png \
+     http://free.shadowsocks8.cc/images/server02.png \
+     http://free.shadowsocks8.cc/images/server03.png \
+     https://ishadow.co/img/server01.png \
+     https://ishadow.co/img/server02.png \
+     https://ishadow.co/img/server03.png)
+
+if [ "$i" -ge "${#res[*]}" ]; then
+    echo "ss: invalid index"
+    exit 1
+fi
+
+wget -nv "${res[$i]}" -O $pic
 if [ $? != 0 ]; then
     exit 1
 fi
