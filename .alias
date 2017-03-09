@@ -12,12 +12,6 @@ alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs 
 alias dumpbin-dependents='dumpbin_func dependents'
 alias dumpbin-exports='dumpbin_func exports'
 
-# For windows: explorer the current directory
-alias window='explorer .'
-
-# For window: explorer
-alias open='explorer'
-
 # Interactive operation...
 alias rm='rm -i'
 alias mv='mv -i'

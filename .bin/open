@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# check param
+if [ $# -gt 1 ]; then
+    echo "open: too many params!"
+    exit 1
+fi
+
+file=${1:-"."}
+
+if [ ! -e "$file" ]; then
+    echo "open: file not exist!"
+    exit 1
+fi
+
+os=$(uname -o)
+if [ "$os" == "Cygwin" ]; then
+    path=$(cygpath --absolute --windows "$file")
+    explorer "$path"
+    exit 0
+fi
+
+echo "open: unsupport os type: $os"
+exit 1
+
