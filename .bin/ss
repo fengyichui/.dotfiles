@@ -49,9 +49,17 @@ localparam='-b 127.0.0.1 -l 1080'
 echo -e "\e[31mServer: $serverinfo\e[0m"
 echo -e "\e[31mProxy: 127.0.0.1:1080\e[0m"
 
-set -x
+# open system proxy
+sysproxy global 127.0.0.1:1080
 
+# catch interrupt
+trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
+
+# ss
 shadowsocks --http-proxy -t 600 $localparam $serverparam
+
+# close system proxy
+sysproxy off
 
 # @} #
 
