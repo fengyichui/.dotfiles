@@ -862,7 +862,6 @@ let g:rainbow_c_parentheses = [
             \ ]
 let g:rainbow_conf = {
             \ 'guifgs': ['orchid', 'yellow', 'LightSkyBlue', 'green'],
-            \ 'ctermfgs': ['yellow', 'green'],
             \ 'separately': {
             \     '*': 0,
             \     'python':{}, 'sh':{},
