@@ -105,7 +105,8 @@ set $64BITS = 0
 set confirm off
 set verbose off
 set history filename ~/.gdb_history
-set history save
+set history remove-duplicates
+set history save on
 set pagination off
 set print pretty
 
