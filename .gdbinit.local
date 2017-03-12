@@ -1,4 +1,8 @@
 
+define xx
+source ~/.gdb.dashboard
+end
+
 define sii
 si
 x/i $pc
