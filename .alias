@@ -65,3 +65,6 @@ dumpbin_func ()
     done
 }
 
+# du&sort: Stats directorys size and sort it
+ds () { du -h --max-depth=1 $1 | sort -rh }
+
