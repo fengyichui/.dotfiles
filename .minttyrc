@@ -9,10 +9,10 @@ CursorType=line
 AllowBlinking=yes
 ClicksTargetApp=yes
 Printer=
-Term=xterm
+Term=xterm-256color
 Locale=C
 Charset=UTF-8
-ZoomShortcuts=no
+ZoomShortcuts=yes
 AltFnShortcuts=no
 FontSmoothing=full
 ThemeFile=
@@ -22,6 +22,7 @@ ClickTargetMod=alt
 BellFlash=no
 ScrollMod=alt
 CtrlAltIsAltGr=no
+PgUpDnScroll=yes
 Language=en
 
 # Solarized colorscheme
