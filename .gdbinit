@@ -77,7 +77,7 @@ set $COLOREDPROMPT = 1
 # SETCOLOR1STLINE and modify it :-)
 set $SETCOLOR1STLINE = 1
 # set to 0 to remove display of objectivec messages (default is 1)
-set $SHOWOBJECTIVEC = 1
+set $SHOWOBJECTIVEC = 0
 # set to 0 to remove display of cpu registers (default is 1)
 set $SHOWCPUREGISTERS = 1
 # set to 1 to enable display of stack (default is 0)
@@ -122,7 +122,8 @@ set $SHOW_NEST_INSN = 0
 
 set $CONTEXTSIZE_STACK = 6
 set $CONTEXTSIZE_DATA  = 8
-set $CONTEXTSIZE_CODE  = 8
+set $CONTEXTSIZE_ASM  = 8
+set $CONTEXTSIZE_SOURCE  = 10
 
 # __________________end gdb options_________________
 #
@@ -291,7 +292,7 @@ define contextsize-code
     if $argc != 1
         help contextsize-code
     else
-        set $CONTEXTSIZE_CODE = $arg0
+        set $CONTEXTSIZE_ASM = $arg0
     end
 end
 document contextsize-code
@@ -2051,14 +2052,14 @@ define context
     if $SHOWSTACK == 1
         color $COLOR_SEPARATOR
         if $ARM == 1
-       printf "[0x%08X]", $sp
+            printf "[0x%08X]", $sp
         else
-        if ($64BITS == 1)
-                printf "[0x%04X:0x%016lX]", $ss, $rsp
-        else
-            printf "[0x%04X:0x%08X]", $ss, $esp
+            if ($64BITS == 1)
+                    printf "[0x%04X:0x%016lX]", $ss, $rsp
+            else
+                printf "[0x%04X:0x%08X]", $ss, $esp
+            end
         end
-    end
         color $COLOR_SEPARATOR
         if $ARM == 1
             printf "-------"
@@ -2143,33 +2144,24 @@ define context
     end
 
     color $COLOR_SEPARATOR
-    printf "--------------------------------------------------------------------------"
+    printf "---------------------------------------------------------------------"
     if ($64BITS == 1)
         printf "---------------------------------------------"
     end
     color $COLOR_SEPARATOR
     color_bold
-    printf "[code]\n"
+    printf "[assembler]\n"
     color_reset
-    set $context_i = $CONTEXTSIZE_CODE
+    set $context_i = $CONTEXTSIZE_ASM
     if ($context_i > 0)
-        if ($SETCOLOR1STLINE == 1)  
-            color $GREEN
-            if ($ARM == 1)
-                #       | $xpsr.t (Thumb flag)
-                x/i (unsigned int)$pc | (($xpsr >> 5) & 1)
-            else
-                x/i $pc
-            end
-            color_reset
+        color $GREEN
+        if ($ARM == 1)
+            #       | $xpsr.t (Thumb flag)
+            x/i (unsigned int)$pc | (($xpsr >> 5) & 1)
         else
-            if ($ARM == 1)
-                #       | $xpsr.t (Thumb flag)
-                  x/i (unsigned int)$pc | (($xpsr >> 5) & 1)
-            else
-                x/i $pc
-            end
+            x/i $pc
         end
+        color_reset
         set $context_i--
     end
     while ($context_i > 0)
@@ -2185,6 +2177,38 @@ define context
         printf "\n"
     end
     color_reset
+
+    color $COLOR_SEPARATOR
+    printf "------------------------------------------------------------------------"
+    if ($64BITS == 1)
+        printf "---------------------------------------------"
+    end
+    color $COLOR_SEPARATOR
+    color_bold
+    printf "[source]\n"
+    color_reset
+    set listsize 1
+    color $BLACK
+    list
+    color_reset
+    set listsize $CONTEXTSIZE_SOURCE/2
+    list -
+    set listsize 1
+    color $GREEN
+    list
+    color_reset
+    set listsize $CONTEXTSIZE_SOURCE/2
+    list
+    color $COLOR_SEPARATOR
+    printf "----------------------------------------"
+    printf "----------------------------------------"
+    if ($64BITS == 1)
+        printf "---------------------------------------------\n"
+    else
+        printf "\n"
+    end
+    color_reset
+
 end
 document context
 Syntax: context
@@ -4007,4 +4031,3 @@ end
 #
 #   Version 2
 #     Radix bugfix by elaine
-#

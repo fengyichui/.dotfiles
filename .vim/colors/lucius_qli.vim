@@ -245,8 +245,8 @@ hi DiffChange       ctermfg=135             ctermbg=52                 cterm=ita
 hi DiffDelete       guifg=#ee0000           guibg=#3b1d1e              gui=italic
 hi DiffDelete       ctermfg=196             ctermbg=52                 cterm=italic
 " changed text within line
-hi DiffText         guifg=#ee0000           guibg=#3b1d1e              gui=italic
-hi DiffText         ctermfg=196             ctermbg=52                 cterm=italic
+hi DiffText         guifg=#3eb8e5           guibg=#3b1d1e              gui=italic
+hi DiffText         ctermfg=38              ctermbg=52                 cterm=italic
 
 " Folds
 " -----
