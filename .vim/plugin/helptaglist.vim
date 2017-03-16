@@ -83,20 +83,16 @@ function s:HTList.Open()
     setlocal modifiable
 
     let g:reHTListTitle = '\d\+\.\(\d\+\|\d\+\(\.\d\+\)*\)\?'
-    let g:strHTListMenu = ">> All buffers's title\n"
-    for i in range(1, bufnr("$"))
-        let lstBufData = getbufline(i, 1, "$")
+    let g:strHTListMenu = ">> Title\n"
+        let lstBufData = getbufline("#", 1, "$")
         for line in lstBufData
             call substitute(line, '^\s*' . g:reHTListTitle . '\s\+.*$', '\=s:HTList.AddToTitle(submatch(0))', '')
         endfor
-    endfor
 
-    let g:strHTListMenu .= "\n>> All buffers's tags\n"
-    for i in range(1, bufnr("$"))
-        let lstBufData = getbufline(i, 1, "$")
-        for line in lstBufData
-            call substitute(line, '\*\([^ \t*]\+\)\*', '\=s:HTList.AddToTag(submatch(1))', 'g')
-        endfor
+    let g:strHTListMenu .= "\n>> Tags\n"
+    let lstBufData = getbufline("#", 1, "$")
+    for line in lstBufData
+        call substitute(line, '\*\([^ \t*]\+\)\*', '\=s:HTList.AddToTag(submatch(1))', 'g')
     endfor
 
     put! = g:strHTListMenu
