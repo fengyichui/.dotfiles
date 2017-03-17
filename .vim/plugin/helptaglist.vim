@@ -77,7 +77,7 @@ function Jump_To_Tag()
 endfunction
 
 function s:HTList.Open()
-    let g:strSaveWinName = bufname(".")
+    let g:strSaveWinName = bufname("%")
 
     exe 'silent! vertical 25 split __Help_Tag_List__'
     setlocal modifiable
