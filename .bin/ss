@@ -19,7 +19,19 @@
 
 pic='/tmp/ssqr.png'
 
-i=${1:-0}
+global_proxy=0
+i=0
+
+if [ ! -z $1 ]; then
+    if [ "$1" == "-g" ]; then
+        global_proxy=1
+        if [ ! -z $2 ]; then
+            i=$2
+        fi
+    else
+        i=$1
+    fi
+fi
 
 res=(http://free.shadowsocks8.cc/images/server01.png \
      http://free.shadowsocks8.cc/images/server02.png \
@@ -49,8 +61,11 @@ localparam='-b 127.0.0.1 -l 1080'
 echo -e "\e[31mServer: $serverinfo\e[0m"
 echo -e "\e[31mProxy: 127.0.0.1:1080\e[0m"
 
-# open system proxy
-sysproxy global 127.0.0.1:1080
+if [ $global_proxy -eq 1 ]; then
+    # open system proxy
+    echo "System proxy running"
+    sysproxy global 127.0.0.1:1080
+fi
 
 # catch interrupt
 trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
@@ -58,8 +73,10 @@ trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
 # ss
 shadowsocks --http-proxy -t 600 $localparam $serverparam
 
-# close system proxy
-sysproxy off
+if [ $global_proxy -eq 1 ]; then
+    # close system proxy
+    sysproxy off
+fi
 
 # @} #
 
