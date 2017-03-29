@@ -1,0 +1,30 @@
+
+# tags
+tags
+*.taghl
+
+# c temp files
+*.o
+*.d
+
+# python compiled files
+*.py[cod]
+__pycache__/
+
+# shell temp files
+.zsh_history
+.bash_history
+.gdb_history
+.lesshst
+.viminfo
+.vimundo/
+.zcompdump*
+.cache/
+.ssh/authorized_keys
+.ssh/id_rsa
+.ssh/id_rsa.pub
+.ssh/known_hosts
+.subversion/README.txt
+.subversion/auth/
+.subversion/servers
+
