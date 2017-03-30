@@ -5,6 +5,7 @@ apt-cyg --mirror http://mirrors.neusoft.edu.cn/cygwin pathof mirror
 
 # software
 apt-cyg -X install gnupg
+apt-cyg install zsh
 apt-cyg install ctags
 apt-cyg install diffutils
 apt-cyg install dos2unix
