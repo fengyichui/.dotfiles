@@ -16,6 +16,8 @@ __pycache__/
 .bash_history
 .gdb_history
 .lesshst
+.w3m/history
+.wget-hsts
 .viminfo
 .vimundo/
 .zcompdump*
@@ -27,4 +29,3 @@ __pycache__/
 .subversion/README.txt
 .subversion/auth/
 .subversion/servers
-
