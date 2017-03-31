@@ -196,17 +196,20 @@ filetype plugin indent on       " Enable filetype plugins
 syntax on                       " syntax on
 
 if has('win32')
-set guifont=Consolas:h11  " Font:Consolas size:h11
-set guifontwide=Microsoft\ YaHei\ Mono:h11  " for double-wide characters
-"set renderoptions=type:directx  " Use Directx to render
-set shellpipe=\|\ tee           " shell pipe to tee
-set noshelltemp                 " Use pipe to instead temp file and avoid the console window flash
-let $PATH=$HOME.'\\vimfiles\\res;' . $PATH . ';' . g:sys_path
-if !exists("g:load_vimrc")
-set lines=46 columns=85         " Startup window size
-endif
+    set guifont=Consolas:h11  " Font:Consolas size:h11
+    set guifontwide=Microsoft\ YaHei\ Mono:h11  " for double-wide characters
+    "set renderoptions=type:directx  " Use Directx to render
+    set shellpipe=\|\ tee           " shell pipe to tee
+    set noshelltemp                 " Use pipe to instead temp file and avoid the console window flash
+    let $PATH=$HOME.'/vimfiles/res/windows;' . $PATH . ';' . g:sys_path
+    if !exists("g:load_vimrc")
+    set lines=46 columns=85         " Startup window size
+    endif
+elseif has('win32unix')
+    " Nothing
 else
-set guifont=DejaVu\ Sans\ Mono\ 10.5
+    let $PATH=$HOME.'/vimfiles/res/linux;' . $PATH
+    set guifont=DejaVu\ Sans\ Mono\ 10.5
 endif
 
 set formatoptions=tcroqlnj      " Automatic formatting
