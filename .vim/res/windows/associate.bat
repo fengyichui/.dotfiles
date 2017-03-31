@@ -18,20 +18,23 @@ echo app: %app%
 echo icon: %icon%
 echo ---------------------------------------------
 
+:: gvim default icon
+reg add HKLM\SOFTWARE\Classes\Applications\gvim.exe\DefaultIcon /ve /d %icon% /f
+
 :: Extension
 set extensions=(c,cc,cpp,h,hpp, asm,s, java, bin,hex, map,dis,sct,symdefs, mk,mak, ini, log, md, vim, xml, diff,patch, sh, gdb)
 :: Do Extension
 for %%e in %extensions% do (
     ftype vim.%%e=%app%
     assoc .%%e=vim.%%e
-    reg add hkcr\vim.%%e\DefaultIcon /ve /d %icon% /f
+    reg add HKCR\vim.%%e\DefaultIcon /ve /d %icon% /f
     echo ---------------------------------------------
 )
 
 :: No extension
 ftype vim.noextension=%app%
 assoc .=vim.noextension
-reg add hkcr\vim.noextension\DefaultIcon /ve /d %icon% /f
+reg add HKCR\vim.noextension\DefaultIcon /ve /d %icon% /f
 echo ---------------------------------------------
 
 :: txt file: special for shellnew
