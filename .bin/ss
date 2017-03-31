@@ -33,12 +33,20 @@ if [ ! -z $1 ]; then
     fi
 fi
 
-res=(http://free.shadowsocks8.cc/images/server01.png \
-     http://free.shadowsocks8.cc/images/server02.png \
-     http://free.shadowsocks8.cc/images/server03.png \
-     https://ishadow.co/img/server01.png \
-     https://ishadow.co/img/server02.png \
-     https://ishadow.co/img/server03.png)
+res=( \
+    http://free.shadowsocks8.cc/images/server01.png \
+    http://free.shadowsocks8.cc/images/server02.png \
+    http://free.shadowsocks8.cc/images/server03.png \
+    http://abc.ishadow.online/img/qr/sga.png \
+    http://abc.ishadow.online/img/qr/sgb.png \
+    http://abc.ishadow.online/img/qr/sgc.png \
+    http://abc.ishadow.online/img/qr/usa.png \
+    http://abc.ishadow.online/img/qr/usb.png \
+    http://abc.ishadow.online/img/qr/usc.png \
+    http://abc.ishadow.online/img/qr/jpa.png \
+    http://abc.ishadow.online/img/qr/jpb.png \
+    http://abc.ishadow.online/img/qr/jpc.png \
+    )
 
 if [ "$i" -ge "${#res[*]}" ]; then
     echo "ss: invalid index"
