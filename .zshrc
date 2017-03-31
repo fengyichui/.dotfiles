@@ -54,7 +54,7 @@ source $ZSH_CUSTOM/plugins/zsh-completions/zsh-completions.plugin.zsh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(safe-paste dircycle extract zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(safe-paste dircycle extract zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
