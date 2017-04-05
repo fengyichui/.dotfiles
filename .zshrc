@@ -57,6 +57,7 @@ source $ZSH_CUSTOM/plugins/zsh-completions/zsh-completions.plugin.zsh
 plugins=(safe-paste \
          dircycle \
          extract \
+         vi-mode \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
 
