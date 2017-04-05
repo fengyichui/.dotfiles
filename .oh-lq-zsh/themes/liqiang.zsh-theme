@@ -2,9 +2,23 @@
 
 #if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
 
+# For root flag
+os=$(uname -o)
+if [[ "$os" == "Cygwin" ]]; then
+    root=$(id -G)
+    # 544 is windows administrators group
+    if [[ $root =~ "544" ]]; then
+        local root_status="#"
+    else
+        local root_status="$"
+    fi
+else
+    local root_status="%(!.#.$)"
+fi
+
 local ret_status="%(?:%{$fg[green]%}»:%{$fg[red]%}»)"
 
-PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}%(!.#.$)%{$reset_color%} '
+PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
 
 rprompt_context () {
     if [[ -n "$SSH_CLIENT" ]]; then
