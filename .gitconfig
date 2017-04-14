@@ -32,6 +32,7 @@
     co = checkout
     d  = diff
     st = status -s -uno
+    dn = diff --name-status # diff name status between two version (HEAD~1)
 
     # authors
     rank    = shortlog -sn --no-merges
