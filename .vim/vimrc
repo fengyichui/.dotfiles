@@ -634,10 +634,6 @@ vnoremap <silent> # :call lq#VisualSelect('search')<cr>??<cr>
 xnoremap <  <gv
 xnoremap >  >gv
 
-" easymotion: search all window
-nmap s <Plug>(easymotion-s)
-nmap S <Plug>(easymotion-overwin-f)
-
 " Q for format
 vnoremap Q gq
 
@@ -779,10 +775,6 @@ let g:ycm_use_ultisnips_completer = 0
 let g:maximizer_restore_on_winleave = 1
 let g:maximizer_default_mapping_key = '<A-o>'
 let g:maximizer_set_mapping_with_bang = 1
-
-" Easymotion
-let g:EasyMotion_do_mapping = 0
-let g:EasyMotion_keys = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789;'
 
 " Startify
 let g:startify_bookmarks = [
