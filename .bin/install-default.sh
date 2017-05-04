@@ -44,6 +44,7 @@ rm -rf get-pip.py
 pip3 install qrcode # QR encode
 pip3 install html2text # html to text
 pip3 install you-get # Download media contents (videos, audios, images) from the Web
+pip3 install pudb # Python debuger
 
 # Command-line translator using Google Translate, Bing Translator, Yandex.Translate, etc.
 git clone https://github.com/soimort/translate-shell
