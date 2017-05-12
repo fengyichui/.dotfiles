@@ -11,6 +11,11 @@ function zle-keymap-select zle-line-init
             vicmd)      echo -ne "\e[1 q";;
             viins|main) echo -ne "\e[5 q";;
         esac
+    elif [[ "$TERM" =~ "tmux" ]]; then
+        case $KEYMAP in
+            vicmd)      echo -ne "\ePtmux;\e\e[1 q\e\\";;
+            viins|main) echo -ne "\ePtmux;\e\e[5 q\e\\";;
+        esac
     fi
 
     zle reset-prompt
@@ -21,12 +26,14 @@ function zle-line-finish
 {
     if [[ "$TERM" =~ "xterm" ]]; then
         echo -ne "\e[5 q"
+    elif [[ "$TERM" =~ "tmux" ]]; then
+        echo -ne "\ePtmux;\e\e[5 q\e\\"
     fi
 }
 
 # Ensure that the prompt is redrawn when the terminal size changes.
 TRAPWINCH() {
-  zle &&  zle -R
+    zle &&  zle -R
 }
 
 zle -N zle-line-init

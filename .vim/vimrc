@@ -305,7 +305,13 @@ if !has('win32unix') " cygwin
 set lazyredraw
 endif
 
-if &term =~ 'xterm'
+if &term =~ 'tmux'
+let &t_ti = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\"
+let &t_SI = "\<esc>Ptmux;\<esc>\<esc>[5 q\<esc>\\"
+let &t_SR = "\<esc>Ptmux;\<esc>\<esc>[3 q\<esc>\\"
+let &t_EI = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\"
+let &t_te = "\<esc>Ptmux;\<esc>\<esc>[0 q\<esc>\\"
+elseif &term =~ 'xterm'
 " cursor
 " 1 or 0 -> blinking block
 " 3 -> blinking underscore
