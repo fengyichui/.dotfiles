@@ -305,24 +305,24 @@ if !has('win32unix') " cygwin
 set lazyredraw
 endif
 
-if &term =~ 'tmux'
-let &t_ti = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\"
-let &t_SI = "\<esc>Ptmux;\<esc>\<esc>[5 q\<esc>\\"
-let &t_SR = "\<esc>Ptmux;\<esc>\<esc>[3 q\<esc>\\"
-let &t_EI = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\"
-let &t_te = "\<esc>Ptmux;\<esc>\<esc>[0 q\<esc>\\"
-elseif &term =~ 'xterm'
-" cursor
+" xterm cursor
 " 1 or 0 -> blinking block
 " 3 -> blinking underscore
 " 4 -> solid underscore
 " 5 -> blinking vertical bar
 " 6 -> solid vertical bar
-let &t_ti .= "\<esc>[1 q"
-let &t_SI .= "\<esc>[5 q"
-let &t_SR .= "\<esc>[3 q"
-let &t_EI .= "\<esc>[1 q"
-let &t_te .= "\<esc>[0 q"
+if &term =~ 'tmux'
+let &t_ti = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\" . &t_ti
+let &t_SI = "\<esc>Ptmux;\<esc>\<esc>[5 q\<esc>\\" . &t_SI
+let &t_SR = "\<esc>Ptmux;\<esc>\<esc>[3 q\<esc>\\" . &t_SR
+let &t_EI = "\<esc>Ptmux;\<esc>\<esc>[1 q\<esc>\\" . &t_EI
+let &t_te = "\<esc>Ptmux;\<esc>\<esc>[0 q\<esc>\\" . &t_te
+elseif &term =~ 'xterm'
+let &t_ti = "\<esc>[1 q" . &t_ti
+let &t_SI = "\<esc>[5 q" . &t_SI
+let &t_SR = "\<esc>[3 q" . &t_SR
+let &t_EI = "\<esc>[1 q" . &t_EI
+let &t_te = "\<esc>[0 q" . &t_te
 endif
 
 " For set undodir=~/.vimundo
