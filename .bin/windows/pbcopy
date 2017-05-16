@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# read stdin
+IFS='' read -d '' -r input
+
+# put it to clipboard
+echo -n "$input" >/dev/clipboard
