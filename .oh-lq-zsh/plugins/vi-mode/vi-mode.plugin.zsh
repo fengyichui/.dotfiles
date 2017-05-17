@@ -69,3 +69,53 @@ bindkey "\e[3~" delete-char
 bindkey '\e[H' beginning-of-line
 bindkey '\e[F' end-of-line
 
+# Some extra vim like bindings
+bindkey -a 'gg' beginning-of-buffer-or-history
+bindkey -a 'G' end-of-buffer-or-history
+bindkey -a 'u' undo
+bindkey -a '^R' redo
+
+#
+# Allow Copy/Paste with the system clipboard
+# behave as expected with vim commands ( y/p/d/c/s )
+#
+# Copy
+function cutbuffer()
+{
+    zle .$WIDGET
+    echo $CUTBUFFER | clipcopy
+}
+
+zle_cut_widgets=(
+    vi-backward-delete-char
+    vi-change
+    vi-change-eol
+    vi-change-whole-line
+    vi-delete
+    vi-delete-char
+    vi-kill-eol
+    vi-substitute
+    vi-yank
+    vi-yank-eol
+)
+for widget in $zle_cut_widgets
+do
+    zle -N $widget cutbuffer
+done
+
+# Paste
+function putbuffer()
+{
+    zle copy-region-as-kill "$(clippaste)"
+    zle .$WIDGET
+}
+
+zle_put_widgets=(
+    vi-put-after
+    vi-put-before
+)
+for widget in $zle_put_widgets
+do
+    zle -N $widget putbuffer
+done
+

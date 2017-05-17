@@ -44,6 +44,9 @@ alias news="webx 'http://news.sina.cn/?pos=1&vt=1&ttp=f1|1|1'"
 alias zhihu="webx 'http://www.zhihu.com/explore'"
 alias cpp="webx 'http://www.cplusplus.com/search.do?q='"
 
+# arm gdb with tmux,gdb.dashboard
+alias armgdb="tmuxinator start armgdb"
+
 #
 # Function
 #

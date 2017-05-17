@@ -34,6 +34,8 @@ apt-cyg install zbar # for QR decode: zbarimg
 apt-cyg install gcc-core #gcc c compiler
 apt-cyg install w3m # web explorer in terminal
 #apt-cyg install lynx # web explorer in terminal
+apt-cyg install ruby
+apt-cyg install rubygems
 
 # Install pip for python
 wget https://bootstrap.pypa.io/get-pip.py
@@ -53,4 +55,7 @@ make TARGET=zsh
 make install
 cd ..
 rm -rf translate-shell/
+
+# gem
+gem install tmuxinator
 
