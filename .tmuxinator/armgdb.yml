@@ -28,7 +28,7 @@ startup_pane: 2
 # attach: false
 
 # Runs after everything. Use it to attach to tmux with custom options etc.
-post: tmux -CC attach -t armgdb
+# post: tmux -CC attach -t armgdb
 
 windows:
   - armgdb:
