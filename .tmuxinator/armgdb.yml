@@ -34,6 +34,6 @@ windows:
   - armgdb:
       layout: even-horizontal
       panes:
-        - tty >/tmp/gdb_dashboard_tty
-        - gdb_dashboard_tty=$(cat /tmp/gdb_dashboard_tty); arm-none-eabi-gdb -ex "source ~/.gdb.dashboard" -ex "dashboard -output $gdb_dashboard_tty"
+        - tty >/tmp/gdb_dashboard_tty; clear
+        - gdb_dashboard_tty=$(cat /tmp/gdb_dashboard_tty); arm-none-eabi-gdb -ex "source ~/.gdb.dashboard" -ex "dashboard -output $gdb_dashboard_tty" -ex "shell clear"
 
