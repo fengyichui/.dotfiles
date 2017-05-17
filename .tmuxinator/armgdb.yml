@@ -28,11 +28,14 @@ startup_pane: 2
 # attach: false
 
 # Runs after everything. Use it to attach to tmux with custom options etc.
-# post: tmux -CC attach -t armgdb
+post: tmux -CC attach -t armgdb
 
 windows:
   - armgdb:
+
+      # Arrange panes in one of the five preset layouts: even-horizontal, even-vertical, main-horizontal, main-vertical, or tiled.
       layout: even-horizontal
+
       panes:
         - tty >/tmp/gdb_dashboard_tty; clear
         - gdb_dashboard_tty=$(cat /tmp/gdb_dashboard_tty); arm-none-eabi-gdb -ex "source ~/.gdb.dashboard" -ex "dashboard -output $gdb_dashboard_tty" -ex "shell clear"
