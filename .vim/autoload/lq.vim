@@ -811,12 +811,14 @@ function! lq#ShowLists()
 endfunction
 
 " PDF read
-function! lq#PdfRead(file)
+function! lq#PdfRead(pdffile)
     setlocal nomodified
-    let l:ftxtfile = fnameescape(a:file.'.txt')
-    let l:spdffile = shellescape(a:file, 0)
-    let l:stxtfile = shellescape(a:file.'.txt', 0)
-    echo "converting " . a:file . " ..."
-    call system('pdftotext -enc UTF-8 -layout -nopgbrk ' . l:spdffile . ' ' . l:stxtfile)
-    execute "edit " . l:ftxtfile
+    let l:txtfile = a:pdffile . '.txt' "fnameescape()
+    if !filereadable(l:txtfile)
+        let l:spdffile = shellescape(a:pdffile, 0)
+        let l:stxtfile = shellescape(l:txtfile, 0)
+        echo "converting " . a:pdffile . " ..."
+        call system('pdftotext -enc UTF-8 -layout -nopgbrk ' . l:spdffile . ' ' . l:stxtfile)
+    endif
+    execute "edit " . l:txtfile
 endfunction
