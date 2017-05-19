@@ -72,7 +72,7 @@
 # set to 1 to have ARM target debugging as default, use the "arm" command to switch inside gdb
 set $ARM = 1
 # set to 0 if you have problems with the colorized prompt - reported by Plouj with Ubuntu gdb 7.2
-set $COLOREDPROMPT = 0
+set $COLOREDPROMPT = 1
 # color the first line of the disassembly - default is green, if you want to change it search for
 # SETCOLOR1STLINE and modify it :-)
 set $SETCOLOR1STLINE = 1
@@ -218,7 +218,7 @@ source ~/.gdbinit.local
 
 # can't use the color functions because we are using the set command
 if $COLOREDPROMPT == 1
-    set prompt \033[31mgdb$ \033[0m
+    set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
 end
 
 # Initialize these variables else comparisons will fail for coloring
