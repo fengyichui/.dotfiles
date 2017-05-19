@@ -809,3 +809,14 @@ function! lq#ShowLists()
         TagbarToggle
     endif
 endfunction
+
+" PDF read
+function! lq#PdfRead(file)
+    setlocal nomodified
+    let l:ftxtfile = fnameescape(a:file.'.txt')
+    let l:spdffile = shellescape(a:file, 0)
+    let l:stxtfile = shellescape(a:file.'.txt', 0)
+    echo "converting " . a:file . " ..."
+    call system('pdftotext -enc UTF-8 -layout -nopgbrk ' . l:spdffile . ' ' . l:stxtfile)
+    execute "edit " . l:ftxtfile
+endfunction

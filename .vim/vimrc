@@ -206,9 +206,9 @@ if has('win32')
     set lines=46 columns=85         " Startup window size
     endif
 elseif has('win32unix')
-    " Nothing
+    let $PATH=$HOME.'/.vim/res/windows:' . $PATH
 else
-    let $PATH=$HOME.'/vimfiles/res/linux;' . $PATH
+    let $PATH=$HOME.'/.vim/res/linux:' . $PATH
     set guifont=DejaVu\ Sans\ Mono\ 10.5
 endif
 
@@ -394,6 +394,9 @@ autocmd BufReadPre   *.bin setlocal binary
 autocmd BufReadPost  * if &binary | call lq#BinaryBufReadPost() | endif
 autocmd BufWritePre  * if &binary | silent! exe 'normal mz' | silent! exe '%!xxd -r' | endif
 autocmd BufWritePost * if &binary | silent! exe '%!xxd' | setlocal nomodified | silent! exe 'normal `z' | endif
+
+" For PDF
+autocmd BufReadCmd *.pdf call lq#PdfRead(expand("<afile>"))
 
 " Cursorline
 autocmd WinEnter    * if mode()=='i' | set nocursorline | else | set cursorline | endif
