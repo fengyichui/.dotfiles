@@ -822,3 +822,16 @@ function! lq#PdfRead(pdffile)
     endif
     execute "edit " . l:txtfile
 endfunction
+
+" Excel read
+function! lq#ExcelRead(excelfile)
+    setlocal nomodified
+    let l:csv = a:excelfile . '.csv'
+    let l:svbscript = shellescape(fnamemodify($MYVIMRC, ":p:h") . "/res/windows/xlstocsv.vbs", 0)
+    let l:sexcel = shellescape(a:excelfile, 0)
+    let l:scsv = shellescape(l:csv, 0)
+    echo "converting " . a:excelfile . " ..."
+    call system('wscript ' . l:svbscript . ' ' . l:sexcel . ' ' . l:scsv)
+    execute "edit " . l:csv
+endfunction
+
