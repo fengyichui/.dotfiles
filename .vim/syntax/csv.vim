@@ -10,6 +10,8 @@ endif
 
 let s:col = '\%([^,]*,\)'
 
+syn region CSVString start=+L\="+ skip=+\\\\\|\\"+ end=+"+
+
 " Has a problem with the last line!
 exe "syn match CSVDelimiter /" . s:col . '/ms=e,me=e contained'
 
@@ -26,6 +28,7 @@ exe 'syn match CSVColumn0 nextgroup=CSVColumn1 /' . s:col . '/ contains=CSVDelim
 syn case ignore
 
 hi def link CSVDelimiter Comment
+hi def link CSVString Todo
 
 hi def link CSVColumn0 Keyword
 hi def link CSVColumn1 Function
