@@ -833,5 +833,6 @@ function! lq#ExcelRead(excelfile)
     echo "converting " . a:excelfile . " ..."
     call system('wscript ' . l:svbscript . ' ' . l:sexcel . ' ' . l:scsv)
     execute "edit " . l:csv
+    set filetype=csv
 endfunction
 
