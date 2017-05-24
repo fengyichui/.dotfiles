@@ -8,9 +8,9 @@ if exists("b:current_syntax")
     finish
 endif
 
-let s:col = '\%([^,]*,\)'
+let s:col = '\%([^,"]*,\)'
 
-syn region CSVString start=+L\="+ skip=+\\\\\|\\"+ end=+"+
+syn region CSVString start=+L\="+ skip=+""\|\\$+ excludenl end=+"+
 
 " Has a problem with the last line!
 exe "syn match CSVDelimiter /" . s:col . '/ms=e,me=e contained'
