@@ -8,12 +8,12 @@ if exists("b:current_syntax")
     finish
 endif
 
-let s:col = '\%([^,"]*,\)'
+let s:col = '\%([^,"]*,\|[^\t"]*\t\)'
 
 syn region CSVString start=+L\="+ skip=+""\|\\$+ excludenl end=+"+
 
 " Has a problem with the last line!
-exe "syn match CSVDelimiter /" . s:col . '/ms=e,me=e contained'
+exe 'syn match CSVDelimiter /' . s:col . '/ms=e,me=e contained'
 
 exe 'syn match CSVColumn1 nextgroup=CSVColumn2 /' . s:col . '/ contains=CSVDelimiter'
 exe 'syn match CSVColumn2 nextgroup=CSVColumn3 /' . s:col . '/ contains=CSVDelimiter'
@@ -27,7 +27,7 @@ exe 'syn match CSVColumn0 nextgroup=CSVColumn1 /' . s:col . '/ contains=CSVDelim
 " Not really needed
 syn case ignore
 
-hi def link CSVDelimiter Comment
+hi def link CSVDelimiter Ignore
 hi def link CSVString Todo
 
 hi def link CSVColumn0 Keyword
