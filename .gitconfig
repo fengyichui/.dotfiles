@@ -30,6 +30,8 @@
 
 [alias]
     co = checkout
+    cm = commit
+    ca = commit -a
     d  = diff
     st = status -s -uno
     dn = diff --name-status # diff name status between two version (HEAD~1)
