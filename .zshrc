@@ -55,9 +55,9 @@ source $ZSH_CUSTOM/plugins/zsh-completions/zsh-completions.plugin.zsh
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(safe-paste \
-         dircycle \
-         extract \
          vi-mode \
+         extract \
+         dircycle \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
 
