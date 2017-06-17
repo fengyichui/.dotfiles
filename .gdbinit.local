@@ -34,7 +34,7 @@ set *0x400e003c=0x335
 end
 
 define rc
-mon reset
+mon reset 1
 load
 c
 end
