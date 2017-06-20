@@ -33,19 +33,15 @@ if [ ! -z $1 ]; then
     fi
 fi
 
+shadowsocks8='http://shadowsocks8.cc/images/'
+ishadow='http://ss.ishadowx.com/img/qr/'
 res=( \
-    http://shadowsocks8.cc/images/server01.png \
-    http://shadowsocks8.cc/images/server02.png \
-    http://shadowsocks8.cc/images/server03.png \
-    http://abc.ishadow.online/img/qr/sga.png \
-    http://abc.ishadow.online/img/qr/sgb.png \
-    http://abc.ishadow.online/img/qr/sgc.png \
-    http://abc.ishadow.online/img/qr/usa.png \
-    http://abc.ishadow.online/img/qr/usb.png \
-    http://abc.ishadow.online/img/qr/usc.png \
-    http://abc.ishadow.online/img/qr/jpa.png \
-    http://abc.ishadow.online/img/qr/jpb.png \
-    http://abc.ishadow.online/img/qr/jpc.png \
+    ${shadowsocks8}server01.png \
+    ${shadowsocks8}server02.png \
+    ${shadowsocks8}server03.png \
+    ${ishadow}sga.png ${ishadow}sgb.png ${ishadow}sgc.png \
+    ${ishadow}usa.png ${ishadow}usb.png ${ishadow}usc.png \
+    ${ishadow}jpa.png ${ishadow}jpb.png ${ishadow}jpc.png \
     )
 
 if [ "$i" -ge "${#res[*]}" ]; then
