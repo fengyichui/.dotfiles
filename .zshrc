@@ -62,8 +62,6 @@ plugins=(safe-paste \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
 
-source $ZSH/oh-my-zsh.sh
-
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -88,7 +86,10 @@ export EDITOR='vim'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#
+
+# Run oh-my-zsh
+source $ZSH/oh-my-zsh.sh
+
 # Alias
 source ~/.alias
 

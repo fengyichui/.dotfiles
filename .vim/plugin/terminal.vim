@@ -107,8 +107,8 @@ endfunction
 " FocusGaine
 function! s:tmux_focus_gained()
     if mode() == 'n'
-        silent execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
-        redraw
+"        sleep 2m
+        silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
     endif
 endfunction
 
