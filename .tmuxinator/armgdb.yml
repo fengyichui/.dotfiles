@@ -34,9 +34,10 @@ windows:
   - armgdb:
 
       # Arrange panes in one of the five preset layouts: even-horizontal, even-vertical, main-horizontal, main-vertical, or tiled.
-      layout: even-horizontal
+      layout: 1241,215x57,0,0{107x57,0,0,0,107x57,108,0[107x45,108,0,1,107x11,108,46,3]}
 
       panes:
         - tty >/tmp/gdb_dashboard_tty; clear
         - gdb_dashboard_tty=$(cat /tmp/gdb_dashboard_tty); arm-none-eabi-gdb -ex "source ~/.gdb.dashboard" -ex "dashboard -output $gdb_dashboard_tty" -ex "shell clear"
+        - gdbserver-jlink
 

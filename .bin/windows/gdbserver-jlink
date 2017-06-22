@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Segger Jlink GDB Server
+JLinkGDBServerCL -speed 5000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -nosilent -vd -noir  #-select usb=20151001
+
