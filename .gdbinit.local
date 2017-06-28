@@ -1,4 +1,8 @@
 
+define armgdbstop
+shell tmuxinator stop armgdb
+end
+
 define xx
 source ~/.gdb.dashboard
 end
