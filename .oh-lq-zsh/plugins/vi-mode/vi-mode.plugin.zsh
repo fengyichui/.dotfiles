@@ -6,15 +6,15 @@
 # Updates editor information when the keymap changes.
 function zle-keymap-select zle-line-init
 {
-    if [[ "$TERM" =~ "xterm" ]]; then
-        case $KEYMAP in
-            vicmd)      echo -ne "\e[1 q";;
-            viins|main) echo -ne "\e[5 q";;
-        esac
-    elif [[ "$TERM" =~ "tmux" ]]; then
+    if [[ -n "$TMUX" ]]; then
         case $KEYMAP in
             vicmd)      echo -ne "\ePtmux;\e\e[1 q\e\\";;
             viins|main) echo -ne "\ePtmux;\e\e[5 q\e\\";;
+        esac
+    else # if [[ "$TERM" =~ "xterm" ]]; then
+        case $KEYMAP in
+            vicmd)      echo -ne "\e[1 q";;
+            viins|main) echo -ne "\e[5 q";;
         esac
     fi
 
@@ -24,10 +24,10 @@ function zle-keymap-select zle-line-init
 
 function zle-line-finish
 {
-    if [[ "$TERM" =~ "xterm" ]]; then
-        echo -ne "\e[5 q"
-    elif [[ "$TERM" =~ "tmux" ]]; then
+    if [[ -n "$TMUX" ]]; then
         echo -ne "\ePtmux;\e\e[5 q\e\\"
+    else # if [[ "$TERM" =~ "xterm" ]]; then
+        echo -ne "\e[5 q"
     fi
 }
 
@@ -64,10 +64,14 @@ bindkey '^r' history-incremental-search-backward
 bindkey '^a' beginning-of-line
 bindkey '^e' end-of-line
 
-# home end delete
-bindkey "\e[3~" delete-char
-bindkey '\e[H' beginning-of-line
-bindkey '\e[F' end-of-line
+# Home End Delete
+bindkey "\e[3~" delete-char             # Del  (For cygwin)
+bindkey "\e[H" beginning-of-line        # Home (For cygwin)
+bindkey "\e[F" end-of-line              # End  (For cygwin)
+bindkey '^[[3~' delete-char             # Del
+bindkey "^[[1~" beginning-of-line       # Home
+bindkey "^[[4~" end-of-line             # End
+bindkey '^[[2~' beep                    # Insert
 
 # Some extra vim like bindings
 bindkey -a 'gg' beginning-of-buffer-or-history
