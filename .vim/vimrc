@@ -206,9 +206,9 @@ if has('win32')
     set lines=46 columns=85         " Startup window size
     endif
 elseif has('win32unix')
-    let $PATH=$HOME.'/.vim/res/windows:' . $PATH
+    let $PATH=$PATH . ':' . $HOME.'/.vim/res/windows'
 else
-    let $PATH=$HOME.'/.vim/res/linux:' . $PATH
+    let $PATH=$PATH . ':' . $HOME.'/.vim/res/linux'
     set guifont=DejaVu\ Sans\ Mono\ 10.5
 endif
 
