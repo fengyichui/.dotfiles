@@ -346,9 +346,15 @@ autocmd BufNewFile,BufRead *.sct    set filetype=scatter
 autocmd BufNewFile,BufRead rfc*.txt set filetype=rfc
 
 " FileType, For document "K"
+if has("win32")
 autocmd FileType python
     \ nnoremap <buffer> K :call lq#Scratch("!python -m pydoc ".expand("<cword>"))<cr> |
     \ vnoremap <buffer> K :call lq#Scratch("!python -m pydoc ".lq#GetVisualSelectText())<cr>
+else
+autocmd FileType python
+    \ nnoremap <buffer> K :call lq#Scratch("!pydoc3 ".expand("<cword>"))<cr> |
+    \ vnoremap <buffer> K :call lq#Scratch("!pydoc3 ".lq#GetVisualSelectText())<cr>
+endif
 autocmd FileType sh,make
     \ nnoremap <buffer> K :call lq#Scratch("!man ".expand("<cword>"),"man")<cr> |
     \ vnoremap <buffer> K :call lq#Scratch("!man ".lq#GetVisualSelectText(),"man")<cr>
