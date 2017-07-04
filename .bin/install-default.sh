@@ -36,6 +36,7 @@ apt-cyg install w3m # web explorer in terminal
 #apt-cyg install lynx # web explorer in terminal
 apt-cyg install ruby
 apt-cyg install rubygems
+apt-cyg install procps # for ps and top
 
 # Install pip for python
 wget https://bootstrap.pypa.io/get-pip.py
