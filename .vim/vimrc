@@ -865,7 +865,8 @@ let g:rainbow_c_parentheses = [
             \ 'start=/^\s*#\s*\(if\|ifdef\|ifndef\)\( \d\@!\)/ step=/^\s*#\s*\(else\|elif\)/ end=/^\s*#\s*endif/ fold',
             \ ]
 let g:rainbow_conf = {
-            \ 'guifgs': ['orchid', 'yellow', 'LightSkyBlue', 'green'],
+            \ 'guifgs': ['Orchid', 'Yellow', 'LightSkyBlue', 'Green'],
+            \ 'ctermfgs': [207, 226, 75, 46],
             \ 'separately': {
             \     'text':0, 'tagbar':0, 'nerdtree':0, 'conque_term':0, 'xxd':0, 'help':0,
             \     'c': {'parentheses': g:rainbow_c_parentheses},

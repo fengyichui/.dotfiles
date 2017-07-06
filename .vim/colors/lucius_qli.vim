@@ -363,16 +363,16 @@ hi YcmWarningSign   ctermfg=11              ctermbg=238             cterm=none
 " -----------------
 "<@>param[in] param_name
 hi DoxygenSpecial                  guifg=#a0a0a0                    gui=none
-hi DoxygenSpecial                  ctermfg=243                      cterm=none
+hi DoxygenSpecial                  ctermfg=247                      cterm=none
 "@<param>[in] param_name
 hi DoxygenParam                    guifg=#a0a0a0                    gui=none
-hi DoxygenParam                    ctermfg=243                      cterm=none
+hi DoxygenParam                    ctermfg=247                      cterm=none
 "@param<[in]> param_name
 hi DoxygenParamDirection           guifg=#a0a0a0                    gui=none
-hi DoxygenParamDirection           ctermfg=243                      cterm=none
+hi DoxygenParamDirection           ctermfg=247                      cterm=none
 "@param[in] <param_name>
 hi DoxygenParamName                guifg=#a0a0a0                    gui=underline
-hi DoxygenParamName                ctermfg=243                      cterm=underline
+hi DoxygenParamName                ctermfg=247                      cterm=underline
 "SpecialComment
 hi DoxygenComment                  guifg=#808080                    gui=italic
 hi DoxygenComment                  ctermfg=243                      cterm=italic
