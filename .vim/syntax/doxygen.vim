@@ -300,7 +300,6 @@ endif
   syn cluster doxygenHtmlTop contains=@Spell,doxygenHtmlSpecial,doxygenHtmlTag,doxygenContinueComment
   " Html Support
   syn region doxygenHtmlLink contained start=+<[aA]\>\s*\(\n\s*\*\s*\)\=\(\(name\|href\)=\("[^"]*"\|'[^']*'\)\)\=\s*>+ end=+</[aA]>+me=e-4 contains=@doxygenHtmlTop
-  hi link doxygenHtmlLink Underlined
 
   syn region doxygenHtmlBold contained start="\c<b\>" end="\c</b>"me=e-4 contains=@doxygenHtmlTop,doxygenHtmlBoldUnderline,doxygenHtmlBoldItalic,@Spell
   syn region doxygenHtmlBold contained start="\c<strong\>" end="\c</strong>"me=e-9 contains=@doxygenHtmlTop,doxygenHtmlBoldUnderline,doxygenHtmlBoldItalic,@Spell
@@ -358,27 +357,24 @@ endif
     hi doxygen_Dummy guifg=black
 
     fun! s:Doxygen_Hilights_Base()
-      SynLink doxygenHtmlSpecial           DoxygenHtmlSpecial "Special
-      SynLink doxygenHtmlVar               DoxygenHtmlVar     "Type
-      SynLink doxygenHtmlExpr              DoxygenHtmlExpr    "String
+      SynLink doxygenHtmlSpecial           DoxygenCommonX
+      SynLink doxygenHtmlVar               DoxygenCommonX
+      SynLink doxygenHtmlExpr              DoxygenCommonX
 
-      SynLink doxygenSmallSpecial          DoxygenSmallSpecial "SpecialChar
+      SynLink doxygenSmallSpecial          DoxygenCommonX
 
-      SynLink doxygenSpecialCodeWord       doxygenSmallSpecial
-      SynLink doxygenSpecialBoldWord       doxygenSmallSpecial
-      SynLink doxygenSpecialEmphasisedWord doxygenSmallSpecial
-      SynLink doxygenSpecialArgumentWord   doxygenSmallSpecial
+      SynLink doxygenSpecialCodeWord       DoxygenNormalX
+      SynLink doxygenSpecialBoldWord       DoxygenNormalX
+      SynLink doxygenSpecialEmphasisedWord DoxygenNormalX
+      SynLink doxygenSpecialArgumentWord   DoxygenNormalX
 
-      " SynColor doxygenFormulaKeyword cterm=bold ctermfg=DarkMagenta guifg=DarkMagenta gui=bold
-      SynLink doxygenFormulaKeyword        DoxygenFormulaKeyword "Keyword
-      "SynColor doxygenFormulaEscaped  ctermfg=DarkMagenta guifg=DarkMagenta gui=bold
-      SynLink doxygenFormulaEscaped        DoxygenFormulaEscaped  "Special
-      SynLink doxygenFormulaOperator       DoxygenFormulaOperator "Operator
-      SynLink doxygenFormula               DoxygenFormula         "Statement
-      SynLink doxygenSymbol                DoxygenSymbol          "Constant
-      SynLink doxygenSpecial               DoxygenSpecial         "Special
-      SynLink doxygenFormulaSpecial        DoxygenFormulaSpecial  "Special
-      "SynColor doxygenFormulaSpecial ctermfg=DarkBlue guifg=DarkBlue
+      SynLink doxygenFormulaKeyword        DoxygenCommonX
+      SynLink doxygenFormulaEscaped        DoxygenCommonX
+      SynLink doxygenFormulaOperator       DoxygenCommonX
+      SynLink doxygenFormula               DoxygenCommonX
+      SynLink doxygenSymbol                DoxygenCommonX
+      SynLink doxygenSpecial               DoxygenOutstandX
+      SynLink doxygenFormulaSpecial        DoxygenCommonX
     endfun
     call s:Doxygen_Hilights_Base()
 
@@ -427,43 +423,16 @@ endif
         endif
       endif
       if font=='' | let font='gui=bold' | endif
-      exe 'SynColor doxygenCodeWord             term=bold cterm=bold '.font
-      if (exists('g:doxygen_enhanced_color') && g:doxygen_enhanced_color) || (exists('g:doxygen_enhanced_colour') && g:doxygen_enhanced_colour)
-        if &background=='light'
-          SynColor doxygenComment ctermfg=DarkRed guifg=DarkRed
-          SynColor doxygenBrief cterm=bold ctermfg=Cyan guifg=DarkBlue gui=bold
-          SynColor doxygenBody ctermfg=DarkBlue guifg=DarkBlue
-          SynColor doxygenSpecialTypeOnelineDesc cterm=bold ctermfg=DarkRed guifg=firebrick3 gui=bold
-          SynColor doxygenBOther cterm=bold ctermfg=DarkMagenta guifg=#aa50aa gui=bold
-          SynColor doxygenParam ctermfg=DarkGray guifg=#aa50aa
-          SynColor doxygenParamName cterm=italic ctermfg=DarkBlue guifg=DeepSkyBlue4 gui=italic,bold
-          SynColor doxygenSpecialOnelineDesc cterm=bold ctermfg=DarkCyan guifg=DodgerBlue3 gui=bold
-          SynColor doxygenSpecialHeading cterm=bold ctermfg=DarkBlue guifg=DeepSkyBlue4 gui=bold
-          SynColor doxygenPrev ctermfg=DarkGreen guifg=DarkGreen
-        else
-          SynColor doxygenComment ctermfg=LightRed guifg=LightRed
-          SynColor doxygenBrief cterm=bold ctermfg=Cyan ctermbg=darkgrey guifg=LightBlue gui=Bold,Italic
-          SynColor doxygenBody ctermfg=Cyan guifg=LightBlue
-          SynColor doxygenSpecialTypeOnelineDesc cterm=bold ctermfg=Red guifg=firebrick3 gui=bold
-          SynColor doxygenBOther cterm=bold ctermfg=Magenta guifg=#aa50aa gui=bold
-          SynColor doxygenParam ctermfg=LightGray guifg=LightGray
-          SynColor doxygenParamName cterm=italic ctermfg=LightBlue guifg=LightBlue gui=italic,bold
-          SynColor doxygenSpecialOnelineDesc cterm=bold ctermfg=LightCyan guifg=LightCyan gui=bold
-          SynColor doxygenSpecialHeading cterm=bold ctermfg=LightBlue guifg=LightBlue gui=bold
-          SynColor doxygenPrev ctermfg=LightGreen guifg=LightGreen
-        endif
-      else
-        SynLink doxygenComment                DoxygenComment                "SpecialComment
-        SynLink doxygenBrief                  DoxygenBrief                  "DoxygenParam
-        SynLink doxygenBody                   DoxygenBody                   "DoxygenParam
-        SynLink doxygenSpecialTypeOnelineDesc DoxygenSpecialTypeOnelineDesc "Statement
-        SynLink doxygenBOther                 DoxygenBOther                 "Constant
-        SynLink doxygenParam                  DoxygenParam                  "SpecialComment
-        SynLink doxygenParamName              DoxygenParamName              "Underlined
-        SynLink doxygenSpecialOnelineDesc     DoxygenSpecialOnelineDesc     "Statement
-        SynLink doxygenSpecialHeading         DoxygenSpecialHeading         "Statement
-        SynLink doxygenPrev                   DoxygenPrev                   "SpecialComment
-      endif
+      SynLink doxygenComment                DoxygenCommonX
+      SynLink doxygenBrief                  DoxygenCommonX
+      SynLink doxygenBody                   DoxygenCommonX
+      SynLink doxygenSpecialTypeOnelineDesc DoxygenCommonX
+      SynLink doxygenBOther                 DoxygenOutstandX
+      SynLink doxygenParam                  DoxygenOutstandX
+      SynLink doxygenParamName              DoxygenUnderlineX
+      SynLink doxygenSpecialOnelineDesc     DoxygenCommonX
+      SynLink doxygenSpecialHeading         DoxygenCommonX
+      SynLink doxygenPrev                   DoxygenCommonX
     endfun
 
     call s:Doxygen_Hilights()
@@ -475,93 +444,108 @@ endif
     au Syntax UserColor_{on,reset,enable} nested call s:Doxygen_Hilights()
     aug END
 
+    SynLink doxygenTODO                    Todo
+    SynLink doxygenOtherTODO               Todo
+    SynLink doxygenOtherWARN               Todo
+    SynLink doxygenOtherBUG                Todo
+    SynLink doxygenErrorSpecial            Error
+    SynLink doxygenErrorEnd                Error
+    SynLink doxygenErrorComment            Error
+    SynLink doxygenLinkError               Error
 
-    SynLink doxygenBody                   DoxygenBody
-    SynLink doxygenLine                   DoxygenBody
-    SynLink doxygenTODO                   Todo
-    SynLink doxygenOtherTODO              Todo
-    SynLink doxygenOtherWARN              Todo
-    SynLink doxygenOtherBUG               Todo
+    SynLink doxygenBody                    DoxygenCommonX
+    SynLink doxygenLine                    DoxygenCommonX
+    SynLink doxygenBriefSpecial            DoxygenOutstandX
+    SynLink doxygenHashSpecial             DoxygenOutstandX
+    SynLink doxygenGroupDefineSpecial      DoxygenOutstandX
+    SynLink doxygenEndlinkSpecial          DoxygenOutstandX
+    SynLink doxygenCodeRegionSpecial       DoxygenOutstandX
+    SynLink doxygenVerbatimRegionSpecial   DoxygenOutstandX
+    SynLink doxygenDotRegionSpecial        DoxygenOutstandX
+    SynLink doxygenGroupDefine             DoxygenOutstandX
 
-    SynLink doxygenErrorSpecial           Error
-    SynLink doxygenErrorEnd               Error
-    SynLink doxygenErrorComment           Error
-    SynLink doxygenLinkError              Error
-    SynLink doxygenBriefSpecial           doxygenSpecial
-    SynLink doxygenHashSpecial            doxygenSpecial
-    SynLink doxygenGroupDefineSpecial     doxygenSpecial
-    SynLink doxygenEndlinkSpecial         doxygenSpecial
-    SynLink doxygenCodeRegionSpecial      doxygenSpecial
-    SynLink doxygenVerbatimRegionSpecial  doxygenSpecial
-    SynLink doxygenDotRegionSpecial       doxygenSpecial
-    SynLink doxygenGroupDefine            doxygenParam
+    SynLink doxygenSpecialMultilineDesc    DoxygenCommonX
+    SynLink doxygenFormulaEnds             DoxygenOutstandX
+    SynLink doxygenBold                    DoxygenBoldX
+    SynLink doxygenBriefWord               DoxygenOutstandX
+    SynLink doxygenRetval                  DoxygenOutstandX
+    SynLink doxygenOther                   DoxygenOutstandX
+    SynLink doxygenStart                   DoxygenCommonX
+    SynLink doxygenStart2                  DoxygenCommonX
+    SynLink doxygenComment2                DoxygenCommonX
+    SynLink doxygenCommentL                DoxygenCommonX
+    SynLink doxygenContinueComment         DoxygenCommonX
+    SynLink doxygenSpecialContinueComment  DoxygenCommonX
+    SynLink doxygenSkipComment             DoxygenCommonX
+    SynLink doxygenEndComment              DoxygenCommonX
+    SynLink doxygenStartL                  DoxygenCommonX
+    SynLink doxygenBriefEndComment         DoxygenCommonX
+    SynLink doxygenPrevL                   DoxygenCommonX
+    SynLink doxygenBriefL                  DoxygenCommonX
+    SynLink doxygenBriefLine               DoxygenCommonX
+    SynLink doxygenHeaderLine              DoxygenCommonX
+    SynLink doxygenStartSkip               DoxygenCommonX
 
-    SynLink doxygenSpecialMultilineDesc   doxygenSpecialOnelineDesc
-    SynLink doxygenFormulaEnds            doxygenSpecial
-    SynLink doxygenBold                   doxygenParam
-    SynLink doxygenBriefWord              doxygenParam
-    SynLink doxygenRetval                 doxygenParam
-    SynLink doxygenOther                  doxygenParam
-    SynLink doxygenStart                  doxygenComment
-    SynLink doxygenStart2                 doxygenStart
-    SynLink doxygenComment2               doxygenComment
-    SynLink doxygenCommentL               doxygenComment
-    SynLink doxygenContinueComment        doxygenComment
-    SynLink doxygenSpecialContinueComment doxygenComment
-    SynLink doxygenSkipComment            doxygenComment
-    SynLink doxygenEndComment             doxygenComment
-    SynLink doxygenStartL                 doxygenComment
-    SynLink doxygenBriefEndComment        doxygenComment
-    SynLink doxygenPrevL                  doxygenPrev
-    SynLink doxygenBriefL                 doxygenBrief
-    SynLink doxygenBriefLine              doxygenBrief
-    SynLink doxygenHeaderLine             doxygenSpecialHeading
-    SynLink doxygenStartSkip              doxygenContinueComment
-    SynLink doxygenLinkWord               doxygenParamName
-    SynLink doxygenLinkRest               doxygenSpecialMultilineDesc
-    SynLink doxygenHyperLink              doxygenLinkWord
-    SynLink doxygenHashLink               doxygenLinkWord
+    SynLink doxygenLinkWord                DoxygenUnderlineX
+    SynLink doxygenLinkRest                DoxygenUnderlineX
+    SynLink doxygenHyperLink               DoxygenUnderlineX
+    SynLink doxygenHashLink                DoxygenUnderlineX
 
-    SynLink doxygenPage                   doxygenSpecial
-    SynLink doxygenPagePage               doxygenBOther
-    SynLink doxygenPageIdent              doxygenParamName
-    SynLink doxygenPageDesc               doxygenSpecialTypeOnelineDesc
+    SynLink doxygenPage                    DoxygenOutstandX
+    SynLink doxygenPagePage                DoxygenOutstandX
+    SynLink doxygenPageIdent               DoxygenUnderlineX
+    SynLink doxygenPageDesc                DoxygenCommonX
 
-    SynLink doxygenSpecialIdent           doxygenPageIdent
-    SynLink doxygenSpecialSectionDesc     doxygenSpecialMultilineDesc
+    SynLink doxygenSpecialIdent            DoxygenUnderlineX
+    SynLink doxygenSpecialSectionDesc      DoxygenCommonX
 
-    SynLink doxygenSpecialRefWord         doxygenOther
-    SynLink doxygenRefWord                doxygenPageIdent
-    SynLink doxygenContinueLinkComment    doxygenComment
+    SynLink doxygenSpecialRefWord          DoxygenOutstandX
+    SynLink doxygenRefWord                 DoxygenUnderlineX
+    SynLink doxygenContinueLinkComment     DoxygenCommonX
 
-    SynLink doxygenHtmlCh                 DoxygenHtmlCh "Function
-    SynLink doxygenHtmlCmd                DoxygenHtmlCmd "Statement
-    SynLink doxygenHtmlBoldItalicUnderline     doxygenHtmlBoldUnderlineItalic
-    SynLink doxygenHtmlUnderlineBold           doxygenHtmlBoldUnderline
-    SynLink doxygenHtmlUnderlineItalicBold     doxygenHtmlBoldUnderlineItalic
-    SynLink doxygenHtmlUnderlineBoldItalic     doxygenHtmlBoldUnderlineItalic
-    SynLink doxygenHtmlItalicUnderline         doxygenHtmlUnderlineItalic
-    SynLink doxygenHtmlItalicBold              doxygenHtmlBoldItalic
-    SynLink doxygenHtmlItalicBoldUnderline     doxygenHtmlBoldUnderlineItalic
-    SynLink doxygenHtmlItalicUnderlineBold     doxygenHtmlBoldUnderlineItalic
-    SynLink doxygenHtmlLink                    DoxygenHtmlLink "Underlined
+    SynLink doxygenParamDirection          DoxygenOutstandX
 
-    SynLink doxygenParamDirection              DoxygenParamDirection "StorageClass
+    SynLink doxygenEmphasisedWord          DoxygenUnderlineX
+    SynLink doxygenBoldWord                DoxygenBoldX
+    SynLink doxygenArgumentWord            DoxygenUnderlineX
+    SynLink doxygenCodeWord                DoxygenNormalX
 
+    SynLink doxygenHtmlTag                 DoxygenNormalX
+    SynLink doxygenHtmlEqu                 DoxygenNormalX
+    SynLink doxygenHtmlCode                DoxygenNormalX
+    SynLink doxygenHtmlCh                  DoxygenUnderlineX
+    SynLink doxygenHtmlCmd                 DoxygenUnderlineX
+    SynLink doxygenHtmlLink                DoxygenUnderlineX
+    SynLink doxygenHtmlBold                DoxygenBoldX
+    SynLink doxygenHtmlItalic              DoxygenItalicX
+    SynLink doxygenHtmlUnderline           DoxygenUnderlineX
+    SynLink doxygenHtmlItalicBold          DoxygenBoldItalicX
+    SynLink doxygenHtmlBoldItalic          DoxygenBoldItalicX
+    SynLink doxygenHtmlUnderlineBold       DoxygenBoldUnderlineX
+    SynLink doxygenHtmlBoldUnderline       DoxygenBoldUnderlineX
+    SynLink doxygenHtmlItalicUnderline     DoxygenUnderlineItalicX
+    SynLink doxygenHtmlUnderlineItalic     DoxygenUnderlineItalicX
+    SynLink doxygenHtmlBoldItalicUnderline DoxygenBoldUnderlineItalicX
+    SynLink doxygenHtmlUnderlineItalicBold DoxygenBoldUnderlineItalicX
+    SynLink doxygenHtmlUnderlineBoldItalic DoxygenBoldUnderlineItalicX
+    SynLink doxygenHtmlItalicBoldUnderline DoxygenBoldUnderlineItalicX
+    SynLink doxygenHtmlItalicUnderlineBold DoxygenBoldUnderlineItalicX
+    SynLink doxygenHtmlBoldUnderlineItalic DoxygenBoldUnderlineItalicX
 
-    if !exists("doxygen_my_rendering") && !exists("html_my_rendering")
-      SynColor doxygenBoldWord             term=bold cterm=bold gui=bold
-      SynColor doxygenEmphasisedWord       term=italic cterm=italic gui=italic
-      SynLink  doxygenArgumentWord         doxygenEmphasisedWord
-      SynLink  doxygenHtmlCode             doxygenCodeWord
-      SynLink  doxygenHtmlBold             doxygenBoldWord
-      SynColor doxygenHtmlBoldUnderline       term=bold,underline cterm=bold,underline gui=bold,underline
-      SynColor doxygenHtmlBoldItalic          term=bold,italic cterm=bold,italic gui=bold,italic
-      SynColor doxygenHtmlBoldUnderlineItalic term=bold,italic,underline cterm=bold,italic,underline gui=bold,italic,underline
-      SynColor doxygenHtmlUnderline        term=underline cterm=underline gui=underline
-      SynColor doxygenHtmlUnderlineItalic  term=italic,underline cterm=italic,underline gui=italic,underline
-      SynColor doxygenHtmlItalic           term=italic cterm=italic gui=italic
-    endif
+    SynLink doxygenSyncStart               DoxygenCommonX
+    SynLink doxygenSyncStart2              DoxygenCommonX
+    SynLink doxygenStartSpecial            DoxygenCommonX
+    SynLink doxygenStartSkip2              DoxygenCommonX
+    SynLink doxygenFindBriefSpecial        DoxygenCommonX
+    SynLink doxygenOtherLink               DoxygenCommonX
+    SynLink doxygenCodeRegion              DoxygenCommonX
+    SynLink doxygenVerbatimRegion          DoxygenCommonX
+    SynLink doxygenDotRegion               DoxygenCommonX
+    SynLink doxygenGroup                   DoxygenUnderlineX
+    SynLink doxygenGroupName               DoxygenCommonX
+    SynLink doxygenAtom                    DoxygenCommonX
+    SynLink doxygenSyncComment             DoxygenCommonX
+    SynLink doxygenSyncEndComment          DoxygenCommonX
 
   finally
     if s:my_synlink | delcommand SynLink | endif

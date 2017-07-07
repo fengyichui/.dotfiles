@@ -316,147 +316,38 @@ hi VisualNOS        ctermfg=fg                                      cterm=underl
 
 " For TagHightlight, liqiang+
 " ---------------------------
-" Class
-hi Class            guifg=#93e690                                   gui=italic
-hi Class            ctermfg=114                                     cterm=italic
-hi Union            guifg=#93e690                                   gui=italic
-hi Union            ctermfg=114                                     cterm=italic
-" Defined Name
-hi DefinedName      guifg=#ae81ff                                   gui=none
-hi DefinedName      ctermfg=135                                     cterm=none
-" Enumerator
-hi Enumerator       guifg=#50d6de                                   gui=none
-hi Enumerator       ctermfg=80                                      cterm=none
-hi EnumerationName  guifg=#50d6de                                   gui=none
-hi EnumerationName  ctermfg=80                                      cterm=none
-hi EnumerationValue guifg=#50d6de                                   gui=none
-hi EnumerationValue ctermfg=80                                      cterm=none
-" Struct or class mumber
-hi Member           guifg=fg                                        gui=italic
-hi Member           ctermfg=fg                                      cterm=italic
-" Global
-hi GlobalConstant   guifg=#bbbb00                                   gui=none
-hi GlobalConstant   ctermfg=142                                     cterm=none
-hi GlobalVariable   guifg=#bbbb00                                   gui=none
-hi GlobalVariable   ctermfg=142                                     cterm=none
-" Local
-hi LocalVariable    guifg=fg                                        gui=none
-hi LocalVariable    ctermfg=fg                                      cterm=none
+hi Class            guifg=#93e690 ctermfg=114   gui=italic cterm=italic
+hi Union            guifg=#93e690 ctermfg=114   gui=italic cterm=italic
+hi DefinedName      guifg=#ae81ff ctermfg=135   gui=none cterm=none
+hi Enumerator       guifg=#50d6de ctermfg=80    gui=none cterm=none
+hi EnumerationName  guifg=#50d6de ctermfg=80    gui=none cterm=none
+hi EnumerationValue guifg=#50d6de ctermfg=80    gui=none cterm=none
+hi Member           guifg=fg      ctermfg=fg    gui=italic cterm=italic
+hi GlobalConstant   guifg=#bbbb00 ctermfg=142   gui=none cterm=none
+hi GlobalVariable   guifg=#bbbb00 ctermfg=142   gui=none cterm=none
+hi LocalVariable    guifg=fg      ctermfg=fg    gui=none cterm=none
 
 " SignifySign, liqiang+
 " ---------------------
-hi SignifySignAdd    guifg=#ffaa33           guibg=#444444          gui=none
-hi SignifySignAdd    ctermfg=214             ctermbg=238            cterm=none
-hi SignifySignDelete guifg=#ee0000           guibg=#444444          gui=none
-hi SignifySignDelete ctermfg=196             ctermbg=238            cterm=none
-hi SignifySignChange guifg=#eeee00           guibg=#444444          gui=none
-hi SignifySignChange ctermfg=11              ctermbg=238            cterm=none
+hi SignifySignAdd    guifg=#ffaa33 ctermfg=214  guibg=#444444 ctermbg=238   gui=none cterm=none
+hi SignifySignDelete guifg=#ee0000 ctermfg=196  guibg=#444444 ctermbg=238   gui=none cterm=none
+hi SignifySignChange guifg=#eeee00 ctermfg=11   guibg=#444444 ctermbg=238   gui=none cterm=none
 
 " YouCompleteMe
 " -------------
-hi YcmErrorSign     guifg=#ee0000           guibg=#444444           gui=none
-hi YcmErrorSign     ctermfg=196             ctermbg=238             cterm=none
-hi YcmWarningSign   guifg=#eeee00           guibg=#444444           gui=none
-hi YcmWarningSign   ctermfg=11              ctermbg=238             cterm=none
+hi YcmErrorSign     guifg=#ee0000 ctermfg=196   guibg=#444444 ctermbg=238   gui=none cterm=none
+hi YcmWarningSign   guifg=#eeee00 ctermfg=11    guibg=#444444 ctermbg=238   gui=none cterm=none
 
 " Doxygen, liqiang+
 " -----------------
-"<@>param[in] param_name
-hi DoxygenSpecial                  guifg=#a0a0a0                    gui=none
-hi DoxygenSpecial                  ctermfg=247                      cterm=none
-"@<param>[in] param_name
-hi DoxygenParam                    guifg=#a0a0a0                    gui=none
-hi DoxygenParam                    ctermfg=247                      cterm=none
-"@param<[in]> param_name
-hi DoxygenParamDirection           guifg=#a0a0a0                    gui=none
-hi DoxygenParamDirection           ctermfg=247                      cterm=none
-"@param[in] <param_name>
-hi DoxygenParamName                guifg=#a0a0a0                    gui=underline
-hi DoxygenParamName                ctermfg=247                      cterm=underline
-"SpecialComment
-hi DoxygenComment                  guifg=#808080                    gui=italic
-hi DoxygenComment                  ctermfg=243                      cterm=italic
-"DoxygenParam
-hi DoxygenBrief                    guifg=#808080                    gui=italic
-hi DoxygenBrief                    ctermfg=243                      cterm=italic
-"DoxygenParam
-hi DoxygenBody                     guifg=#808080                    gui=italic
-hi DoxygenBody                     ctermfg=243                      cterm=italic
-"Statement
-hi DoxygenSpecialTypeOnelineDesc   guifg=#808080                    gui=italic
-hi DoxygenSpecialTypeOnelineDesc   ctermfg=243                      cterm=italic
-"Constant
-hi DoxygenBOther                   guifg=#808080                    gui=italic
-hi DoxygenBOther                   ctermfg=243                      cterm=italic
-"Statement
-hi DoxygenSpecialOnelineDesc       guifg=#808080                    gui=italic
-hi DoxygenSpecialOnelineDesc       ctermfg=243                      cterm=italic
-"Statement
-hi DoxygenSpecialHeading           guifg=#808080                    gui=italic
-hi DoxygenSpecialHeading           ctermfg=243                      cterm=italic
-"SpecialComment
-hi DoxygenPrev                     guifg=#808080                    gui=italic
-hi DoxygenPrev                     ctermfg=243                      cterm=italic
-"Special
-hi DoxygenHtmlSpecial              guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlSpecial              ctermfg=243                      cterm=italic,underline
-"Type
-hi DoxygenHtmlVar                  guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlVar                  ctermfg=243                      cterm=italic,underline
-"String
-hi DoxygenHtmlExpr                 guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlExpr                 ctermfg=243                      cterm=italic,underline
-"SpecialChar
-hi DoxygenSmallSpecial             guifg=#808080                    gui=italic
-hi DoxygenSmallSpecial             ctermfg=243                      cterm=italic
-"Keyword
-hi DoxygenFormulaKeyword           guifg=#808080                    gui=italic
-hi DoxygenFormulaKeyword           ctermfg=243                      cterm=italic
-"Special
-hi DoxygenFormulaEscaped           guifg=#808080                    gui=italic
-hi DoxygenFormulaEscaped           ctermfg=243                      cterm=italic
-"Operator
-hi DoxygenFormulaOperator          guifg=#808080                    gui=italic
-hi DoxygenFormulaOperator          ctermfg=243                      cterm=italic
-"Statement
-hi DoxygenFormula                  guifg=#808080                    gui=italic
-hi DoxygenFormula                  ctermfg=243                      cterm=italic
-"Constant
-hi DoxygenSymbol                   guifg=#808080                    gui=italic
-hi DoxygenSymbol                   ctermfg=243                      cterm=italic
-"Codeword
-hi doxygenCodeWord                 guifg=#808080                    gui=italic
-hi doxygenCodeWord                 ctermfg=243                      cterm=italic
-"Special
-hi DoxygenFormulaSpecial           guifg=#808080                    gui=italic
-hi DoxygenFormulaSpecial           ctermfg=243                      cterm=italic
-"Function
-hi DoxygenHtmlCh                   guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlCh                   ctermfg=243                      cterm=italic,underline
-"Statement
-hi DoxygenHtmlCmd                  guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlCmd                  ctermfg=243                      cterm=italic,underline
-"Underlined
-hi DoxygenHtmlLink                 guifg=#808080                    gui=italic,underline
-hi DoxygenHtmlLink                 ctermfg=243                      cterm=italic,underline
-"html
-hi doxygenBoldWord                 guifg=#808080                    gui=bold
-hi doxygenBoldWord                 ctermfg=243                      cterm=bold
-hi doxygenEmphasisedWord           guifg=#808080                    gui=italic
-hi doxygenEmphasisedWord           ctermfg=243                      cterm=italic
-hi doxygenArgumentWord             guifg=#808080                    gui=italic
-hi doxygenArgumentWord             ctermfg=243                      cterm=italic
-hi doxygenHtmlBold                 guifg=#808080                    gui=bold
-hi doxygenHtmlBold                 ctermfg=243                      cterm=bold
-hi doxygenHtmlBoldUnderline        guifg=#808080                    gui=bold,underline
-hi doxygenHtmlBoldUnderline        ctermfg=243                      cterm=bold,underline
-hi doxygenHtmlBoldItalic           guifg=#808080                    gui=bold,italic
-hi doxygenHtmlBoldItalic           ctermfg=243                      cterm=bold,italic
-hi doxygenHtmlBoldUnderlineItalic  guifg=#808080                    gui=bold,italic,underline
-hi doxygenHtmlBoldUnderlineItalic  ctermfg=243                      cterm=bold,italic,underline
-hi doxygenHtmlUnderline            guifg=#808080                    gui=underline
-hi doxygenHtmlUnderline            ctermfg=243                      cterm=underline
-hi doxygenHtmlUnderlineItalic      guifg=#808080                    gui=italic,underline
-hi doxygenHtmlUnderlineItalic      ctermfg=243                      cterm=italic,underline
-hi doxygenHtmlItalic               guifg=#808080                    gui=italic
-hi doxygenHtmlItalic               ctermfg=243                      cterm=italic
+hi  DoxygenOutstandX            guifg=#a0a0a0 ctermfg=247   gui=none cterm=none
+hi  DoxygenCommonX              guifg=#808080 ctermfg=243   gui=italic cterm=italic
+hi  DoxygenNormalX              guifg=#808080 ctermfg=243   gui=none cterm=none
+hi  DoxygenItalicX              guifg=#808080 ctermfg=243   gui=italic cterm=italic
+hi  DoxygenBoldX                guifg=#808080 ctermfg=243   gui=bold cterm=bold
+hi  DoxygenUnderlineX           guifg=#808080 ctermfg=243   gui=underline cterm=underline
+hi  DoxygenBoldItalicX          guifg=#808080 ctermfg=243   gui=italic,bold cterm=italic,bold
+hi  DoxygenBoldUnderlineX       guifg=#808080 ctermfg=243   gui=underline,bold cterm=underline,bold
+hi  DoxygenUnderlineItalicX     guifg=#808080 ctermfg=243   gui=underline,italic cterm=underline,italic
+hi  DoxygenBoldUnderlineItalicX guifg=#808080 ctermfg=243   gui=bold,underline,italic cterm=bold,underline,italic
+
