@@ -191,7 +191,7 @@ let g:learn_path = fnamemodify('E:/4-other/OneDrive/Skill/Harvest/learn.txt', ":
 set nocompatible                " Not compatibe Vi
 let $LANG = 'en_US.UTF-8'       " Disable language translations
 set langmenu=en_US.UTF-8        " sets the language of the menu
-color lucius_qli                " Color
+color qiang                     " Color
 filetype plugin indent on       " Enable filetype plugins
 syntax on                       " syntax on
 
