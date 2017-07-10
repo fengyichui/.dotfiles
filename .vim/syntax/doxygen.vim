@@ -216,14 +216,14 @@ endif
   syn match doxygenDotRegionSpecial contained +[\\@]\(enddot\>\)\@=+
 
   " Match single line identifiers.
-  syn keyword doxygenBOther contained class enum file fn mainpage interface
+  syn keyword doxygenBOther contained class enum file fn mainpage interface subpage
   \ namespace struct typedef union var def name
   \ nextgroup=doxygenSpecialTypeOnelineDesc
 
   syn keyword doxygenOther contained par nextgroup=doxygenHeaderLine
   syn region doxygenHeaderLine start=+.+ end=+^+ contained skipwhite nextgroup=doxygenSpecialMultilineDesc
 
-  syn keyword doxygenOther contained file details arg author date deprecated li return returns see invariant note post pre remarks since test nextgroup=doxygenSpecialMultilineDesc
+  syn keyword doxygenOther contained details arg author date deprecated li return returns see invariant note post pre remarks since test nextgroup=doxygenSpecialMultilineDesc
   syn keyword doxygenOtherTODO contained todo attention nextgroup=doxygenSpecialMultilineDesc
   syn keyword doxygenOtherWARN contained warning nextgroup=doxygenSpecialMultilineDesc
   syn keyword doxygenOtherBUG contained bug nextgroup=doxygenSpecialMultilineDesc
