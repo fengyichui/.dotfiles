@@ -104,17 +104,23 @@ function! s:tmux_fix()
     cnoremap <silent> <F25> <C-\>e<SID>do_autocmd('FocusGained')<CR>
 endfunction
 
+let s:tmux_is_running = 0
+
 " FocusGaine
 function! s:tmux_focus_gained()
-    if mode() == 'n'
-"        sleep 2m
-        silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
+    if s:tmux_is_running
+        if mode() == 'n'
+            " FIXME:
+            " sleep 100m
+            silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
+        endif
     endif
+    let s:tmux_is_running = 1
 endfunction
 
 " FocusLosted
 function! s:tmux_focus_losted()
-    silent execute '!echo -ne ' . shellescape(s:tmux_cursor_insert, 0)
+    silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_insert, 0)
 endfunction
 
 " Fix tmux issue
