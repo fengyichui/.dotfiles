@@ -20,7 +20,7 @@ local ret_status="%(?:%{$fg[green]%}»:%{$fg[red]%}»)"
 
 setopt PROMPT_SUBST
 
-PROMPT='%{${ret_status}%} %{$fg[magenta]%}%c %{$fg[yellow]%}%{${root_status}%}%{$reset_color%} '
+PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
 
 #rprompt_context () {
 #    if [[ -n "$SSH_CLIENT" ]]; then
