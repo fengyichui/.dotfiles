@@ -171,7 +171,8 @@ def check_ge_zero(x):
 def to_unsigned(value, size=8):
     # values from GDB can be used transparently but are not suitable for
     # being printed as unsigned integers, so a conversion is needed
-    return int(value.cast(gdb.Value(0).type)) % (2 ** (size * 8))
+    mask = (2 ** (size * 8)) - 1
+    return int(value.cast(gdb.Value(mask).type)) & mask
 
 def to_string(value):
     # attempt to convert an inferior value to string; OK when (Python 3 ||
@@ -387,7 +388,6 @@ class Dashboard(gdb.Command):
         Dashboard.parse_inits(False)
         # GDB overrides
         run('set pagination off')
-        run('alias -a db = dashboard')
 
     @staticmethod
     def get_term_width(fd=1):  # defaults to the main terminal
@@ -991,18 +991,36 @@ location, if available. Optionally list the frame arguments and locals too."""
             frame_lines.append('[{}] {}'.format(frame_id, info))
             # fetch frame arguments and locals
             decorator = gdb.FrameDecorator.FrameDecorator(frame)
+            separator = ansi(', ', R.style_low)
+            strip_newlines = re.compile(r'$\s*', re.MULTILINE)
             if self.show_arguments:
+                def prefix(line):
+                    return Stack.format_line('arg', line)
                 frame_args = decorator.frame_args()
-                args_lines = Stack.fetch_frame_info(frame, frame_args, 'arg')
+                args_lines = Stack.fetch_frame_info(frame, frame_args)
                 if args_lines:
-                    frame_lines.extend(args_lines)
+                    if self.compact:
+                        args_line = separator.join(args_lines)
+                        args_line = strip_newlines.sub('', args_line)
+                        single_line = prefix(args_line)
+                        frame_lines.append(single_line)
+                    else:
+                        frame_lines.extend(map(prefix, args_lines))
                 else:
                     frame_lines.append(ansi('(no arguments)', R.style_low))
             if self.show_locals:
+                def prefix(line):
+                    return Stack.format_line('loc', line)
                 frame_locals = decorator.frame_locals()
-                locals_lines = Stack.fetch_frame_info(frame, frame_locals, 'loc')
+                locals_lines = Stack.fetch_frame_info(frame, frame_locals)
                 if locals_lines:
-                    frame_lines.extend(locals_lines)
+                    if self.compact:
+                        locals_line = separator.join(locals_lines)
+                        locals_line = strip_newlines.sub('', locals_line)
+                        single_line = prefix(locals_line)
+                        frame_lines.append(single_line)
+                    else:
+                        frame_lines.extend(map(prefix, locals_lines))
                 else:
                     frame_lines.append(ansi('(no locals)', R.style_low))
             # add frame
@@ -1026,13 +1044,18 @@ location, if available. Optionally list the frame arguments and locals too."""
         return lines
 
     @staticmethod
-    def fetch_frame_info(frame, data, prefix):
+    def format_line(prefix, line):
         prefix = ansi(prefix, R.style_low)
+        return '{} {}'.format(prefix, line)
+
+    @staticmethod
+    def fetch_frame_info(frame, data):
         lines = []
         for elem in data or []:
             name = elem.sym
+            equal = ansi('=', R.style_low)
             value = to_string(elem.sym.value(frame))
-            lines.append('{} {} = {}'.format(prefix, name, value))
+            lines.append('{} {} {}'.format(name, equal, value))
         return lines
 
     @staticmethod
@@ -1077,6 +1100,11 @@ location, if available. Optionally list the frame arguments and locals too."""
                 'doc': 'Frame locals visibility flag.',
                 'default': False,
                 'name': 'show_locals',
+                'type': bool
+            },
+            'compact': {
+                'doc': 'Single-line display flag.',
+                'default': False,
                 'type': bool
             }
         }
@@ -1377,7 +1405,7 @@ set python print-stack full
 python Dashboard.start()
 
 # ------------------------------------------------------------------------------
-# Copyright (c) 2015-2016 Andrea Cardaci <cyrus.and@gmail.com>
+# Copyright (c) 2015-2017 Andrea Cardaci <cyrus.and@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
