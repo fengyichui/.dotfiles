@@ -53,6 +53,15 @@ fi
 # Core highlighting update system
 # -------------------------------------------------------------------------------------------------
 
+# Use workaround for bug in ZSH?
+# zsh-users/zsh@48cadf4 http://www.zsh.org/mla/workers//2017/msg00034.html
+autoload -U is-at-least
+if is-at-least 5.4; then
+  zsh_highlight__pat_static_bug=false
+else
+  zsh_highlight__pat_static_bug=true
+fi
+
 # Array declaring active highlighters names.
 typeset -ga ZSH_HIGHLIGHT_HIGHLIGHTERS
 
@@ -67,7 +76,9 @@ _zsh_highlight()
 
   # Remove all highlighting in isearch, so that only the underlining done by zsh itself remains.
   # For details see FAQ entry 'Why does syntax highlighting not work while searching history?'.
-  if [[ $WIDGET == zle-isearch-update ]] && ! (( $+ISEARCHMATCH_ACTIVE )); then
+  # This disables highlighting during isearch (for reasons explained in README.md) unless zsh is new enough
+  # and doesn't have the pattern matching bug
+  if [[ $WIDGET == zle-isearch-update ]] && { $zsh_highlight__pat_static_bug || ! (( $+ISEARCHMATCH_ACTIVE )) }; then
     region_highlight=()
     return $ret
   fi
@@ -377,7 +388,7 @@ _zsh_highlight_bind_widgets || {
 
 # Resolve highlighters directory location.
 _zsh_highlight_load_highlighters "${ZSH_HIGHLIGHT_HIGHLIGHTERS_DIR:-${${0:A}:h}/highlighters}" || {
-  print -r -- >&@ 'zsh-syntax-highlighting: failed loading highlighters, exiting.'
+  print -r -- >&2 'zsh-syntax-highlighting: failed loading highlighters, exiting.'
   return 1
 }
 
@@ -394,8 +405,6 @@ add-zsh-hook preexec _zsh_highlight_preexec_hook 2>/dev/null || {
 
 # Load zsh/parameter module if available
 zmodload zsh/parameter 2>/dev/null || true
-
-autoload -U is-at-least
 
 # Initialize the array of active highlighters if needed.
 [[ $#ZSH_HIGHLIGHT_HIGHLIGHTERS -eq 0 ]] && ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
