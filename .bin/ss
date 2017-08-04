@@ -33,7 +33,7 @@ if [ ! -z $1 ]; then
     fi
 fi
 
-shadowsocks8='http://my.shadowsocks8.org/images/'
+shadowsocks8='http://ss8.6gg6.net/images/'
 ishadow='http://ss.ishadowx.com/img/qr/'
 res=( \
     ${shadowsocks8}server01.png \
