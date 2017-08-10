@@ -13,9 +13,9 @@ alias dumpbin-dependents='dumpbin_func dependents'
 alias dumpbin-exports='dumpbin_func exports'
 
 # Interactive operation...
-alias rm='rm -i'
-alias mv='mv -i'
-alias cp='cp -i'
+#alias rm='rm -i'
+#alias mv='mv -i'
+#alias cp='cp -i'
 alias cpx='rsync --info=progress2'
 
 # vim stdin
