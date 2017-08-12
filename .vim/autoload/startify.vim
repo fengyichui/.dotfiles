@@ -14,7 +14,7 @@ let s:nowait         = v:version >= 704 || (v:version == 703 && has('patch1261')
 let s:padding_left   = repeat(' ', get(g:, 'startify_padding_left', 3))
 let s:numfiles       = get(g:, 'startify_files_number', 10)
 let s:show_special   = get(g:, 'startify_enable_special', 1)
-let s:relative_path  = get(g:, 'startify_relative_path') ? ':.:~' : ':p:~'
+let s:relative_path  = get(g:, 'startify_relative_path') ? ':~:.' : ':p:~'
 let s:session_dir    = resolve(expand(get(g:, 'startify_session_dir',
       \ has('win32') ? '$HOME\vimfiles\session' : '~/.vim/session')))
 let s:tf             = exists('g:startify_transformations')
@@ -447,7 +447,8 @@ function! s:display_by_path(path_prefix, path_format, use_env) abort
         \ [a:path_prefix, a:path_format, a:use_env])
 
   let entry_format = "s:padding_left .'['. index .']'. repeat(' ', (3 - strlen(index)))"
-  if exists('*WebDevIconsGetFileTypeSymbol')  " support for vim-devicons
+  if exists('*WebDevIconsGetFileTypeSymbol') && get(g:, 'webdevicons_enable')
+    " support for vim-devicons
     let entry_format .= ". WebDevIconsGetFileTypeSymbol(entry_path) .' '.  entry_path"
   else
     let entry_format .= '. entry_path'
@@ -513,7 +514,7 @@ function! s:filter_oldfiles(path_prefix, path_format, use_env) abort
     call s:init_env()
     for i in range(len(oldfiles))
       for [k,v] in s:env
-        let p = oldfiles[i][1]
+        let p = oldfiles[i][0]
         if !stridx(tolower(p), tolower(v))
           let oldfiles[i][1] = printf('$%s%s', k, p[len(v):])
           break
@@ -558,7 +559,7 @@ endfun
 
 " Function: s:show_dir {{{1
 function! s:show_dir() abort
-  return s:display_by_path(getcwd(), ':.', 0)
+  return s:display_by_path(getcwd() . s:sep, ':.', 0)
 endfunction
 
 " Function: s:show_files {{{1
@@ -644,7 +645,7 @@ function! s:show_bookmarks() abort
     if has('win32')
       let path = substitute(path, '\[', '\[[]', 'g')
     endif
-    call s:register(line('$'), index, 'file', 'edit', fnameescape(path))
+    call s:register(line('$'), index, 'file', 'edit', fnameescape(expand(path)))
 
     unlet bookmark  " avoid type mismatch for heterogeneous lists
   endfor
@@ -731,6 +732,7 @@ function! s:set_mappings() abort
   execute "nnoremap <buffer>". s:nowait ."<silent> v             :call <sid>set_mark('V')<cr>"
   execute "nnoremap <buffer>". s:nowait ."<silent> <cr>          :call startify#open_buffers()<cr>"
   execute "nnoremap <buffer>". s:nowait ."<silent> <2-LeftMouse> :call startify#open_buffers()<cr>"
+  execute "nnoremap <buffer>". s:nowait ."<silent> <MiddleMouse> :enew <bar> execute 'normal! \"'.(v:register=='\"'?'*':v:register).'gp'<cr>"
 
   " Without these mappings n/N wouldn't work properly, since autocmds always
   " force the cursor back on the index.
@@ -806,7 +808,16 @@ function! s:check_user_options(path) abort
   elseif get(g:, 'startify_change_to_vcs_root')
     call s:cd_to_vcs_root(a:path)
   elseif get(g:, 'startify_change_to_dir', 1)
-    execute 'lcd' isdirectory(a:path) ? a:path : fnamemodify(a:path, ':h')
+    if isdirectory(a:path)
+      execute 'lcd' a:path
+    else
+      let dir = fnamemodify(a:path, ':h')
+      if isdirectory(dir)
+        execute 'lcd' dir
+      else
+        " Do nothing. E.g. a:path == `scp://foo/bar`
+      endif
+    endif
   endif
 endfunction
 
@@ -887,7 +898,11 @@ endfunction
 " Function: s:init_env {{{1
 function! s:init_env()
   let s:env = []
-  let ignore = { 'PWD': 1, 'OLDPWD': 1 }
+  let ignore = {
+        \ 'HOME':   1,
+        \ 'OLDPWD': 1,
+        \ 'PWD':    1,
+        \ }
 
   function! s:get_env()
     redir => s

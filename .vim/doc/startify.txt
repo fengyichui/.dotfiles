@@ -542,9 +542,9 @@ Dynamic example:~
 <
 If you go for a dynamic header, you might find the following functions useful:
 
-    startify#fortune#quote()    raw random quote
-    startify#fortune#boxed()    formatted random quote in a box
-    startify#fortune#cowsay()   formatted random quote in a box + cow
+    startify#fortune#quote()     raw random quote
+    startify#fortune#boxed(...)  opt list or formatted random quote in a box
+    startify#fortune#cowsay()    formatted random quote in a box + cow
 
 Try them like this:
 >
@@ -589,11 +589,15 @@ Also have a look at |startify-faq-08|.
 If you don't set |g:startify_custom_header|, the internal cowsay implementation
 with shipped random quotes will be used.
 
-If you want to use your own quotes, add a list of lists, like this:
+To use your own quotes, set this option to a list of quotes. Each quote is
+either another list or a |Funcref| (see |expr-lambda|) that returns a list.
+
+Each element of the inner lists is put on an own line in the custom header.
 >
     let g:startify_custom_header_quotes = [
-        \ ['line 1', '', 'line 3'],
-        \ ['quote #2']
+        \ ['quote #1'],
+        \ ['quote #2', 'using', 'three lines'],
+        \ {-> systemlist('echo quote #3')}
         \ ]
 <
 ------------------------------------------------------------------------------
@@ -616,8 +620,11 @@ Don't run Startify at Vim startup. You can still call it anytime via
 >
     let g:startify_relative_path = 0
 <
-Show filenames relative to the current working directory instead of as
-absolute paths. This only applies to the "files" list, since the "dir" list is
+If the file is in or below the current working directory, use a relative path.
+Otherwise an absolute path is used. The latter prevents hard to grasp entries
+like `../../../../../foo`.
+
+NOTE: This only applies to the "files" list, since the "dir" list is
 relative by nature.
 
 -----------------------------------------------------------------------------
