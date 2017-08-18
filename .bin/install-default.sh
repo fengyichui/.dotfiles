@@ -9,7 +9,7 @@ apt-cyg install zsh
 apt-cyg install ctags
 apt-cyg install diffutils
 apt-cyg install dos2unix
-apt-cyg install gzip
+apt-cyg install gzip zip unzip
 apt-cyg install python
 apt-cyg install python3
 apt-cyg install git
@@ -19,8 +19,6 @@ apt-cyg install vim
 apt-cyg install wget
 apt-cyg install curl
 apt-cyg install xxd
-apt-cyg install zip
-apt-cyg install unzip
 apt-cyg install gawk
 apt-cyg install sed
 apt-cyg install bash-completion
@@ -34,9 +32,9 @@ apt-cyg install zbar # for QR decode: zbarimg
 apt-cyg install gcc-core #gcc c compiler
 apt-cyg install w3m # web explorer in terminal
 #apt-cyg install lynx # web explorer in terminal
-apt-cyg install ruby
-apt-cyg install rubygems
+apt-cyg install ruby rubygems # ruby and its package manager
 apt-cyg install procps # for ps and top
+apt-cyg install gnuplot # for plot
 
 # Install pip for python
 wget https://bootstrap.pypa.io/get-pip.py
