@@ -855,6 +855,9 @@ let g:tagbar_left = 1
 let g:tagbar_sort = 0
 let g:tagbar_width = 30
 let g:tagbar_iconchars = ['▸', '▾']
+"Add this to tagbar/types/ctags.vim and utags.vim
+"let g:tagbar_type_cpp = {'kinds' : ['p:prototypes:1:1']}
+"let g:tagbar_type_c   = {'kinds' : ['p:prototypes:1:1']}
 
 " Rainbow
 let g:rainbow_active = 1
