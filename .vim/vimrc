@@ -411,6 +411,7 @@ augroup END
 
 " Misc
 menu liqiang.misc.delele-repeat-line :g/^\(.*\)$\n^\1$/d<cr>
+menu liqiang.misc.reverse-line :g/^/m0\|nohl<cr>
 menu liqiang.misc.[3:0]\\[3]=>0x0000000X :silent! %s/\[\s*\(\d\+\)\s*:\s*\(\d\+\)\s*\]/\=printf("0x%08X", eval("float2nr(pow(2,".submatch(1)."+1-".submatch(2)."))-1") * eval("float2nr(pow(2,".submatch(2)."))"))/g \| silent! %s/\[\s*\(\d\+\)\s*\]/\=printf("0x%08X", float2nr(eval("pow(2,".submatch(1).")")))/g<cr>
 menu liqiang.misc.GetBufferSize=>get_buffer_size :silent %s/\%(\<[A-Za-z_]\i*\)\@<=\(\l\)\(\u\)/\L\1_\2/ge \| %s/\<\(\i*\l\i*\)\>/\L\1/ge \| nohl<cr>
 
