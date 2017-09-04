@@ -33,7 +33,7 @@ if [ ! -z $1 ]; then
     fi
 fi
 
-ss8='http://s8.6gg6.net/images/'
+ss8='http://ss8.pm/images/'
 ishadow='http://ss.ishadowx.com/img/qr/'
 fvs='http://jn9.org/img/'
 res=( \
