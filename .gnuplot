@@ -52,4 +52,5 @@ set key textcolor rgb "grey"
 
 # Set default terminal for cygwin
 set terminal sixel # size 800,640
+#set terminal x11 # For x11
 
