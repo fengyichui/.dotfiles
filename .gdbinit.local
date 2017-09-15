@@ -66,14 +66,23 @@ define download
     mon halt
     file ~/.local/HS662X.GDB.FLM
     restore ~/.local/HS662X.GDB.FLM
-    p FlashDevice.DevName
     set $sp=&FlashDevice.sectors[1024]
     set $buffer=(unsigned char *)FlashDevice.sectors
     set $sector_size=4096
 
+    # Show device name
+    printf "\n"
+    output FlashDevice.DevName
+    printf "\n"
+
+    # Get file size
     shell echo "set \$file_size=$(stat -c %s a.bin)" >/tmp/download_gdb.tmp
     source /tmp/download_gdb.tmp
     shell rm -rf /tmp/download_gdb.tmp
+
+    # show file size
+    printf "a.bin: %.2fkB\n", $file_size/1024.0
+    printf "\n"
 
     printf "Erase...\n"
     set $res=Init(0, 6000000, 1)
