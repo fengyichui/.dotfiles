@@ -1,3 +1,6 @@
+#
+# GDB init local file
+#
 
 define xx
 source ~/.gdb.dashboard
@@ -57,3 +60,70 @@ end
 #mon flash device = STM32F103VE
 #mon flash download = 1
 
+# Download application to flash, use KEIL FLASH Algorithm
+define download
+    mon reset 1
+    mon halt
+    file HS662X.GDB.FLM
+    restore HS662X.GDB.FLM
+    p FlashDevice.DevName
+    set $sp=&FlashDevice.sectors[1024]
+    set $buffer=(unsigned char *)FlashDevice.sectors
+    set $sector_size=4096
+
+    shell echo "set \$file_size=$(stat -c %s a.bin)" >/tmp/download_gdb.tmp
+    source /tmp/download_gdb.tmp
+    shell rm -rf /tmp/download_gdb.tmp
+
+    printf "Erase...\n"
+    set $res=Init(0, 6000000, 1)
+    set $i=0
+    while $i < $file_size
+        set $res=EraseSector($i)
+        set $i=$i+$sector_size
+    end
+    set $res=UnInit(1)
+
+    printf "Program...\n"
+    set $res=Init(0, 6000000, 2)
+    set $i=0
+    while $i < $file_size
+        set $left=$file_size-$i
+        if $left < $sector_size
+            set $len=$left
+        else
+            set $len=$sector_size
+        end
+        restore a.bin binary $buffer-$i $i $i+$len
+        set $res=ProgramPage($i, $len, $buffer)
+        set $i=$i+$sector_size
+    end
+    set $res=UnInit(2)
+
+    printf "Verify...\n"
+    set $res=Init(0, 6000000, 3)
+    set $i=0
+    while $i < $file_size
+        set $left=$file_size-$i
+        if $left < $sector_size
+            set $len=$left
+        else
+            set $len=$sector_size
+        end
+        restore a.bin binary $buffer-$i $i $i+$len
+        set $res=Verify($i, $len, $buffer)
+        if $res != $i+$len
+            printf "!!! FAIL !!!\n"
+            return
+        end
+        set $i=$i+$sector_size
+    end
+    set $res=UnInit(3)
+    file
+end
+document dump_binfile
+Syntax: download
+| Download binary(a.bin) file to flash
+end
+
+# vim: ft=gdb
