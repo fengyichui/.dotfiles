@@ -16,6 +16,40 @@ if exists('g:loaded_terminal') && g:loaded_terminal
 endif
 let g:loaded_terminal = 1
 
+function! s:alt_fix()
+    " leaving out problematic characters: 'O', double quote, pipe and '['
+    let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(92, 123) + [125, 126]
+    let printable_characters = map(ascii_nums, 'nr2char(v:val)')
+    for char in printable_characters
+        exe "set <M-".char.">=\<Esc>".char
+    endfor
+    " double quote
+    exe 'set <M-\">=\"'
+    " pipe
+    exe 'set <M-bar>=\|'
+    " space - messes all other mappings
+    " exe "set <M-space>= "
+    " Can't get this one to work
+    " exe "set <M-\>>=\>"
+    " left bracket just messes vim up
+    " exe 'set <M-[>=['
+endfunction
+
+function! s:ctrl_fix()
+    " Get the keycode
+    "   :iunmap <c-v>
+    "   <ctrl-v><something-key> (insert mode)
+
+    " for <ctrl-enter> in mintty
+    exe 'set <F20>='
+    map <F20> <C-CR>
+    map! <F20> <C-CR>
+endfunction
+
+" fix alt/ctrl key
+call s:alt_fix()
+call s:ctrl_fix()
+
 " xterm cursor
 " 1 or 0 -> blinking block
 " 3 -> blinking underscore
