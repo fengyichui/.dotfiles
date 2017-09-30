@@ -5,9 +5,11 @@
 # 2.plot
 #   plot sin(x)
 #   plot sin(x) with lines              # lines,dots,linespoints,points,boxes,steps
-#   plot "1.dat"                        # 使用文件内的一列数据绘图
-#   plot "1.dat" using 1:2 w lp pt 5,\  # 使用文件内的第1,2列绘图, 同时使用第1,3列绘图
-#        "1.dat" using 1:3 w lp pt 7
+#   plot "a.dat"                        # 使用文件内的第1列数据绘图
+#   plot "a.dat" using 2 with lines     # 使用文件内的第2列数据绘图
+#   plot "a.dat" using ($1-$2)          # 使用文件内的第1列减去第2列的结果绘图
+#   plot "a.dat" using 1:2 with lines,\ # 使用文件内的数据绘制两条线, 线1:第1,2列分别作为x,y轴;
+#        "a.dat" using 1:3 with lines   #                             线2:第1,3列分别作为x,y轴
 #
 # 3.常用命令：
 #   set title "各城市月平均降水量"    # Title

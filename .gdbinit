@@ -108,7 +108,9 @@ set history filename ~/.gdb_history
 set history remove-duplicates unlimited
 set history save on
 set pagination off
-set print pretty
+set print pretty on
+set print elements 0
+set print array on
 
 set output-radix 0x0A
 set input-radix 0x0A
