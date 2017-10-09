@@ -129,6 +129,10 @@
 "   echo "\x31\x31"             #显示二进制0x31、0x31对应的显示字符
 "   <Ctrl-r>="\u2122"           #插入模式下插入Unicode码
 "
+" 输入某个按键的 keycode
+"   :iunmap <c-v>               # 取消<ctrl-v>的map
+"   <ctrl-v><something-key>     # 插入模式：先按ctrl+v, 然后按需要显示按键值
+"
 " 高级搜索
 "   :g/^\s*$/d                  #搜索所有空行, 并删除(d) (g是global的意思, 反义为: g!/.../d)
 "   :%s/abc//gn                 #搜索abc, 并统计它出现的次数
