@@ -59,6 +59,7 @@ plugins=(safe-paste \
          extract \
          dircycle \
          tmux \
+         zsh-fzf \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
 
@@ -71,6 +72,13 @@ export LANG=en_US.UTF-8
 
 # Editor
 export EDITOR='vim'
+
+# Remove Duplicate History
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
