@@ -38,6 +38,7 @@ apt-cyg install gnuplot # for plot
 #apt-cyg install inetutils # for telnet
 #apt-cyg install xorg-server # for X window system
 #apt-cyg install xinit # for X window system (start with: $ startxwin)
+apt-cyg install fzf
 
 # Install pip for python
 wget https://bootstrap.pypa.io/get-pip.py
