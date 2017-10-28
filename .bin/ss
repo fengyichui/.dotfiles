@@ -34,14 +34,14 @@ if [ ! -z $1 ]; then
 fi
 
 ss8='http://ss8.pm/images/'
-ishadow='http://ss.ishadowx.com/img/qr/'
+ishadow='https://ss.ishadowx.net/img/qr/'
 fvs='http://jn9.org/img/'
 res=( \
     ${ss8}server01.png  ${ss8}server02.png  ${ss8}server03.png \
     ${fvs}qr01.png      ${fvs}qr02.png      ${fvs}qr03.png \
-    ${ishadow}sga.png   ${ishadow}sgb.png   ${ishadow}sgc.png \
-    ${ishadow}usa.png   ${ishadow}usb.png   ${ishadow}usc.png \
-    ${ishadow}jpa.png   ${ishadow}jpb.png   ${ishadow}jpc.png \
+    ${ishadow}sgaxxoo.png   ${ishadow}sgbxxoo.png   ${ishadow}sgcxxoo.png \
+    ${ishadow}usaxxoo.png   ${ishadow}usbxxoo.png   ${ishadow}uscxxoo.png \
+    ${ishadow}jpaxxoo.png   ${ishadow}jpbxxoo.png   ${ishadow}jpcxxoo.png \
     )
 
 if [ "$i" -ge "${#res[*]}" ]; then
