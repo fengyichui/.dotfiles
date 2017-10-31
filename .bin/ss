@@ -17,59 +17,122 @@
 # @{
 ######################################################################
 
-pic='/tmp/ssqr.png'
+# const
+mode_inside_qr_net_path=0
+mode_usr_qr_net_path=1
+mode_usr_qr_local_path=2
+mode_usr_server_password=3 #like: rc4-md5:52918214@138.68.61.42:23456 (encrypt_method:password@ip_address:port)
 
+# variable
 global_proxy=0
-i=0
+inside_qr_index=0
+qr_net_path=''
+qr_local_path='/tmp/ssqr.png'
+server_info='rc4-md5:52918214@138.68.61.42:23456'
+mode=$mode_inside_qr_net_path
 
-if [ ! -z $1 ]; then
-    if [ "$1" == "-g" ]; then
-        global_proxy=1
-        if [ ! -z $2 ]; then
-            i=$2
-        fi
-    else
-        i=$1
+# Parse argument
+for i in "$@"
+do
+    case $i in
+        -i=*|--inside-index=*)
+            inside_qr_index="${i#*=}"
+            mode=$mode_inside_qr_net_path
+            shift # past argument=value
+            ;;
+        -n=*|--qr-net=*)
+            qr_net_path="${i#*=}"
+            mode=$mode_usr_qr_net_path
+            shift # past argument=value
+            ;;
+        -l=*|--qr-local=*)
+            qr_local_path="${i#*=}"
+            mode=$mode_usr_qr_local_path
+            shift # past argument=value
+            ;;
+        -s=*|--server=*)
+            server_info="${i#*=}"
+            mode=$mode_usr_server_password
+            shift # past argument=value
+            ;;
+        -g|--global)
+            global_proxy=1
+            shift # past argument with no value
+            ;;
+        -h|--help)
+            echo "Automatic proxy with shadowsocks."
+            echo "Usage:"
+            echo "  -i|--inside-index  inside proxy table index"
+            echo "  -n|--qr-net        network QR picture address"
+            echo "  -l|--qr-local      local QR picture path"
+            echo "  -s|--server        encrypt_method:password@ip_addr:port"
+            echo "  -g|--global        use global proxy mode"
+            echo "  -h|--help          show this help"
+            echo "Example:"
+            echo "  -i=1"
+            echo "  -n='http://ss8.pm/images/server01.png'"
+            echo "  -l='./qr.png'"
+            echo "  -s='rc4-md5:52918214@138.68.61.42:23456'"
+            echo "Default is used inside proxy table index=0 to proxy."
+            echo "by liqiang"
+            exit 0
+            ;;
+        *)
+            # unknown option
+        ;;
+    esac
+done
+
+# Get inside QR network path
+if [[ $mode -eq $mode_inside_qr_net_path ]]; then
+    ss8='http://ss8.pm/images/'
+    ishadow='https://ss.ishadowx.net/img/qr/'
+    fvs='http://jn9.org/img/'
+    res=( \
+        ${ss8}server01.png  ${ss8}server02.png  ${ss8}server03.png \
+        ${fvs}qr01.png      ${fvs}qr02.png      ${fvs}qr03.png \
+        ${ishadow}sgaxxoo.png   ${ishadow}sgbxxoo.png   ${ishadow}sgcxxoo.png \
+        ${ishadow}usaxxoo.png   ${ishadow}usbxxoo.png   ${ishadow}uscxxoo.png \
+        ${ishadow}jpaxxoo.png   ${ishadow}jpbxxoo.png   ${ishadow}jpcxxoo.png \
+        )
+
+    if [ "$inside_qr_index" -ge "${#res[*]}" ]; then
+        echo "ss: invalid index"
+        exit 1
+    fi
+
+    qr_net_path=${res[$inside_qr_index]}
+fi
+
+# Get network QR
+if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path ]]; then
+    wget $qr_net_path -O $qr_local_path
+    if [ $? != 0 ]; then
+        exit 1
     fi
 fi
 
-ss8='http://ss8.pm/images/'
-ishadow='https://ss.ishadowx.net/img/qr/'
-fvs='http://jn9.org/img/'
-res=( \
-    ${ss8}server01.png  ${ss8}server02.png  ${ss8}server03.png \
-    ${fvs}qr01.png      ${fvs}qr02.png      ${fvs}qr03.png \
-    ${ishadow}sgaxxoo.png   ${ishadow}sgbxxoo.png   ${ishadow}sgcxxoo.png \
-    ${ishadow}usaxxoo.png   ${ishadow}usbxxoo.png   ${ishadow}uscxxoo.png \
-    ${ishadow}jpaxxoo.png   ${ishadow}jpbxxoo.png   ${ishadow}jpcxxoo.png \
-    )
-
-if [ "$i" -ge "${#res[*]}" ]; then
-    echo "ss: invalid index"
-    exit 1
+# Parse server info
+if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path || $mode -eq $mode_usr_qr_local_path ]]; then
+    # like: rc4-md5:52918214@138.68.61.42:23456
+    server_info=$(zbarimg -q --raw $qr_local_path | sed 's#^ss://##' | base64 -d)
 fi
-
-wget "${res[$i]}" -O $pic
-if [ $? != 0 ]; then
-    exit 1
-fi
-
-# like: rc4-md5:52918214@138.68.61.42:23456
-serverinfo=$(zbarimg -q --raw $pic | sed 's#^ss://##' | base64 -d)
 
 # link: -m rc4-md5 -k 52918214 -s 138.68.61.42 -p 23456
-serverparam=$(echo $serverinfo | sed 's/^/-m /; s/:/ -k /; s/@/ -s /; s/:/ -p /')
+serverparam=$(echo $server_info | sed 's/^/-m /; s/:/ -k /; s/@/ -s /; s/:/ -p /')
 
 localparam='-b 127.0.0.1 -l 1080'
 
-echo -e "\e[31mServer: $serverinfo\e[0m"
+echo -e "\e[31mServer: $server_info\e[0m"
 echo -e "\e[31mProxy: 127.0.0.1:1080\e[0m"
 
 if [ $global_proxy -eq 1 ]; then
     # open system proxy
-    echo "System proxy running"
+    echo -e "\e[32mSystem proxy running\e[0m"
     sysproxy global 127.0.0.1:1080
 fi
+
+echo ""
 
 # catch interrupt
 trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
