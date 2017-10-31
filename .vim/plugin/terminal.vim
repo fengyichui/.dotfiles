@@ -18,7 +18,7 @@ let g:loaded_terminal = 1
 
 function! s:alt_fix()
     " leaving out problematic characters: 'O', double quote, pipe and '['
-    let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(92, 123) + [125, 126]
+    let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(94, 123) + [125, 126]
     let printable_characters = map(ascii_nums, 'nr2char(v:val)')
     for char in printable_characters
         exe "set <M-".char.">=\<Esc>".char
