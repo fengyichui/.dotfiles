@@ -17,6 +17,18 @@
 # @{
 ######################################################################
 
+# inside proxy table
+ss8='http://ss8.pm/images/'
+ishadow='https://ss.ishadowx.net/img/qr/'
+fvs='http://jn9.org/img/'
+res=( \
+    ${ss8}server01.png ${ss8}server02.png ${ss8}server03.png \
+    ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png \
+    ${ishadow}sgaxxoo.png ${ishadow}sgbxxoo.png ${ishadow}sgcxxoo.png \
+    ${ishadow}usaxxoo.png ${ishadow}usbxxoo.png ${ishadow}uscxxoo.png \
+    ${ishadow}jpaxxoo.png ${ishadow}jpbxxoo.png ${ishadow}jpcxxoo.png \
+    )
+
 # const
 mode_inside_qr_net_path=0
 mode_usr_qr_net_path=1
@@ -85,22 +97,10 @@ done
 
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
-    ss8='http://ss8.pm/images/'
-    ishadow='https://ss.ishadowx.net/img/qr/'
-    fvs='http://jn9.org/img/'
-    res=( \
-        ${ss8}server01.png  ${ss8}server02.png  ${ss8}server03.png \
-        ${fvs}qr01.png      ${fvs}qr02.png      ${fvs}qr03.png \
-        ${ishadow}sgaxxoo.png   ${ishadow}sgbxxoo.png   ${ishadow}sgcxxoo.png \
-        ${ishadow}usaxxoo.png   ${ishadow}usbxxoo.png   ${ishadow}uscxxoo.png \
-        ${ishadow}jpaxxoo.png   ${ishadow}jpbxxoo.png   ${ishadow}jpcxxoo.png \
-        )
-
     if [ "$inside_qr_index" -ge "${#res[*]}" ]; then
         echo "ss: invalid index"
         exit 1
     fi
-
     qr_net_path=${res[$inside_qr_index]}
 fi
 
