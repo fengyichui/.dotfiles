@@ -18,15 +18,14 @@
 ######################################################################
 
 # inside proxy table
-ss8='http://ss8.pm/images/'
-ishadow='https://ss.ishadowx.net/img/qr/'
-fvs='http://jn9.org/img/'
+x='x'
+ss8='ss8.pm/images/'
+isx='isx.yt/img/qr/'
+fvs='jn9.org/img/'
 res=( \
-    ${ss8}server01.png ${ss8}server02.png ${ss8}server03.png \
-    ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png \
-    ${ishadow}sgaxxoo.png ${ishadow}sgbxxoo.png ${ishadow}sgcxxoo.png \
-    ${ishadow}usaxxoo.png ${ishadow}usbxxoo.png ${ishadow}uscxxoo.png \
-    ${ishadow}jpaxxoo.png ${ishadow}jpbxxoo.png ${ishadow}jpcxxoo.png \
+    ${ss8}server01.png ${ss8}server02.png ${ss8}server03.png $x $x $x $x $x $x $x \
+    ${isx}sgaxxoo.png ${isx}sgbxxoo.png ${isx}sgcxxoo.png ${isx}usaxxoo.png ${isx}usbxxoo.png ${isx}uscxxoo.png ${isx}jpaxxoo.png ${isx}jpbxxoo.png ${isx}jpcxxoo.png $x \
+    ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png $x $x $x $x $x $x $x \
     )
 
 # const
@@ -97,11 +96,15 @@ done
 
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
-    if [ "$inside_qr_index" -ge "${#res[*]}" ]; then
+    if [[ "$inside_qr_index" -ge "${#res[*]}" ]]; then
         echo "ss: invalid index"
         exit 1
     fi
     qr_net_path=${res[$inside_qr_index]}
+    if [[ $qr_net_path == $x ]]; then
+        echo "ss: invalid index"
+        exit 1
+    fi
 fi
 
 # Get network QR
