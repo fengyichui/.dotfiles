@@ -41,6 +41,7 @@ qr_net_path=''
 qr_local_path='/tmp/ssqr.png'
 server_info='rc4-md5:52918214@138.68.61.42:23456'
 mode=$mode_inside_qr_net_path
+proxy_mode='--http-proxy' # HTTP or SOCKS5
 
 # Parse argument
 for i in "$@"
@@ -70,6 +71,10 @@ do
             global_proxy=1
             shift # past argument with no value
             ;;
+        -5|--socks5)
+            proxy_mode=''
+            shift # past argument with no value
+            ;;
         -h|--help)
             echo "Automatic proxy with shadowsocks."
             echo "Usage:"
@@ -77,7 +82,8 @@ do
             echo "  -n|--qr-net        network QR picture address"
             echo "  -l|--qr-local      local QR picture path"
             echo "  -s|--server        encrypt_method:password@ip_addr:port"
-            echo "  -g|--global        use global proxy mode"
+            echo "  -g|--global        use global proxy"
+            echo "  -5|--socks5        use socks5 proxy mode"
             echo "  -h|--help          show this help"
             echo "Example:"
             echo "  -i=1"
@@ -135,13 +141,14 @@ if [ $global_proxy -eq 1 ]; then
     sysproxy global 127.0.0.1:1080
 fi
 
+# bank line
 echo ""
 
 # catch interrupt
 trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
 
 # ss
-shadowsocks --http-proxy -t 600 $localparam $serverparam
+shadowsocks -t 600 $proxy_mode $localparam $serverparam
 
 if [ $global_proxy -eq 1 ]; then
     # close system proxy
