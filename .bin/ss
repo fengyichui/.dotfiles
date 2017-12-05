@@ -150,6 +150,12 @@ trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
 # ss
 shadowsocks -t 600 $proxy_mode $localparam $serverparam
 
+# sslocal only support socks5
+# request:
+#   $ pip3 install shadowsocks
+#   $ apt-cyg install openssl-devel
+#sslocal -v -t 600 $localparam $serverparam
+
 if [ $global_proxy -eq 1 ]; then
     # close system proxy
     sysproxy off
