@@ -46,8 +46,10 @@ endfunction
 call s:initVariable("g:NERDTreeAutoCenter", 1)
 call s:initVariable("g:NERDTreeAutoCenterThreshold", 3)
 call s:initVariable("g:NERDTreeCaseSensitiveSort", 0)
+call s:initVariable("g:NERDTreeNaturalSort", 0)
 call s:initVariable("g:NERDTreeSortHiddenFirst", 1)
 call s:initVariable("g:NERDTreeChDirMode", 0)
+call s:initVariable("g:NERDTreeCreatePrefix", "silent")
 call s:initVariable("g:NERDTreeMinimalUI", 0)
 if !exists("g:NERDTreeIgnore")
     let g:NERDTreeIgnore = ['\~$']
@@ -56,6 +58,7 @@ call s:initVariable("g:NERDTreeBookmarksFile", expand('$HOME') . '/.NERDTreeBook
 call s:initVariable("g:NERDTreeBookmarksSort", 1)
 call s:initVariable("g:NERDTreeHighlightCursorline", 1)
 call s:initVariable("g:NERDTreeHijackNetrw", 1)
+call s:initVariable('g:NERDTreeMarkBookmarks', 1)
 call s:initVariable("g:NERDTreeMouseMode", 1)
 call s:initVariable("g:NERDTreeNotificationThreshold", 100)
 call s:initVariable("g:NERDTreeQuitOnOpen", 0)
@@ -65,10 +68,16 @@ call s:initVariable("g:NERDTreeShowFiles", 1)
 call s:initVariable("g:NERDTreeShowHidden", 0)
 call s:initVariable("g:NERDTreeShowLineNumbers", 0)
 call s:initVariable("g:NERDTreeSortDirs", 1)
-call s:initVariable("g:NERDTreeDirArrows", !nerdtree#runningWindows())
-call s:initVariable("g:NERDTreeDirArrowExpandable", "▸")
-call s:initVariable("g:NERDTreeDirArrowCollapsible", "▾")
+
+if !nerdtree#runningWindows() && !nerdtree#runningCygwin()
+    call s:initVariable("g:NERDTreeDirArrowExpandable", "▸")
+    call s:initVariable("g:NERDTreeDirArrowCollapsible", "▾")
+else
+    call s:initVariable("g:NERDTreeDirArrowExpandable", "+")
+    call s:initVariable("g:NERDTreeDirArrowCollapsible", "~")
+endif
 call s:initVariable("g:NERDTreeCascadeOpenSingleChildDir", 1)
+call s:initVariable("g:NERDTreeCascadeSingleChildDir", 1)
 
 if !exists("g:NERDTreeSortOrder")
     let g:NERDTreeSortOrder = ['\/$', '*', '\.swp$',  '\.bak$', '\~$']
@@ -79,12 +88,14 @@ else
     endif
 endif
 
+call s:initVariable("g:NERDTreeGlyphReadOnly", "RO")
+
 if !exists('g:NERDTreeStatusline')
 
     "the exists() crap here is a hack to stop vim spazzing out when
     "loading a session that was created with an open nerd tree. It spazzes
-    "because it doesnt store b:NERDTreeRoot (its a b: var, and its a hash)
-    let g:NERDTreeStatusline = "%{exists('b:NERDTreeRoot')?b:NERDTreeRoot.path.str():''}"
+    "because it doesnt store b:NERDTree(its a b: var, and its a hash)
+    let g:NERDTreeStatusline = "%{exists('b:NERDTree')?b:NERDTree.root.path.str():''}"
 
 endif
 call s:initVariable("g:NERDTreeWinPos", "left")
@@ -95,6 +106,8 @@ call s:initVariable("g:NERDTreeWinSize", 31)
 "Note: the space after the command is important
 if nerdtree#runningWindows()
     call s:initVariable("g:NERDTreeRemoveDirCmd", 'rmdir /s /q ')
+    call s:initVariable("g:NERDTreeCopyDirCmd", 'xcopy /s /e /i /y /q ')
+    call s:initVariable("g:NERDTreeCopyFileCmd", 'copy /y ')
 else
     call s:initVariable("g:NERDTreeRemoveDirCmd", 'rm -rf ')
     call s:initVariable("g:NERDTreeCopyCmd", 'cp -r ')
@@ -188,7 +201,7 @@ function! NERDTreeFocus()
     if g:NERDTree.IsOpen()
         call g:NERDTree.CursorToTreeWin()
     else
-        call g:NERDTreeCreator.TogglePrimary("")
+        call g:NERDTreeCreator.ToggleTabTree("")
     endif
 endfunction
 

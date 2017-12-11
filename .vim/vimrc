@@ -806,8 +806,7 @@ let g:signify_skip_filename_pattern = ['*.log']
 
 " NEER Tree
 let g:NERDTreeRespectWildIgnore = 1
-let g:NERDTreeWinSize = 30
-let g:NERDTreeDirArrows = 1
+"let g:NERDTreeWinSize = 30
 
 " TagHighlight
 let g:TagHighlightSettings = {}
@@ -858,8 +857,7 @@ let g:neocomplcache_enable_at_startup = 0
 " Tagbar
 let g:tagbar_left = 1
 let g:tagbar_sort = 0
-let g:tagbar_width = 30
-let g:tagbar_iconchars = ['▸', '▾']
+"let g:tagbar_width = 30
 "Add this to tagbar/types/ctags.vim and utags.vim
 "let g:tagbar_type_cpp = {'kinds' : ['p:prototypes:1:1']}
 "let g:tagbar_type_c   = {'kinds' : ['p:prototypes:1:1']}
