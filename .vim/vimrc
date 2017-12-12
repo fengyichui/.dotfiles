@@ -786,6 +786,7 @@ let g:maximizer_default_mapping_key = '<A-o>'
 let g:maximizer_set_mapping_with_bang = 1
 
 " Startify
+let g:startify_enable_unsafe = 1
 let g:startify_bookmarks = [
             \ {'v': $MYVIMRC},
             \ {'l': expand(g:learn_path)},

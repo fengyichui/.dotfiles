@@ -538,25 +538,29 @@ function! s:filter_oldfiles_unsafe(path_prefix, path_format, use_env) abort
   let entries     = {}
   let oldfiles    = []
   let is_dir      = escape(s:sep, '\') . '$'
+  let is_nerdtree = 'NERD_tree_1$'
+  let is_tagbar   = '__Tagbar__\.1$'
 
   for fname in v:oldfiles
     if counter <= 0
       break
     endif
 
-    let absolute_path = glob(fnamemodify(fname, ":p"))
+    let absolute_path = fname
     if empty(absolute_path)
           \ || has_key(entries, absolute_path)
           \ || (absolute_path =~ is_dir)
+          \ || (absolute_path =~ is_nerdtree)
+          \ || (absolute_path =~ is_tagbar)
           \ || match(absolute_path, path_prefix)
           \ || s:is_in_skiplist(absolute_path)
       continue
     endif
 
-    let entry_path              = fnamemodify(absolute_path, a:path_format)
+    let entry_path              = absolute_path
     let entries[absolute_path]  = 1
     let counter                -= 1
-    let oldfiles               += [[fnameescape(absolute_path), entry_path]]
+    let oldfiles               += [[absolute_path, entry_path]]
   endfor
 
   return oldfiles
