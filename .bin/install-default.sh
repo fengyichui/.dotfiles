@@ -34,6 +34,7 @@ apt-cyg install w3m # web explorer in terminal
 #apt-cyg install lynx # web explorer in terminal
 apt-cyg install ruby rubygems # ruby and its package manager
 apt-cyg install procps # for ps and top
+apt-cyg install psmisc # for fuser and pstree
 apt-cyg install gnuplot # for plot
 #apt-cyg install inetutils # for telnet
 #apt-cyg install xorg-server # for X window system
