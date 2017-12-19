@@ -1,0 +1,40 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.elf
+*.axf
+obj/
+_build/
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+#*.dll
+#*.so
+#*.so.*
+#*.dylib
+
+# Executables
+*.exe
+*.out
+*.hex
+*.bin
+
+# Backup files
+*.bak
+
+# Keil TMEP files
+*uvgui.*
+JLinkLog.txt
+JLinkSettings.ini
+EventRecorderStub.scvd
+
