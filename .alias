@@ -46,6 +46,8 @@ alias cpp="webx 'http://www.cplusplus.com/search.do?q='"
 
 # arm gdb with tmux,gdb.dashboard
 alias armgdb="tmuxinator start armgdb"
+alias armgdb2="tmuxinator start armgdb -n armgdb2"
+alias armgdb3="tmuxinator start armgdb -n armgdb3"
 
 #
 # Function
