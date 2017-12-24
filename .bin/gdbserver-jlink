@@ -1,0 +1,13 @@
+#!/bin/bash
+
+params = '-speed 5000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -nosilent -vd -noir'  #-select usb=20151001
+
+os=$(uname -o)
+
+# Segger Jlink GDB Server
+if [[ "$os" =~ "Cygwin" ]]; then
+    JLinkGDBServerCL $params
+elif [[ "$os" =~ "Linux" ]]; then
+    JLinkGDBServer $params
+fi
+
