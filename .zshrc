@@ -1,5 +1,12 @@
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+os=$(uname -o)
+if [[ "$os" =~ "Linux" ]]; then
+    export OSTYPE='Linux'
+    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+elif [[ "$os" =~ "Cygwin" ]]; then
+    export OSTYPE='Cygwin'
+    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh

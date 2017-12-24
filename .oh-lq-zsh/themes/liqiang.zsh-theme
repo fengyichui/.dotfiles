@@ -3,8 +3,7 @@
 #if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="green"; fi
 
 # For root flag
-os=$(uname -o)
-if [[ "$os" == "Cygwin" ]]; then
+if [[ "$OSTYPE" == "Cygwin" ]]; then
     root=$(id -G)
     # 544 is windows administrators group
     if [[ $root =~ "544" ]]; then
