@@ -1,10 +1,7 @@
 # If you come from bash you might have to change your $PATH.
-os=$(uname -o)
-if [[ "$os" =~ "Linux" ]]; then
-    export OSTYPE='Linux'
+if [[ "$OSTYPE" =~ "linux" ]]; then
     export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
-elif [[ "$os" =~ "Cygwin" ]]; then
-    export OSTYPE='Cygwin'
+elif [[ "$OSTYPE" =~ "cygwin" ]]; then
     export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
 fi
 
