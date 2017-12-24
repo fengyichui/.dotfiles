@@ -8,7 +8,7 @@ if [[ "$OSTYPE" =~ "cygwin" ]]; then
     echo -n "$input" >/dev/clipboard
 elif [[ "$OSTYPE" =~ "linux" ]]; then
     kernel=$(uname -r)
-    if [[ "$OSTYPE" =~ "Microsoft" ]]; then
+    if [[ "$kernel" =~ "Microsoft" ]]; then
         echo -n "$input" | clip.exe
     else
         echo -n "$input" | xclip
