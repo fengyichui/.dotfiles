@@ -1,6 +1,6 @@
 #!/bin/bash
 
-params = '-speed 5000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -nosilent -vd -noir'  #-select usb=20151001
+params='-speed 6000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -nosilent -vd -noir'  #-select usb=20151001
 
 os=$(uname -o)
 
