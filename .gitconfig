@@ -258,3 +258,5 @@
     # checkout a tag into a branch
     checkout-tag = "!f() { tagname=${1}; branchname='${tagname}-branch'; git checkout -b '${branchname}' '${tagname}'; } ; f"
 
+[push]
+	default = simple
