@@ -216,6 +216,7 @@ else
     set guifont=DejaVu\ Sans\ Mono\ 10.5
 endif
 
+set modeline                    " modeline
 set formatoptions=tcroqlnj      " Automatic formatting
 set noequalalways               " Don't automatically made the same size after close a window
 set number                      " show line number
