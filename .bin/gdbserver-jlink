@@ -6,6 +6,12 @@ params='-speed 6000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -no
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
     JLinkGDBServerCL $params
 elif [[ "$OSTYPE" =~ "linux" ]]; then
-    JLinkGDBServer $params
+    kernel=$(uname -r)
+    # WSL
+    if [[ "$kernel" =~ "Microsoft" ]]; then
+        JLinkGDBServerCL.exe $params
+    else
+        JLinkGDBServer $params
+    fi
 fi
 
