@@ -50,6 +50,7 @@
     # various pretty loggers from various places
     lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit --all --date=relative
     lc = !git lg ORIG_HEAD.. --stat
+    lf = !git lg --name-only
 
     # what branch contains the sha
     contains = branch --contains
