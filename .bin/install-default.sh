@@ -13,6 +13,7 @@ apt-cyg install gzip zip unzip
 apt-cyg install python
 apt-cyg install python3
 apt-cyg install git
+apt-cyg install git-svn # git svn clone ...
 apt-cyg install subversion # svn
 apt-cyg install the_silver_searcher # ag search
 apt-cyg install vim
