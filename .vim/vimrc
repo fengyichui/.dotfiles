@@ -304,11 +304,10 @@ set statusline+=/%{&fileformat}
 set statusline+=/%{&filetype==\"\"?\"?\":&filetype}
 set statusline+=\ %c:%l/%L\ %P
 
-if !has('win32unix') " cygwin
-" In cygwin64, the lazyredraw lead vim slowly in insert mode
-" Don't redraw while executing macros (good performance config)
-set lazyredraw
-endif
+"if !has('win32unix') " cygwin
+"" In cygwin64, the lazyredraw lead vim slowly in insert mode
+set lazyredraw  " Don't redraw while executing macros (good performance config)
+"endif
 
 " For set undodir=~/.vimundo
 if !isdirectory($HOME."/.vimundo")
