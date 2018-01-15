@@ -2,6 +2,8 @@
 # GDB init local file
 #
 
+source ~/.local/hs662x.gdb.py
+
 define xx
 source ~/.gdb.dashboard
 end
@@ -61,7 +63,7 @@ end
 #mon flash download = 1
 
 # Download application to flash, use KEIL FLASH Algorithm
-define download
+define _download
     mon reset 1
     mon halt
     file ~/.local/HS662X.GDB.FLM

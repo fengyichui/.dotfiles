@@ -62,7 +62,6 @@ plugins=(safe-paste \
          vi-mode \
          extract \
          dircycle \
-         tmux \
          zsh-fzf \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
