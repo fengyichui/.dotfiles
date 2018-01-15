@@ -49,6 +49,9 @@ alias armgdb="tmuxinator start armgdb"
 alias armgdb2="tmuxinator start armgdb -n armgdb2"
 alias armgdb3="tmuxinator start armgdb -n armgdb3"
 
+# gdb for hs662x
+alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.gdb/hs662x.gdb.py"'
+
 #
 # Function
 #

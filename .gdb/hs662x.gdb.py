@@ -47,8 +47,8 @@ def prepare_and_show():
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
-    gdb.execute('file ~/.local/HS662X.GDB.FLM', to_string=True)
-    gdb.execute('restore ~/.local/HS662X.GDB.FLM', to_string=True)
+    gdb.execute('file ~/.gdb/HS662X.GDB.FLM', to_string=True)
+    gdb.execute('restore ~/.gdb/HS662X.GDB.FLM', to_string=True)
     gdb.execute('set $sp=&FlashDevice.sectors[1024]', to_string=True)
 
     # Show device name

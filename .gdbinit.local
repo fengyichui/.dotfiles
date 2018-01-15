@@ -2,10 +2,12 @@
 # GDB init local file
 #
 
-source ~/.local/hs662x.gdb.py
+define hs662x
+source ~/.gdb/hs662x.gdb.py
+end
 
 define xx
-source ~/.gdb.dashboard
+source ~/.gdb/dashboard.gdb
 end
 
 define sii
@@ -66,8 +68,8 @@ end
 define _download
     mon reset 1
     mon halt
-    file ~/.local/HS662X.GDB.FLM
-    restore ~/.local/HS662X.GDB.FLM
+    file ~/.gdb/HS662X.GDB.FLM
+    restore ~/.gdb/HS662X.GDB.FLM
     set $sp=&FlashDevice.sectors[1024]
     set $buffer=(unsigned char *)FlashDevice.sectors
     set $sector_size=4096
