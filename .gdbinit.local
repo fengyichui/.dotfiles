@@ -134,7 +134,7 @@ define _download
     set $res=UnInit(3)
     file
 end
-document download
+document _download
 Syntax: download
 | Download binary(a.bin) file to flash
 end
