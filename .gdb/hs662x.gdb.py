@@ -66,7 +66,7 @@ def prepare_and_show():
     else:
         flash_size = 1 << (flash_id&0xff)
         flash_name = 'Unknown'
-    print('Flash:  {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
+    print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
 
 
 ######################################################################
@@ -136,12 +136,15 @@ class download_register(gdb.Command):
 
         # Get file name
         if args == '':
-            file_path = './a.bin'
+            file_path = 'a.bin'
         else:
             file_path = args
 
         # Get file size
         file_size = os.path.getsize(file_path)
+
+        # show burn application info
+        print('{}: {}kB'.format(file_path, file_size/1024))
 
         # get buffer
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
