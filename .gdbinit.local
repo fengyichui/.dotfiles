@@ -29,13 +29,13 @@ connect2local
 end
 
 #remap RAM to 0x00000000
-define remap2ram
+define remap2ram_hs662x
 set *0x400e003c=0x336
 set *0x400e003c=0x336
 end
 
 #remap ROM to 0x00000000
-define remap2rom
+define remap2rom_hs662x
 set *0x400e003c=0x335
 set *0x400e003c=0x335
 end
@@ -47,7 +47,7 @@ c
 end
 
 define rc1
-remap2ram
+remap2ram_hs662x
 #reset core only
 mon reset 1
 load

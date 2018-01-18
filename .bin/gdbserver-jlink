@@ -1,17 +1,20 @@
 #!/bin/bash
 
-params='-speed 6000 -port 2331 -if SWD -nolocalhostonly -nologtofile -nohalt -nosilent -vd -noir'  #-select usb=20151001
+# add device Cortex-CM3, jlinkGdbServer will wait chip wakeduped, and then connect
+params='-device Cortex-M3 -speed 6000 -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout'  #-select usb=20151001
 
 # Segger Jlink GDB Server
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
-    JLinkGDBServerCL $params
+    gdbserver=JLinkGDBServerCL
 elif [[ "$OSTYPE" =~ "linux" ]]; then
     kernel=$(uname -r)
     # WSL
     if [[ "$kernel" =~ "Microsoft" ]]; then
-        JLinkGDBServerCL.exe $params
+        gdbserver=JLinkGDBServerCL.exe
     else
-        JLinkGDBServer $params
+        gdbserver=JLinkGDBServer
     fi
 fi
+
+$gdbserver $params
 

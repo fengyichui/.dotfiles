@@ -43,7 +43,7 @@ flash_info_table = {
 # FUNCTIONS
 ######################################################################
 
-def prepare_and_show():
+def flash_prepare_and_show():
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
@@ -69,21 +69,58 @@ def prepare_and_show():
     print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
 
 
+def mem32_read(addr):
+    value = int(gdb.parse_and_eval('*{}'.format(addr)).cast(gdb.lookup_type('unsigned long')))
+    return value
+
+
+def mem32_write(addr, value):
+    gdb.execute('set *{}={}'.format(addr, value))
+
+
 ######################################################################
 # CLASS
 ######################################################################
 
+# remap to RAM
+class remap2ram_register(gdb.Command):
+
+    """HS662x remap to RAM
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("remap2ram", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+        gdb.execute('set *0x400e003c=0x336')
+        gdb.execute('set *0x400e003c=0x336')
+
+
+# remap to ROM
+class remap2rom_register(gdb.Command):
+
+    """HS662x remap to ROM
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("remap2rom", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+        gdb.execute('set *0x400e003c=0x335')
+        gdb.execute('set *0x400e003c=0x335')
+
+
 # info
-class info_register(gdb.Command):
+class device_info_register(gdb.Command):
 
     """HS662x info
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("info_hs662x", gdb.COMMAND_USER)
+        super(self.__class__, self).__init__("device_info", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        prepare_and_show()
+        flash_prepare_and_show()
 
 
 # upload
@@ -93,14 +130,14 @@ class upload_register(gdb.Command):
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("upload_hs662x", gdb.COMMAND_USER)
+        super(self.__class__, self).__init__("upload", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
         flash_image = b''
         flash_file = './hs662x_upload_flash_image.bin'
 
         # Prepare
-        prepare_and_show()
+        flash_prepare_and_show()
 
         # Read flash data
         print("  uploading... [{}]".format(flash_file))
@@ -127,12 +164,12 @@ class download_register(gdb.Command):
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("download_hs662x", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+        super(self.__class__, self).__init__("download", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
 
         # Prepare
-        prepare_and_show()
+        flash_prepare_and_show()
 
         # Get file name
         if args == '':
@@ -191,7 +228,9 @@ class download_register(gdb.Command):
 
 
 # register
-info_register()
+remap2ram_register()
+remap2rom_register()
+device_info_register()
 upload_register()
 download_register()
 
