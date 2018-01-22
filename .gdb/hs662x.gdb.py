@@ -49,7 +49,8 @@ def flash_prepare_and_show():
     gdb.execute('mon halt', to_string=True)
     gdb.execute('file ~/.gdb/HS662X.GDB.FLM', to_string=True)
     gdb.execute('restore ~/.gdb/HS662X.GDB.FLM', to_string=True)
-    gdb.execute('set $sp=&FlashDevice.sectors[1024]', to_string=True)
+    gdb.execute('set $sp=&FlashDevice.sectors[1024]')
+    gdb.execute('set $res=Init(0, 6000000, 3)')
 
     # Show device name
     device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))
@@ -141,7 +142,6 @@ class upload_register(gdb.Command):
 
         # Read flash data
         print("  uploading... [{}]".format(flash_file))
-        gdb.execute('set $res=Init(0, 6000000, 3)')
         read_buffer = int(gdb.parse_and_eval('m_buffer').cast(gdb.lookup_type('int')))
         addr = 0
         while addr < flash_size:
