@@ -131,14 +131,21 @@ class upload_register(gdb.Command):
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("upload", gdb.COMMAND_USER)
+        super(self.__class__, self).__init__("upload", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
-        flash_image = b''
-        flash_file = './hs662x_upload_flash_image.bin'
 
         # Prepare
         flash_prepare_and_show()
+
+        # flash image data
+        flash_image = b''
+
+        # Get file name
+        if args == '':
+            flash_file = 'hs662x_upload_flash_image.bin'
+        else:
+            flash_file = args
 
         # Read flash data
         print("  uploading... [{}]".format(flash_file))
