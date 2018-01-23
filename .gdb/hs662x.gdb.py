@@ -70,6 +70,10 @@ def flash_prepare_and_show():
     print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
 
 
+def flash_finish():
+    gdb.execute('file', to_string=True)
+
+
 def mem32_read(addr):
     value = int(gdb.parse_and_eval('*{}'.format(addr)).cast(gdb.lookup_type('unsigned long')))
     return value
@@ -122,6 +126,7 @@ class device_info_register(gdb.Command):
 
     def invoke(self, args, from_tty):
         flash_prepare_and_show()
+        flash_finish()
 
 
 # upload
@@ -143,7 +148,7 @@ class flash_upload_register(gdb.Command):
 
         # Get file name
         if args == '':
-            flash_file = 'hs662x_upload_flash_image.bin'
+            flash_file = 'flash_image.bin'
         else:
             flash_file = args
 
@@ -161,17 +166,66 @@ class flash_upload_register(gdb.Command):
 
         # Finish
         print("Finish")
-        gdb.execute('file')
+        flash_finish()
 
 
 # download
-class flash_download_register(gdb.Command):
+class flash_download_image_register(gdb.Command):
 
     """HS662x download to flash
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("flash_download", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+        super(self.__class__, self).__init__("flash_download_image", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Prepare
+        flash_prepare_and_show()
+
+        # Get file name
+        if args == '':
+            file_path = 'flash_image.bin'
+        else:
+            file_path = args
+
+        # Get file size
+        file_size = os.path.getsize(file_path)
+        file_size = min(file_size, (flash_size-flash_sector_size)) # last is CPFT data
+
+        # show burn application info
+        print('{}: {}kB'.format(file_path, file_size/1024))
+
+        # get buffer
+        buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+
+        # Erase
+        print("  Erase...")
+        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(0, flash_size-flash_sector_size)) # last is CPFT data
+
+        # Program
+        print("  Program...")
+        addr = 0
+        while addr < file_size:
+            left = file_size - addr
+            len = left if left<flash_sector_size else flash_sector_size
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
+            gdb.execute('set $res=flash_write({}, {}, {})'.format(addr, buffer, len))
+            addr += flash_sector_size
+
+        # Finish
+        print("Finish")
+        flash_finish()
+
+
+# download
+class flash_download_app_register(gdb.Command):
+
+    """HS662x download to flash
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_download_app", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
 
@@ -231,7 +285,7 @@ class flash_download_register(gdb.Command):
 
         # Finish
         print("Finish")
-        gdb.execute('file')
+        flash_finish()
 
 
 class flash_erase_register(gdb.Command):
@@ -249,10 +303,10 @@ class flash_erase_register(gdb.Command):
         argv = gdb.string_to_argv(args)
         if len(argv) == 0:
             begin = 0
-            length = 511
+            length = flash_size - flash_sector_size # last is CPFT data
         elif len(argv) == 2:
-            begin = int(argv[0])
-            length = int(argv[1])
+            begin = int(argv[0]) * 1024
+            length = int(argv[1]) * 1024
         else:
             raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
 
@@ -260,10 +314,15 @@ class flash_erase_register(gdb.Command):
         flash_prepare_and_show()
 
         # Info
-        print("Erase begin={}kB length={}kB".format(begin, length))
+        print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
 
         # Erase
-        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin, 1024*length))
+        print("  Erase...")
+        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin, length))
+
+        # Finish
+        print("Finish")
+        flash_finish()
 
 
 # register
@@ -271,7 +330,8 @@ remap2ram_register()
 remap2rom_register()
 device_info_register()
 flash_upload_register()
-flash_download_register()
+flash_download_app_register()
+flash_download_image_register()
 flash_erase_register()
 
 
