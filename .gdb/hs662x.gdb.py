@@ -125,13 +125,13 @@ class device_info_register(gdb.Command):
 
 
 # upload
-class upload_register(gdb.Command):
+class flash_upload_register(gdb.Command):
 
     """HS662x upload from flash
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("upload", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+        super(self.__class__, self).__init__("flash_upload", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
 
@@ -165,13 +165,13 @@ class upload_register(gdb.Command):
 
 
 # download
-class download_register(gdb.Command):
+class flash_download_register(gdb.Command):
 
     """HS662x download to flash
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("download", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+        super(self.__class__, self).__init__("flash_download", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
 
@@ -234,13 +234,45 @@ class download_register(gdb.Command):
         gdb.execute('file')
 
 
+class flash_erase_register(gdb.Command):
+
+    """HS662x flash erase
+    flash_erase <begin_kB> <length_kB>
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_erase", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+
+        # param
+        argv = gdb.string_to_argv(args)
+        if len(argv) == 0:
+            begin = 0
+            length = 511
+        elif len(argv) == 2:
+            begin = int(argv[0])
+            length = int(argv[1])
+        else:
+            raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
+
+        # Prepare
+        flash_prepare_and_show()
+
+        # Info
+        print("Erase begin={}kB length={}kB".format(begin, length))
+
+        # Erase
+        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin, 1024*length))
+
+
 # register
 remap2ram_register()
 remap2rom_register()
 device_info_register()
-upload_register()
-download_register()
-
+flash_upload_register()
+flash_download_register()
+flash_erase_register()
 
 
 # @} #
