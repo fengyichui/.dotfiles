@@ -115,6 +115,22 @@ class remap2rom_register(gdb.Command):
         gdb.execute('set *0x400e003c=0x335')
 
 
+# reboot
+class reboot_register(gdb.Command):
+
+    """HS662x reboot
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("reboot", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+        gdb.execute('mon reset')
+        gdb.execute('remap2rom')
+        gdb.execute('mon reset 1')
+        gdb.execute('c')
+
+
 # info
 class device_info_register(gdb.Command):
 
@@ -328,6 +344,7 @@ class flash_erase_register(gdb.Command):
 # register
 remap2ram_register()
 remap2rom_register()
+reboot_register()
 device_info_register()
 flash_upload_register()
 flash_download_app_register()

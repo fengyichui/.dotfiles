@@ -26,10 +26,10 @@ if !exists("g:DirDiffEnableMappings")
 endif
 
 if g:DirDiffEnableMappings
-    nnoremap <unique> <Leader>dg :diffget<CR>
-    nnoremap <unique> <Leader>dp :diffput<CR>
-    nnoremap <unique> <Leader>dj :DirDiffNext<CR>
-    nnoremap <unique> <Leader>dk :DirDiffPrev<CR>
+    nnoremap <Leader>dg :diffget<CR>
+    nnoremap <Leader>dp :diffput<CR>
+    nnoremap <Leader>dj :DirDiffNext<CR>
+    nnoremap <Leader>dk :DirDiffPrev<CR>
 endif
 
 " Global Maps:
@@ -74,6 +74,21 @@ endif
 " Defaults to off
 if !exists("g:DirDiffDynamicDiffText")
     let g:DirDiffDynamicDiffText = 0
+endif
+
+" Force set the LANG variable before running the C command.  Default to C.
+" Set to "" to not set the variable.
+if !exists("g:DirDiffForceLang")
+    let g:DirDiffForceLang = "C"
+endif
+
+let g:DirDiffLangString = ""
+if (g:DirDiffForceLang != "")
+    if has('win32') && !has('win32unix')
+      let g:DirDiffLangString = 'SET LANG=' . g:DirDiffForceLang . ' && '
+    else
+      let g:DirDiffLangString = 'LANG=' . g:DirDiffForceLang . ' '
+    endif
 endif
 
 " String used for the English equivalent "Files "
@@ -173,7 +188,8 @@ function! <SID>DirDiff(srcA, srcB)
     let DiffBuffer = tempname()
     " We first write to that file
     " Constructs the command line
-    let cmd = "!diff"
+    let langStr = ""
+    let cmd = "!" . g:DirDiffLangString . "diff"
     let cmdarg = " -r --brief"
 
     " If variable is set, we ignore the case
@@ -241,6 +257,7 @@ function! <SID>DirDiff(srcA, srcB)
     call append(5, "")
     " go to the beginning of the file
     0
+    setlocal filetype=dirdiff
     setlocal nomodified
     setlocal nomodifiable
     setlocal buftype=nowrite
@@ -611,6 +628,7 @@ function! <SID>DirDiffSync() range
             let currLine = currLine + 1
         endif
     endwhile
+    redraw!
     echo syncCount . " diff item(s) synchronized."
 endfunction
 
@@ -891,7 +909,7 @@ function! <SID>GetDiffStrings()
 	silent exe s:DirDiffMakeDirCmd . "\"" . tmp1 . "\""
 	silent exe s:DirDiffMakeDirCmd . "\"" . tmp2 . "\""
 	silent exe "!echo test > \"" . tmp1 . s:sep . "test" . "\""
-	silent exe "!diff -r --brief \"" . tmp1 . "\" \"" . tmp2 . "\" > \"" . tmpdiff . "\""
+	silent exe "!" . g:DirDiffLangString . "diff -r --brief \"" . tmp1 . "\" \"" . tmp2 . "\" > \"" . tmpdiff . "\""
 
 	" Now get the result of that diff cmd
 	silent exe "split ". tmpdiff
@@ -903,13 +921,13 @@ function! <SID>GetDiffStrings()
 	let s:DirDiffDiffOnlyLineCenter = substitute( getline(1), regex, '\2', '') 
     "echo "DirDiff Only: " . s:DirDiffDiffOnlyLine
 	
-	q
+	bd
 
 	" Now let's get the Differ string
     "echo "Getting the diff in GetDiffStrings"
 	
 	silent exe "!echo testdifferent > \"" . tmp2 . s:sep . "test" . "\""
-	silent exe "!diff -r --brief \"" . tmp1 . "\" \"" . tmp2 . "\" > \"" . tmpdiff . "\""
+	silent exe "!" . g:DirDiffLangString . "diff -r --brief \"" . tmp1 . "\" \"" . tmp2 . "\" > \"" . tmpdiff . "\""
 	
 	silent exe "split ". tmpdiff
 	let s:DirDiffDifferLine = substitute( getline(1), tmp1rx . ".*$", "", '') 
