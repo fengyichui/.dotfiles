@@ -43,7 +43,7 @@ c
 end
 
 define rc1
-remap2ram_hs662x
+remap2ram
 #reset core only
 mon reset 1
 load
