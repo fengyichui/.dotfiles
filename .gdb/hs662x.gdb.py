@@ -39,6 +39,18 @@ flash_info_table = {
     0x856014: {'size': 1024*1024, 'name': "P25R80H"},
 }
 
+FLASH_PART_APP           = 2
+FLASH_PART_CFG           = 4
+FLASH_PART_PATCH         = 5
+
+FLASH_APP_BASE_ADDR      = 3 * flash_sector_size
+FLASH_CFG_BASE_ADDR_N    = 4 * flash_sector_size
+FLASH_PATCH_BASE_ADDR_DN = 4 * flash_sector_size
+
+APP_MAX_SIZE             = 128 * flash_sector_size
+CFG_MAX_SIZE             = 3 * flash_sector_size
+PATCH_MAX_SIZE           = 2 * flash_sector_size
+
 ######################################################################
 # FUNCTIONS
 ######################################################################
@@ -81,6 +93,85 @@ def mem32_read(addr):
 
 def mem32_write(addr, value):
     gdb.execute('set *{}={}'.format(addr, value))
+
+
+def flash_download_part(part_type, file_path, is_verify=True):
+
+    # Prepare
+    flash_prepare_and_show()
+
+    # Get file size
+    file_size = os.path.getsize(file_path)
+
+    # Get flash base address
+    if part_type == FLASH_PART_APP:
+        if file_size > APP_MAX_SIZE:
+            raise gdb.GdbError('Too larger APP file')
+        flash_base_addr = FLASH_APP_BASE_ADDR
+        erase_size = file_size
+    elif part_type == FLASH_PART_CFG:
+        if file_size > CFG_MAX_SIZE:
+            raise gdb.GdbError('Too larger CFG file')
+        flash_base_addr = flash_size - FLASH_CFG_BASE_ADDR_N
+        erase_size = CFG_MAX_SIZE
+    elif part_type == FLASH_PART_PATCH:
+        file_size_align = (file_size + flash_sector_size - 1) / flash_sector_size * flash_sector_size
+        if file_size_align > PATCH_MAX_SIZE:
+            raise gdb.GdbError('Too larger PATCH file')
+        flash_base_addr = flash_size - FLASH_PATCH_BASE_ADDR_DN - file_size_align
+        erase_size = file_size_align
+    else:
+        raise gdb.GdbError('invalid part')
+
+    # show burn info
+    print('{}: {}kB (0x{:08X} in flash)'.format(file_path, file_size/1024, flash_base_addr))
+
+    # get buffer
+    buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+
+    # Erase
+    print("  Erase...")
+    gdb.execute('set $res=Init(0, 6000000, 1)')
+    gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
+    addr = 0
+    while addr < erase_size:
+        gdb.execute('set $res=EraseSector({})'.format(addr))
+        addr += flash_sector_size
+    gdb.execute('set $res=UnInit(1)')
+
+    # Program
+    print("  Program...")
+    gdb.execute('set $res=Init(0, 6000000, {})'.format(int(part_type)))
+    gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
+    addr = 0
+    while addr < file_size:
+        left = file_size - addr
+        len = left if left<flash_sector_size else flash_sector_size
+        gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
+        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, len, buffer))
+        addr += flash_sector_size
+    gdb.execute('set $res=UnInit({})'.format(int(part_type)))
+
+    # Verify
+    if is_verify:
+        print("  Verify...")
+        gdb.execute('set $res=Init(0, 6000000, 3)')
+        gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
+        addr = 0
+        while addr < file_size:
+            left = file_size - addr
+            len = left if left<flash_sector_size else flash_sector_size
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
+            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, len, buffer))
+            res = int(gdb.parse_and_eval('$res').cast(gdb.lookup_type('int')))
+            if res != addr + len:
+                raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+len))
+            addr += flash_sector_size
+        gdb.execute('set $res=UnInit(3)')
+
+    # Finish
+    print("Finish")
+    flash_finish()
 
 
 ######################################################################
@@ -188,7 +279,7 @@ class flash_upload_register(gdb.Command):
 # download
 class flash_download_image_register(gdb.Command):
 
-    """HS662x download to flash
+    """HS662x download ALL image to flash
     """
 
     def __init__(self):
@@ -234,10 +325,10 @@ class flash_download_image_register(gdb.Command):
         flash_finish()
 
 
-# download
+# download app
 class flash_download_app_register(gdb.Command):
 
-    """HS662x download to flash
+    """HS662x download APP to flash
     """
 
     def __init__(self):
@@ -245,65 +336,59 @@ class flash_download_app_register(gdb.Command):
 
     def invoke(self, args, from_tty):
 
-        # Prepare
-        flash_prepare_and_show()
-
         # Get file name
         if args == '':
             file_path = 'a.bin'
         else:
             file_path = args
 
-        # Get file size
-        file_size = os.path.getsize(file_path)
-
-        # show burn application info
-        print('{}: {}kB'.format(file_path, file_size/1024))
-
-        # get buffer
-        buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
-
-        # Erase
-        print("  Erase...")
-        gdb.execute('set $res=Init(0, 6000000, 1)')
-        addr = 0
-        while addr < file_size:
-            gdb.execute('set $res=EraseSector({})'.format(addr))
-            addr += flash_sector_size
-        gdb.execute('set $res=UnInit(1)')
-
-        # Program
-        print("  Program...")
-        gdb.execute('set $res=Init(0, 6000000, 2)')
-        addr = 0
-        while addr < file_size:
-            left = file_size - addr
-            len = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
-            gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, len, buffer))
-            addr += flash_sector_size
-        gdb.execute('set $res=UnInit(2)')
-
-        # Verify
-        print("  Verify...")
-        gdb.execute('set $res=Init(0, 6000000, 3)')
-        addr = 0
-        while addr < file_size:
-            left = file_size - addr
-            len = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
-            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, len, buffer))
-            res = int(gdb.parse_and_eval('$res').cast(gdb.lookup_type('int')))
-            if res != addr + len:
-                raise gdb.GdbError('!!! Fail !!!')
-            addr += flash_sector_size
-        gdb.execute('set $res=UnInit(3)')
-
-        # Finish
-        print("Finish")
-        flash_finish()
+        # Download
+        flash_download_part(FLASH_PART_APP, file_path)
 
 
+# download cfg
+class flash_download_cfg_register(gdb.Command):
+
+    """HS662x download CFG to flash
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_download_cfg", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Get file name
+        if args == '':
+            file_path = 'cfg.bin'
+        else:
+            file_path = args
+
+        # Download
+        flash_download_part(FLASH_PART_CFG, file_path)
+
+
+# download patch
+class flash_download_patch_register(gdb.Command):
+
+    """HS662x download PATCH to flash
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_download_patch", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Get file name
+        if args == '':
+            file_path = 'patch.bin'
+        else:
+            file_path = args
+
+        # Download
+        flash_download_part(FLASH_PART_PATCH, file_path)
+
+
+# erase
 class flash_erase_register(gdb.Command):
 
     """HS662x flash erase
@@ -348,6 +433,8 @@ reboot_register()
 device_info_register()
 flash_upload_register()
 flash_download_app_register()
+flash_download_cfg_register()
+flash_download_patch_register()
 flash_download_image_register()
 flash_erase_register()
 
