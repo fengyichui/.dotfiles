@@ -54,12 +54,12 @@ pip3 install you-get # Download media contents (videos, audios, images) from the
 pip3 install pudb # Python debuger
 
 # Command-line translator using Google Translate, Bing Translator, Yandex.Translate, etc.
-git clone https://github.com/soimort/translate-shell
-cd translate-shell/
-make TARGET=zsh
-make install
-cd ..
-rm -rf translate-shell/
+#git clone https://github.com/soimort/translate-shell
+#cd translate-shell/
+#make TARGET=zsh
+#make install
+#cd ..
+#rm -rf translate-shell/
 
 # gem
 gem install tmuxinator
