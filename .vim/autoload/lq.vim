@@ -596,11 +596,15 @@ endfunction
 " Compile It
 function! lq#CompileIt()
     if expand("%:e") == 'uvproj'
-        make %
+        Makekeil %
+    elseif expand("%:e") == 'ewp'
+        Makeiar %
     elseif exists("b:current_compiler") && b:current_compiler=='keil'
-        make
+        Makekeil
+    elseif exists("b:current_compiler") && b:current_compiler=='iar'
+        Makeiar
     elseif &filetype == 'cpp' || &filetype == 'c' || &filetype == 'make'
-        make -j
+        Makegcc
     else
         echohl Error | echo "Can't compile this kind of file!" | echohl None
     endif
