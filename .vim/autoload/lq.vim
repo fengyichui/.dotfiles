@@ -768,6 +768,44 @@ function! lq#CommandItV() range
     endfor
 endfunction
 
+" Hex folder
+let b:hexfoldexpr_matching = ''
+function! lq#HexFoldexpr(lnum)
+    let l      = getline(a:lnum+0)[10:]
+    let l_next = getline(a:lnum+1)[10:]
+    if b:hexfoldexpr_matching == ''
+        if l == l_next
+            let b:hexfoldexpr_matching = l
+            return '>1'
+        else
+            return '0'
+        endif
+    else
+        if b:hexfoldexpr_matching == l_next
+            return '='
+        else
+            let b:hexfoldexpr_matching = ''
+            return '<1'
+        endif
+    endif
+endfunction
+function! lq#HexFoldtext()
+    let text = getline(v:foldstart)
+    let end  = getline(v:foldend)[:7]
+    let line = text . ' [' . end . ']'
+    let has_numbers = &number || &relativenumber
+    let nucolwidth = &fdc + has_numbers * &numberwidth
+    let windowwidth = winwidth(0) - nucolwidth - 6
+    let foldedlinecount = v:foldend - v:foldstart + 1
+    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+    return line . ' ' . repeat("-", fillcharcount) . foldedlinecount
+endfunction
+function! lq#HexFold()
+    setlocal foldtext=lq#HexFoldtext()
+    setlocal foldexpr=lq#HexFoldexpr(v:lnum)
+    setlocal foldmethod=expr
+endfunction
+
 " binary buffer read post
 function! lq#BinaryBufReadPost()
     if exists("b:binary_little_endian")
@@ -778,6 +816,7 @@ function! lq#BinaryBufReadPost()
         silent! exe '%!xxd'
     endif
     setlocal filetype=xxd
+    call lq#HexFold()
 endfunction
 
 " Hex(binary) endian Toggle
