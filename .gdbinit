@@ -2,30 +2,27 @@
 #
 # __________________gdb options_________________
 
-# set to 1 to have ARM target debugging as default, use the "arm" command to switch inside gdb
-set $ARM = 1
 # set to 0 if you have problems with the colorized prompt - reported by Plouj with Ubuntu gdb 7.2
 set $COLOREDPROMPT = 1
 # use colorized output or not
 set $USECOLOR = 1
-set $64BITS = 0
 
+# Option
 set confirm off
 set verbose off
 set history filename ~/.gdb_history
 set history remove-duplicates unlimited
 set history save on
-set pagination off
 set print pretty on
 set print elements 0
 set print array on
-
 set output-radix 0x0A
 set input-radix 0x0A
 
 # These make gdb never pause in its output
-set height 0
-set width 0
+#set height unlimited
+#set width unlimited
+set pagination off
 
 # __________________end gdb options_________________
 #
@@ -189,11 +186,7 @@ define hexdump_aux
         help hexdump_aux
     else
         color_bold
-        if ($64BITS == 1)
-            printf "0x%016lX : ", $arg0
-        else
-            printf "0x%08X : ", $arg0
-        end
+        printf "0x%08X : ", $arg0
         color_reset
         hex_quad $arg0
         color_bold
@@ -234,25 +227,10 @@ define ddump
         help ddump
     else
         color $COLOR_SEPARATOR
-        if $ARM == 1
-            printf "[0x%08X]", $data_addr
-        else
-            if ($64BITS == 1)
-                printf "[0x%04X:0x%016lX]", $ds, $data_addr
-            else
-                printf "[0x%04X:0x%08X]", $ds, $data_addr
-            end
-        end
+        printf "[0x%08X]", $data_addr
 
         color $COLOR_SEPARATOR
-        if $ARM == 1
-            printf "-------"
-        end
-        printf "------------------------"
         printf "-------------------------------"
-        if ($64BITS == 1)
-            printf "-------------------------------------"
-        end
         color_bold
         color $COLOR_SEPARATOR
         printf "[data]\n"
