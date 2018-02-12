@@ -10,6 +10,7 @@ set $USECOLOR = 1
 # Option
 set confirm off
 set verbose off
+set pagination off
 set history filename ~/.gdb_history
 set history remove-duplicates unlimited
 set history save on
@@ -22,7 +23,6 @@ set input-radix 0x0A
 # These make gdb never pause in its output
 #set height unlimited
 #set width unlimited
-set pagination off
 
 # __________________end gdb options_________________
 #
