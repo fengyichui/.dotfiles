@@ -790,15 +790,13 @@ function! lq#HexFoldexpr(lnum)
     endif
 endfunction
 function! lq#HexFoldtext()
-    let text = getline(v:foldstart)
-    let end  = getline(v:foldend)[:7]
-    let line = text . ' [' . end . ']'
-    let has_numbers = &number || &relativenumber
-    let nucolwidth = &fdc + has_numbers * &numberwidth
-    let windowwidth = winwidth(0) - nucolwidth - 6
     let foldedlinecount = v:foldend - v:foldstart + 1
-    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
-    return line . ' ' . repeat("-", fillcharcount) . foldedlinecount
+    let line = getline(v:foldstart) . ' [' . foldedlinecount . '] '
+    if line('$') == v:foldend
+        let end  = getline(v:foldend)[:7]
+        let line = line . '=>' . end . ' '
+    end
+    return line
 endfunction
 function! lq#HexFold()
     setlocal foldtext=lq#HexFoldtext()
