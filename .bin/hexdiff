@@ -4,6 +4,9 @@
 # hexdiff by liqinag
 #
 
+# exit if any errors
+set -e
+
 # check param
 if [ $# != 2 ]; then
     echo "hexdiff: please give 2 param!"
@@ -11,8 +14,8 @@ if [ $# != 2 ]; then
 fi
 
 # tempfile
-a=$(mktemp)".$1"
-b=$(mktemp)".$2"
+a=$(mktemp)
+b=$(mktemp)
 
 # hexdump
 hexdump -v -C $1 >$a
