@@ -1,4 +1,5 @@
-BoldAsFont=no
+BoldAsFont=yes
+BoldAsColour=yes
 Transparency=low
 Columns=80
 Rows=46
