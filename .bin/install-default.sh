@@ -6,14 +6,13 @@ apt-cyg --mirror http://mirrors.neusoft.edu.cn/cygwin pathof mirror
 # software
 apt-cyg -X install gnupg
 apt-cyg install zsh
+apt-cyg install tmux
 apt-cyg install ctags
 apt-cyg install diffutils
 apt-cyg install dos2unix
 apt-cyg install gzip zip unzip
-apt-cyg install python
-apt-cyg install python3
-apt-cyg install python-pip
-apt-cyg install python3-pip
+apt-cyg install python python-pip
+apt-cyg install python3 python3-pip
 apt-cyg install git
 apt-cyg install git-svn # git svn clone ...
 apt-cyg install subversion # svn
