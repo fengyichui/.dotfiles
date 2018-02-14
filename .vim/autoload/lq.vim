@@ -807,11 +807,11 @@ endfunction
 " binary buffer read post
 function! lq#BinaryBufReadPost()
     if exists("b:binary_little_endian")
-        silent! exe '%!xxd -e'
+        silent! undojoin | silent! exe '%!xxd -e'
         setlocal nomodifiable
         setlocal readonly
     else
-        silent! exe '%!xxd'
+        silent! undojoin | silent! exe '%!xxd'
     endif
     setlocal filetype=xxd
     call lq#HexFold()
