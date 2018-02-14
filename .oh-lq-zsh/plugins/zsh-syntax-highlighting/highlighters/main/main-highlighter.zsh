@@ -40,8 +40,8 @@
 : ${ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]:=}
 : ${ZSH_HIGHLIGHT_STYLES[globbing]:=fg=blue}
 : ${ZSH_HIGHLIGHT_STYLES[history-expansion]:=fg=blue}
-: ${ZSH_HIGHLIGHT_STYLES[single-hyphen-option]:=fg=blue,bold} # qli<>
-: ${ZSH_HIGHLIGHT_STYLES[double-hyphen-option]:=fg=blue,bold} # qli<>
+: ${ZSH_HIGHLIGHT_STYLES[single-hyphen-option]:=fg=blue} # qli<>
+: ${ZSH_HIGHLIGHT_STYLES[double-hyphen-option]:=fg=blue} # qli<>
 : ${ZSH_HIGHLIGHT_STYLES[back-quoted-argument]:=fg=yellow} # qli<>
 : ${ZSH_HIGHLIGHT_STYLES[single-quoted-argument]:=fg=yellow}
 : ${ZSH_HIGHLIGHT_STYLES[double-quoted-argument]:=fg=yellow}
