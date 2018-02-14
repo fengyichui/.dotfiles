@@ -12,6 +12,8 @@ apt-cyg install dos2unix
 apt-cyg install gzip zip unzip
 apt-cyg install python
 apt-cyg install python3
+apt-cyg install python-pip
+apt-cyg install python3-pip
 apt-cyg install git
 apt-cyg install git-svn # git svn clone ...
 apt-cyg install subversion # svn
@@ -41,11 +43,6 @@ apt-cyg install gnuplot # for plot
 #apt-cyg install xorg-server # for X window system
 #apt-cyg install xinit # for X window system (start with: $ startxwin)
 apt-cyg install fzf
-
-# Install pip for python
-wget https://bootstrap.pypa.io/get-pip.py
-python3 get-pip.py
-rm -rf get-pip.py
 
 # Python packages
 pip3 install qrcode # QR encode
