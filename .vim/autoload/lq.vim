@@ -806,15 +806,24 @@ endfunction
 
 " binary buffer read post
 function! lq#BinaryBufReadPost()
+    " not record undo info
+    let old_undolevels = &undolevels
+    set undolevels=-1
+
+    " read
     if exists("b:binary_little_endian")
-        silent! undojoin | silent! exe '%!xxd -e'
+        silent! exe '%!xxd -e'
         setlocal nomodifiable
         setlocal readonly
     else
-        silent! undojoin | silent! exe '%!xxd'
+        silent! exe '%!xxd'
     endif
     setlocal filetype=xxd
     call lq#HexFold()
+
+    " undo restore
+    let &undolevels = old_undolevels
+    unlet old_undolevels
 endfunction
 
 " Hex(binary) endian Toggle
