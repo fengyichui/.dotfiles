@@ -776,16 +776,16 @@ function! lq#HexFoldexpr(lnum)
     if b:hexfoldexpr_matching == ''
         if l == l_next
             let b:hexfoldexpr_matching = l
-            return '>1'
+            return 1 " fold start
         else
-            return '0'
+            return 0 " not fold
         endif
     else
         if b:hexfoldexpr_matching == l_next
-            return '='
+            return 1 " fold keep
         else
             let b:hexfoldexpr_matching = ''
-            return '<1'
+            return "<1" " fold end
         endif
     endif
 endfunction
