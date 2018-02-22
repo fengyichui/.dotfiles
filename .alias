@@ -80,3 +80,8 @@ ds ()
     du -h --max-depth=1 $1 | sort -rh
 }
 
+# vim directory diff
+vimdiff-dir ()
+{
+    vim -c ":DirDiff $1 $2"
+}
