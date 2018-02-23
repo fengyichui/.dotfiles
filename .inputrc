@@ -41,6 +41,16 @@
 "\eOH": beginning-of-line
 "\eOF": end-of-line
 
+# For GDB
+# Detail:
+#   (GDB)  https://sourceware.org/gdb/onlinedocs/gdb/Command-Line-Editing.html#Command-Line-Editing
+#   (BASH) https://www.gnu.org/software/bash/manual/html_node/Command-Line-Editing.html#Command-Line-Editing
+$if Gdb
+# Arrow keys like "zsh-history-substring-search"
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+$endif
+
 # Allow 8-bit input/output
 #set meta-flag on
 #set convert-meta off
