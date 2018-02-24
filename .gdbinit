@@ -14,6 +14,7 @@ set pagination off
 set history filename ~/.gdb_history
 set history remove-duplicates unlimited
 set history save on
+set history size 4096
 set print pretty on
 set print elements 0
 set print array on
