@@ -11,6 +11,7 @@ AllowBlinking=yes
 ClicksTargetApp=yes
 Printer=
 Term=xterm-256color
+BellType=0
 Locale=C
 Charset=UTF-8
 ZoomShortcuts=yes
