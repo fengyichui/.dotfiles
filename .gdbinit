@@ -7,19 +7,30 @@ set $COLOREDPROMPT = 1
 # use colorized output or not
 set $USECOLOR = 1
 
-# Option
+# misc
 set confirm off
 set verbose off
 set pagination off
+
+# history
 set history filename ~/.gdb_history
 set history remove-duplicates unlimited
 set history save on
 set history size 4096
+
+# print
 set print pretty on
 set print elements 0
 set print array on
+
+# radix
 set output-radix 0x0A
 set input-radix 0x0A
+
+# logging
+set logging file gdb.log
+set logging overwrite on
+set logging on
 
 # These make gdb never pause in its output
 #set height unlimited
