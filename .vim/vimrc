@@ -725,7 +725,7 @@ command! -complete=file -nargs=? SVNupdate   exe "!svn update ".<q-args>
 command! -complete=file -nargs=1 SVNblame    call lq#Scratch("!svn blame ".<q-args>)
 command! -complete=file -nargs=1 SVNrevert   exe "silent :!svn revert ".<q-args>
 command! -complete=file -nargs=1 SVNadd      exe "!svn add ".<q-args>
-command!                -nargs=0 SVNrollback exe "!svn update && svn merge -r COMMITTED:PREV ./"  " also rollbak workspace
+command!                -nargs=0 SVNrollback exe "!svn update && svn merge -r COMMITTED:PREV ./"
 command!                -nargs=0 SVNstatus   call lq#Scratch("!svn status -q")
 command!                -nargs=0 SVNinfo     call lq#Scratch("!svn info")
 command!                -nargs=0 SVNcleanup  exe "!svn cleanup"
@@ -734,11 +734,11 @@ command!                -nargs=0 SVNcleanup  exe "!svn cleanup"
 command! -complete=file -nargs=+ GITcommit   exe "!git commit -m ".<q-args> | SignifyRefresh
 command! -complete=file -nargs=? GITdiff     call lq#Scratch("!git diff HEAD ".<q-args>, "git")
 command! -complete=file -nargs=? GITlog      call lq#Scratch("!git log ".<q-args>, "git")
-command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>  " like SVNupdate
+command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>
 command! -complete=file -nargs=1 GITblame    call lq#Scratch("!git blame ".<q-args>)
-command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout HEAD ".<q-args>  " like SVNrevert
+command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout HEAD ".<q-args>
 command! -complete=file -nargs=1 GITadd      exe "!git add ".<q-args>
-command!                -nargs=0 GITrollback exe "!git reset HEAD~1"  " only rollbak local repo
+command!                -nargs=0 GITrollback exe "!git reset HEAD~1"
 command!                -nargs=0 GITstatus   call lq#Scratch("!git status")
 command!                -nargs=0 GITinfo     call lq#Scratch("!git remote -v")
 command!                -nargs=0 GITpush     !git push
