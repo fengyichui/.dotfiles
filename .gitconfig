@@ -38,6 +38,7 @@
     cm = commit
     ca = commit -a
     d  = diff --stat -p
+    dw = diff --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+" --stat -p
     st = status -s -uno
 
     # authors
