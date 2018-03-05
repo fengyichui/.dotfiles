@@ -379,7 +379,7 @@ autocmd BufReadPost *.ewp    setlocal makeprg=makeiar     | compiler iar
 autocmd FileType sh          setlocal makeprg=bash\ -n\ % | compiler sh
 
 " For binary file, xxd
-autocmd BufNewFile   *.bin setlocal binary | setlocal filetype=xxd | call lq#HexFold()
+autocmd BufNewFile   *.bin setlocal binary noendofline filetype=xxd | call lq#HexFold()
 autocmd BufReadPre   *.bin setlocal binary
 autocmd BufReadPost  * if &binary | call lq#BinaryBufReadPost() | endif
 autocmd BufWritePre  * if &binary | let b:oldbinview = winsaveview() | silent! undojoin | silent! exe '%s#^[^:]*: \(\%(\x\+ \)\+\) .*#\1# | %!xxd -r -p' | endif

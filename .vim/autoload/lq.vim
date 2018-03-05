@@ -819,6 +819,7 @@ function! lq#BinaryBufReadPost()
         silent! exe '%!xxd'
     endif
     setlocal filetype=xxd
+    setlocal noendofline    " Avoid invalid <0a>
     call lq#HexFold()
 
     " undo restore
