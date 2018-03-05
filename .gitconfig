@@ -11,6 +11,7 @@
     autocrlf = false
     filemode = false
     quotepath = false
+#    whitespace = cr-at-eol
 
 [color]
     ui = auto
