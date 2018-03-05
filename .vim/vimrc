@@ -732,7 +732,7 @@ command!                -nargs=0 SVNcleanup  exe "!svn cleanup"
 
 " Git
 command! -complete=file -nargs=+ GITcommit   exe "!git commit -m ".<q-args> | SignifyRefresh
-command! -complete=file -nargs=? GITdiff     call lq#Scratch("!git diff HEAD ".<q-args>, "git")
+command! -complete=file -nargs=? GITdiff     call lq#Scratch("!git diff HEAD --stat -p ".<q-args>, "git")
 command! -complete=file -nargs=? GITlog      call lq#Scratch("!git log ".<q-args>, "git")
 command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>
 command! -complete=file -nargs=1 GITblame    call lq#Scratch("!git blame ".<q-args>)
