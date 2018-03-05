@@ -382,7 +382,7 @@ autocmd FileType sh          setlocal makeprg=bash\ -n\ % | compiler sh
 autocmd BufNewFile   *.bin setlocal binary | setlocal filetype=xxd | call lq#HexFold()
 autocmd BufReadPre   *.bin setlocal binary
 autocmd BufReadPost  * if &binary | call lq#BinaryBufReadPost() | endif
-autocmd BufWritePre  * if &binary | let b:oldbinview = winsaveview() | silent! undojoin | silent! exe '%!xxd -r' | endif
+autocmd BufWritePre  * if &binary | let b:oldbinview = winsaveview() | silent! undojoin | silent! exe '%s#^[^:]*: \(\%(\x\+ \)\+\) .*#\1# | %!xxd -r -p' | endif
 autocmd BufWritePost * if &binary | silent! undojoin | silent! exe '%!xxd' | setlocal nomodified | call winrestview(b:oldbinview) | endif
 
 " For PDF
