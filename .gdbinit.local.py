@@ -76,11 +76,12 @@ class loop_memery_change_register(gdb.Command):
         # loop
         try:
             save = int(gdb.parse_and_eval(args))
-            print("{:08X}".format(save))
+            time_base = time.time()
+            print("{:0>8.3f}: {:08X} {}".format(0, save, save))
             while True:
                 cur = int(gdb.parse_and_eval(args))
                 if cur != save:
-                    print("{:08X}".format(cur))
+                    print("{:0>8.3f}: {:08X} {}".format(time.time()-time_base, cur, cur))
                     save = cur
         except KeyboardInterrupt:
             pass
