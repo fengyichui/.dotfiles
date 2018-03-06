@@ -126,6 +126,7 @@ end
 # can also be used to redefine anything else in particular the colors aka theming
 # just remap the color variables defined above
 source ~/.gdbinit.local
+source ~/.gdbinit.local.py
 
 # can't use the color functions because we are using the set command
 if $COLOREDPROMPT == 1
