@@ -21,7 +21,7 @@ set history size 4096
 # print
 set print pretty on
 set print elements 0
-set print array on
+#set print array on
 
 # radix
 set output-radix 0x0A
