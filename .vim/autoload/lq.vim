@@ -22,18 +22,31 @@ function! lq#QfMakeConv()
 endfunction
 
 " Command line used in function
-function! lq#CmdLine(str)
-    exe "menu liqiang.cmdline :" . a:str
-    emenu liqiang.cmdline
-    unmenu liqiang.cmdline
+function! lq#CmdLine(cmd, cursor_left_num)
+
+"    " new vim version (8.0.1000+) not support this way:
+"    exe "menu liqiang.cmdline :" . a:cmd . repeat("<left>", a:cursor_left_num)
+"    emenu liqiang.cmdline
+"    unmenu liqiang.cmdline
+
+    " Prompt command line
+    call inputsave()
+    let l:cmd_result = input(":", a:cmd . repeat("\<left>", a:cursor_left_num), "history")
+    call inputrestore()
+    if l:cmd_result != ""
+        " Add to history
+        call histadd(":", l:cmd_result)
+        " Execute it
+        exe l:cmd_result
+    endif
 endfunction
 
 " grep automatically, use 'ag'
 function! lq#GrepAuto(pattern, ...)
     if &filetype == 'c' || &filetype == 'cpp'
-        let l:files = '.*\.c$\\|.*\.h$\\|.*\.cpp$'
+        let l:files = '.*\.c$\|.*\.h$\|.*\.cpp$'
     elseif &filetype == 'make'
-        let l:files = 'makefile\\|.*\.mk$\\|.*\.mak$'
+        let l:files = 'makefile\|.*\.mk$\|.*\.mak$'
     else
         let l:files = '.*\.' . expand("%:e") . '$'
     endif
@@ -43,7 +56,7 @@ function! lq#GrepAuto(pattern, ...)
         let l:opt = '-i' "Ignore cases
     endif
     " grep it
-    call lq#CmdLine('grep ' . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"<left>')
+    call lq#CmdLine('grep ' . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"', 1)
 endfunction
 
 " Replace all automatically, use 'args','argdo','%s'
@@ -56,7 +69,7 @@ function! lq#ReplaceAllAuto(pattern)
         let l:files = '**/*.' . expand("%:e")
     endif
     " replace it
-    call lq#CmdLine('args ' . l:files . ' \| argdo %s/' . a:pattern . '//gec<left><left><left><left>')
+    call lq#CmdLine('args ' . l:files . ' \| argdo %s/' . a:pattern . '//gec', 4)
 endfunction
 
 " Get Visual Select Text
@@ -77,7 +90,7 @@ function! lq#VisualSelect(mode) range
     elseif a:mode == 'grep'
         call lq#GrepAuto(l:pattern)
     elseif a:mode == 'replace'
-        call lq#CmdLine("%s" . '/'. l:pattern . '//gc<left><left><left>')
+        call lq#CmdLine("%s" . '/'. l:pattern . '//gc', 3)
     elseif a:mode == 'replace-all'
         call lq#ReplaceAllAuto(l:pattern)
     endif
