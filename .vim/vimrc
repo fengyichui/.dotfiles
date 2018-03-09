@@ -746,9 +746,9 @@ command!                -nargs=0 GITfetch    !git fetch
 command!                -nargs=0 GITpull     !git pull
 
 " For Custom make
-command! -nargs=* -complete=file Makekeil  set makeprg=makekeil | compiler! keil | copen | AsyncRun makekeil <args>
-command! -nargs=* -complete=file Makeiar   set makeprg=makeiar  | compiler! iar  | copen | AsyncRun makeiar <args>
-command! -nargs=* -complete=file Makegcc   set makeprg=make     | compiler! gcc  | copen | AsyncRun make -j <args>
+command! -nargs=* -complete=file Makekeil  set makeprg=makekeil | compiler! keil | makekeil <args>
+command! -nargs=* -complete=file Makeiar   set makeprg=makeiar  | compiler! iar  | makeiar <args>
+command! -nargs=* -complete=file Makegcc   set makeprg=make     | compiler! gcc  | make -j <args>
 
 " X command
 command! -nargs=* Xcolumn     call lq#ColumnOp(<q-args>)
