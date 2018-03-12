@@ -50,6 +50,16 @@ load
 c
 end
 
+define rcc
+file
+shell makekeil hs6620_rom.uvproj
+mon reset
+mon reset 1
+restore out/hs6620_rom.bin binary 0x08000000
+file out/hs6620_rom.axf
+c
+end
+
 define rst
 set *0=0
 set *4=0

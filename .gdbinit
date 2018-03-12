@@ -131,6 +131,7 @@ source ~/.gdbinit.local.py
 # can't use the color functions because we are using the set command
 if $COLOREDPROMPT == 1
     set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
+#    set extended-prompt \[\e[1;33m\](gdb) \[\e[0m\]
 end
 
 # __________hex/ascii dump an address_________
