@@ -50,14 +50,21 @@ load
 c
 end
 
-define rcc
+define rrc
+if $argc >= 1
 file
-shell makekeil hs6620_rom.uvproj
-mon reset
+shell makekeil rom/hs6620_rom.uvproj
+end
 mon reset 1
-restore out/hs6620_rom.bin binary 0x08000000
-file out/hs6620_rom.axf
+file rom/out/hs6620_rom.axf
+restore rom/out/hs6620_rom.bin binary 0x08000000
+mon reset 1
 c
+end
+document rrc
+Syntax: rcc [1]
+| HS662x rom reset-load-continue
+| 1: do makekeil
 end
 
 define rst
