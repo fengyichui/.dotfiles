@@ -124,7 +124,7 @@ def flash_download_part(part_type, file_path, is_verify=True):
         raise gdb.GdbError('invalid part')
 
     # show burn info
-    print('{}: {}kB (0x{:08X} in flash)'.format(file_path, file_size/1024, flash_base_addr))
+    print('{}: {:.1f}kB (0x{:08X} in flash)'.format(file_path, file_size/1024.0, flash_base_addr))
 
     # get buffer
     buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
