@@ -14,8 +14,8 @@ if [ $# != 2 ]; then
 fi
 
 # tempfile
-a=$(mktemp)
-b=$(mktemp)
+a=$(mktemp).a
+b=$(mktemp).b
 
 # hexdump
 hexdump -v -C $1 >$a
