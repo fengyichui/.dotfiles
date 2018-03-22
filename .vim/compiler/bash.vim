@@ -6,7 +6,7 @@
 if exists("current_compiler")
   finish
 endif
-let current_compiler = "sh"
+let current_compiler = "bash"
 
 let s:cpo_save = &cpo
 set cpo&vim

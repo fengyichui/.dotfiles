@@ -618,6 +618,8 @@ function! lq#CompileIt()
         Makeiar
     elseif &filetype == 'cpp' || &filetype == 'c' || &filetype == 'make'
         Makegcc
+    elseif &filetype == 'sh'
+        make
     else
         echohl Error | echo "Can't compile this kind of file!" | echohl None
     endif

@@ -266,9 +266,9 @@ define dump_hexfile
     dump ihex memory $arg0 $arg1 $arg2
 end
 document dump_hexfile
-Syntax: dump_hexfile FILENAME ADDR1 ADDR2
+Syntax: dump_hexfile FILENAME START_ADDR STOP_ADDR
 | Write a range of memory to a file in Intel ihex (hexdump) format.
-| The range is specified by ADDR1 and ADDR2 addresses.
+| The range is specified by START_ADDR and STOP_ADDR addresses.
 end
 
 
@@ -276,9 +276,9 @@ define dump_binfile
     dump memory $arg0 $arg1 $arg2
 end
 document dump_binfile
-Syntax: dump_binfile FILENAME ADDR1 ADDR2
+Syntax: dump_binfile FILENAME START_ADDR STOP_ADDR
 | Write a range of memory to a binary file.
-| The range is specified by ADDR1 and ADDR2 addresses.
+| The range is specified by START_ADDR and STOP_ADDR addresses.
 end
 
 

@@ -187,7 +187,7 @@ let g:sys_path = 'C:/Python35;C:/cygwin64/bin;'
 let g:cygwin_path = 'C:/cygwin64/cygwin.bat'
 let g:jlink_path = 'D:/Keil_v520/ARM/Segger/Jlink.exe'
 let g:gdb_path = 'arm-none-eabi-gdb'
-let g:learn_path = fnamemodify('E:/4-other/OneDrive/Skill/Harvest/learn.txt', ":p")
+let g:learn_path = fnamemodify('~/github/harvest/learn.txt', ":p")
 
 
 " Option {{{1
@@ -376,7 +376,7 @@ autocmd FileType xml let &l:formatprg = 'tidy -quiet -xml -indent --indent-space
 " Custom Make
 autocmd BufReadPost *.uvproj setlocal makeprg=makekeil    | compiler keil
 autocmd BufReadPost *.ewp    setlocal makeprg=makeiar     | compiler iar
-autocmd FileType sh          setlocal makeprg=bash\ -n\ % | compiler sh
+autocmd FileType sh          setlocal makeprg=shellcheck\ --shell=bash\ --format=gcc\ % | compiler gcc
 
 " For binary file, xxd
 autocmd BufNewFile   *.bin setlocal binary noendofline filetype=xxd | call lq#HexFold()
