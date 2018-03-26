@@ -376,7 +376,7 @@ autocmd FileType xml let &l:formatprg = 'tidy -quiet -xml -indent --indent-space
 " Custom Make
 autocmd BufReadPost *.uvproj setlocal makeprg=makekeil    | compiler keil
 autocmd BufReadPost *.ewp    setlocal makeprg=makeiar     | compiler iar
-autocmd FileType sh          setlocal makeprg=shellcheck\ --shell=bash\ --format=gcc\ % | compiler gcc
+autocmd FileType sh          setlocal makeprg=shellcheck\ --format=gcc\ % | compiler gcc
 
 " For binary file, xxd
 autocmd BufNewFile   *.bin setlocal binary noendofline filetype=xxd | call lq#HexFold()
