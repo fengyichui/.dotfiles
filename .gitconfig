@@ -20,17 +20,41 @@
     default = simple
 
 [diff]
+    # Controls which diff tool is used by git-difftool
     tool = vimdiff
+
+    # Use "patience diff" algorithm when generating patches.
     algorithm = patience
+
+    # Uses a prefix pair that is different from the standard "a/" and "b/"
+    # (i)ndex, (w)ork, (c)ommit, (o)bject
     mnemonicPrefix = true
-    compactionHeuristic = true
+
+[difftool]
+    # Not prompt before each invocation of the diff tool.
+    prompt = false
 
 [merge]
-    tool = vimdiff
+    # Controls which merge tool is used by git-mergetool.
+    tool = vimdiff #vim-merge3way
+
+    # Specify the style in which conflicted hunks are written out to working tree files upon merge.
+    # The default is "merge", which shows a <<<<<<< conflict marker, changes made by one side,
+    # a ======= marker, changes made by the other side, and then a >>>>>>> marker.
+    # An alternate style, "diff3", adds a ||||||| marker and the original text before the ======= marker.
     conflictstyle = diff3
 
+[mergetool]
+    # Not prompt before each invocation of the merge resolution program.
+    prompt = false
+
 [mergetool "vim-merge3way"]
+    # Specify the command to invoke the specified merge tool.
     cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
+
+    #  If this is not set to true then the merge target file timestamp is checked and the merge
+    #  assumed to have been successful if the file has been updated, otherwise the user is
+    #  prompted to indicate the success of the merge.
     trustExitCode = true
 
 [alias]

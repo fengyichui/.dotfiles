@@ -564,6 +564,7 @@ nnoremap <A-S-n> :cprevious<cr>zvzz
 " Fast saving/quit
 nnoremap <leader>w :update<cr>
 nnoremap <leader>q :q<cr>
+nnoremap <leader>Q :qall<cr>
 
 " Pressing ,ss will toggle and untoggle spell checking
 noremap <leader>ss :setlocal spell!<cr>
