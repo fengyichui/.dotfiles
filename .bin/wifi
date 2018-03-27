@@ -4,6 +4,8 @@
 # For cygwin, wifi control
 #
 
+/cygdrive/c/Windows/system32/chcp 437 >/dev/null
+
 ssid="lqWIFI"
 key="1234567890"
 
@@ -26,8 +28,6 @@ if [ $# == 0 ]; then
     exit 1
 fi
 
-/cygdrive/c/Windows/system32/chcp 437 >/dev/null
-
 case $1 in
     "start")
         netsh wlan show driver | findstr Hosted
@@ -43,7 +43,7 @@ case $1 in
         netsh wlan show hostednetwork
         ;;
     "connect")
-        netsh wlan connect name="$2"
+        netsh wlan connect "$2"
         ;;
     "disconnect")
         netsh wlan disconnect
