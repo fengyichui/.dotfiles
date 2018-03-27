@@ -14,6 +14,7 @@ function usage()
     echo "    stop:      Stop WIFI AP"
     echo "    connect:   Connect to WIFI"
     echo "    disonnect: Disconnect from WIFI"
+    echo "    delete:    Delete profile (wifi show profiles)"
     echo "    show:      Show all WLAN info"
     echo ""
     echo "wifi show:"
@@ -46,6 +47,13 @@ case $1 in
         ;;
     "disconnect")
         netsh wlan disconnect
+        ;;
+    "delete")
+        while (($#!=1))
+        do
+            netsh wlan delete profile "$2"
+            shift
+        done
         ;;
     "show")
         if [[ "$2" ]]; then
