@@ -28,6 +28,7 @@ set output-radix 0x0A
 set input-radix 0x0A
 
 # logging
+set logging off
 set logging file gdb.log
 set logging overwrite on
 set logging on
