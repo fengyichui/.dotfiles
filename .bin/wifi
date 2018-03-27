@@ -4,7 +4,7 @@
 # For cygwin, wifi control
 #
 
-/cygdrive/c/Windows/system32/chcp 437 >/dev/null
+cmd /c chcp 437 >/dev/null
 
 ssid="lqWIFI"
 key="1234567890"
