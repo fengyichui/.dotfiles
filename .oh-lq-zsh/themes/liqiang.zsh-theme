@@ -21,15 +21,13 @@ setopt PROMPT_SUBST
 
 PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
 
-#rprompt_context () {
-#    if [[ -n "$SSH_CLIENT" ]]; then
-#        echo -n "%{$fg[magenta]%}[%n@%m]%{$reset_color%}"
-#    else
-#        echo -n "%{$fg[magenta]%}[%D{%H:%M}]%{$reset_color%}"
-#    fi
-#}
-#
-#RPROMPT='$(rprompt_context)'
+rprompt_ssh_context () {
+    echo -n "%{$fg[magenta]%}[%n@%m]%{$reset_color%}"
+}
+
+if [[ -n "$SSH_CLIENT" ]]; then
+    RPROMPT='$(rprompt_ssh_context)'
+fi
 
 # LS colors
 export LSCOLORS="Gxfxcxdxbxegedabagacad"
