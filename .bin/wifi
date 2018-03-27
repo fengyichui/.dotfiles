@@ -15,6 +15,9 @@ function usage()
     echo "    connect:   Connect to WIFI"
     echo "    disonnect: Disconnect from WIFI"
     echo "    show:      Show all WLAN info"
+    echo ""
+    echo "wifi show:"
+    netsh wlan show '/?'
 }
 
 if [ $# == 0 ]; then
@@ -45,7 +48,11 @@ case $1 in
         netsh wlan disconnect
         ;;
     "show")
-        netsh wlan show all
+        if [[ "$2" ]]; then
+            netsh wlan show "$2"
+        else
+            netsh wlan show all
+        fi
         ;;
     *)
         usage
