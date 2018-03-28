@@ -1,0 +1,163 @@
+
+#
+# General Shell Configuration
+#
+
+#####################################
+#               Alias               #
+#####################################
+
+# ls
+alias ls='ls --color=auto --group-directories-first'                             # classify files in colour
+alias ll='ls -al --color=auto --time-style=long-iso --group-directories-first'   # long list all file
+alias l='ls -l --color=auto --time-style=long-iso --group-directories-first'     # long list file
+
+# grep file
+alias grep='grep --color'  # show differences in color
+alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
+
+# dumpbin with windows
+alias dumpbin-dependents='dumpbin_func dependents'
+alias dumpbin-exports='dumpbin_func exports'
+
+# Interactive operation...
+#alias rm='rm -i'
+#alias mv='mv -i'
+#alias cp='cp -i'
+alias cpx='rsync --info=progress2'
+
+# vim stdin
+alias vim-='vim -c "silent file stdin | set nomodified" -'
+
+# grep
+alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
+
+# diff
+alias diff='diff --color=auto'
+
+# Stopwatch
+alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
+
+# gbk2utf8
+alias gbk2utf8='iconv -f GBK -t UTF8'
+
+# web
+#alias dict="webx 'http://dict.youdao.com/search?q='"
+alias dict="webx 'http://cn.bing.com/dict/search?q='"
+alias wiki="webx 'http://en.wikipedia.org/wiki/'"
+alias baidu="webx 'http://m.baidu.com/s?wd='"
+alias baike="webx 'http://wapbaike.baidu.com/item/'"
+alias qsbk="webx 'http://www.qiushibaike.com/text/'"
+alias news="webx 'http://news.sina.cn/?pos=1&vt=1&ttp=f1|1|1'"
+alias zhihu="webx 'http://www.zhihu.com/explore'"
+alias cpp="webx 'http://www.cplusplus.com/search.do?q='"
+
+# arm gdb with tmux,gdb.dashboard
+alias armgdb="tmuxinator start armgdb"
+alias armgdb2="tmuxinator start armgdb -n armgdb2"
+alias armgdb3="tmuxinator start armgdb -n armgdb3"
+
+# gdb for hs662x
+alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.gdb/hs662x.gdb.py"'
+
+
+#####################################
+#             Function              #
+#####################################
+
+# Dumpbin function for windows
+dumpbin_func ()
+{
+    mode=$1
+    shift
+    while (($#!=0))
+    do
+        case $mode in
+            'machine')      dumpbin /HEADERS $1 | awk "/machine \(/{print \$3 \": $1\"}"
+            ;;
+            'dependents')   dumpbin /DEPENDENTS $1
+            ;;
+            'exports')      dumpbin /EXPORTS $1
+            ;;
+        esac
+        shift
+    done
+}
+
+# du&sort: Stats directorys size and sort it
+ds ()
+{
+    du -h --max-depth=1 $1 | sort -rh
+}
+
+# vim directory diff
+vimdiff-dir ()
+{
+    vim -c ":DirDiff $1 $2"
+}
+
+
+#####################################
+#             Export                #
+#####################################
+
+# default X-window display
+export DISPLAY=:0.0
+
+
+#####################################
+#               Misc                #
+#####################################
+
+# If you come from bash you might have to change your $PATH.
+if [[ "$OSTYPE" =~ "linux" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+elif [[ "$OSTYPE" =~ "cygwin" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+fi
+
+# For sudo and new command
+if [ -f "/tmp/.init.tmp" ]; then
+    mv -f /tmp/.init.tmp /tmp/.init.tmp2
+    source /tmp/.init.tmp2
+    rm -rf /tmp/.init.tmp2
+else
+#    # My logo
+#    echo "                         ███████████████████████████"
+#    echo "                         ███████▀▀▀░░░░░░░▀▀▀███████"
+#    echo "                         ████▀░░░░░░░░░░░░░░░░░▀████"
+#    echo "                         ███│░░░░░░░░░░░░░░░░░░░│███"
+#    echo "                         ██▌│░░░░░░░░░░░░░░░░░░░│▐██"
+#    echo "                         ██░└┐░░░░░░░░░░░░░░░░░┌┘░██"
+#    echo "                         ██░░└┐░░░░░░░░░░░░░░░┌┘░░██"
+#    echo "                         ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██"
+#    echo "                         ██▌░│██████▌░░░▐██████│░▐██"
+#    echo "                         ███░│▐███▀▀░░▄░░▀▀███▌│░███"
+#    echo "                         ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██"
+#    echo "                         ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██"
+#    echo "                         ████▄─┘██▌░░░░░░░▐██└─▄████"
+#    echo "                         █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████"
+#    echo "                         ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████"
+#    echo "                         █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████"
+#    echo "                         ███████▄░░░░░░░░░░░▄███████"
+#    echo "                         ██████████▄▄▄▄▄▄▄██████████"
+#    echo "                         ███████████████████████████"
+
+#     echo "                                                       "
+#     echo "                                      .----.           "
+#     echo "                                   _.'__    \`.         "
+#     echo "                               .--(#)(##)---/#\\        "
+#     echo "                             .' @          /###\\       "
+#     echo "                             :         ,   #####       "
+#     echo "                              \`-..__.-' _.-\\###/       "
+#     echo "                                    \`;_:    \`\"'        "
+#     echo "                                  .'\"\"\"\"\"\`.            "
+#     echo "                                 /,  JOE  ,\\           "
+#     echo "                                //  COOL!  \\\\          "
+#     echo "                                \`-._______.-'          "
+#     echo "                                ___\`. | .'___          "
+#     echo "                               (______|______)         "
+     echo ""
+     echo "                             ! Welcome Qiang !       "
+fi
+

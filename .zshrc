@@ -1,9 +1,3 @@
-# If you come from bash you might have to change your $PATH.
-if [[ "$OSTYPE" =~ "linux" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
-elif [[ "$OSTYPE" =~ "cygwin" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
-fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -106,51 +100,6 @@ setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 # Run oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 
-# Alias
-source ~/.alias
-
-# For sudo and new command
-if [ -f "/tmp/.init.tmp" ]; then
-    mv -f /tmp/.init.tmp /tmp/.init.tmp2
-    source /tmp/.init.tmp2
-    rm -rf /tmp/.init.tmp2
-else
-#    # My logo
-#    echo "                         ███████████████████████████"
-#    echo "                         ███████▀▀▀░░░░░░░▀▀▀███████"
-#    echo "                         ████▀░░░░░░░░░░░░░░░░░▀████"
-#    echo "                         ███│░░░░░░░░░░░░░░░░░░░│███"
-#    echo "                         ██▌│░░░░░░░░░░░░░░░░░░░│▐██"
-#    echo "                         ██░└┐░░░░░░░░░░░░░░░░░┌┘░██"
-#    echo "                         ██░░└┐░░░░░░░░░░░░░░░┌┘░░██"
-#    echo "                         ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██"
-#    echo "                         ██▌░│██████▌░░░▐██████│░▐██"
-#    echo "                         ███░│▐███▀▀░░▄░░▀▀███▌│░███"
-#    echo "                         ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██"
-#    echo "                         ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██"
-#    echo "                         ████▄─┘██▌░░░░░░░▐██└─▄████"
-#    echo "                         █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████"
-#    echo "                         ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████"
-#    echo "                         █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████"
-#    echo "                         ███████▄░░░░░░░░░░░▄███████"
-#    echo "                         ██████████▄▄▄▄▄▄▄██████████"
-#    echo "                         ███████████████████████████"
-
-#     echo "                                                       "
-#     echo "                                      .----.           "
-#     echo "                                   _.'__    \`.         "
-#     echo "                               .--(#)(##)---/#\\        "
-#     echo "                             .' @          /###\\       "
-#     echo "                             :         ,   #####       "
-#     echo "                              \`-..__.-' _.-\\###/       "
-#     echo "                                    \`;_:    \`\"'        "
-#     echo "                                  .'\"\"\"\"\"\`.            "
-#     echo "                                 /,  JOE  ,\\           "
-#     echo "                                //  COOL!  \\\\          "
-#     echo "                                \`-._______.-'          "
-#     echo "                                ___\`. | .'___          "
-#     echo "                               (______|______)         "
-     echo ""
-     echo "                             ! Welcome Qiang !       "
-fi
+# General shell config
+source ~/.gshrc
 

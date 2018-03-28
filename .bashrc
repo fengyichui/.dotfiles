@@ -115,9 +115,6 @@ alias cd=cd_func
 [[ $PS1 && -f /usr/share/bash-completion/bash_completion ]] && \
     . /usr/share/bash-completion/bash_completion
 
-# Alias
-source ~/.alias
-
 # Functions
 #
 # Some people use a different file for functions
@@ -191,47 +188,6 @@ cd_func ()
     return 0
 }
 
-# For sudo and new command
-if [ -f "/tmp/.init.tmp" ]; then
-    mv -f /tmp/.init.tmp /tmp/.init.tmp2
-    source /tmp/.init.tmp2
-    rm -rf /tmp/.init.tmp2
-else
-#    # My logo
-#    echo "                         ███████████████████████████"
-#    echo "                         ███████▀▀▀░░░░░░░▀▀▀███████"
-#    echo "                         ████▀░░░░░░░░░░░░░░░░░▀████"
-#    echo "                         ███│░░░░░░░░░░░░░░░░░░░│███"
-#    echo "                         ██▌│░░░░░░░░░░░░░░░░░░░│▐██"
-#    echo "                         ██░└┐░░░░░░░░░░░░░░░░░┌┘░██"
-#    echo "                         ██░░└┐░░░░░░░░░░░░░░░┌┘░░██"
-#    echo "                         ██░░┌┘▄▄▄▄▄░░░░░▄▄▄▄▄└┐░░██"
-#    echo "                         ██▌░│██████▌░░░▐██████│░▐██"
-#    echo "                         ███░│▐███▀▀░░▄░░▀▀███▌│░███"
-#    echo "                         ██▀─┘░░░░░░░▐█▌░░░░░░░└─▀██"
-#    echo "                         ██▄░░░▄▄▄▓░░▀█▀░░▓▄▄▄░░░▄██"
-#    echo "                         ████▄─┘██▌░░░░░░░▐██└─▄████"
-#    echo "                         █████░░▐█─┬┬┬┬┬┬┬─█▌░░█████"
-#    echo "                         ████▌░░░▀┬┼┼┼┼┼┼┼┬▀░░░▐████"
-#    echo "                         █████▄░░░└┴┴┴┴┴┴┴┘░░░▄█████"
-#    echo "                         ███████▄░░░░░░░░░░░▄███████"
-#    echo "                         ██████████▄▄▄▄▄▄▄██████████"
-#    echo "                         ███████████████████████████"
+# general shell config
+source ~/.gshrc
 
-#     echo "                                                       "
-#     echo "                                      .----.           "
-#     echo "                                   _.'__    \`.         "
-#     echo "                               .--(#)(##)---/#\\        "
-#     echo "                             .' @          /###\\       "
-#     echo "                             :         ,   #####       "
-#     echo "                              \`-..__.-' _.-\\###/       "
-#     echo "                                    \`;_:    \`\"'        "
-#     echo "                                  .'\"\"\"\"\"\`.            "
-#     echo "                                 /,  JOE  ,\\           "
-#     echo "                                //  COOL!  \\\\          "
-#     echo "                                \`-._______.-'          "
-#     echo "                                ___\`. | .'___          "
-#     echo "                               (______|______)         "
-     echo ""
-     echo "                             ! Welcome Qiang !       "
-fi
