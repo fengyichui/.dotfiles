@@ -10,6 +10,7 @@
     editor   = vim
     autocrlf = false
     filemode = true
+    quotepath = false
 
 [color]
     ui = auto
