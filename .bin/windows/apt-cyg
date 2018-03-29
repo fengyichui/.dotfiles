@@ -60,73 +60,68 @@ fi
 function usage()
 {
   echo apt-cyg: Installs and removes Cygwin packages.
-  echo "  \"apt-cyg install <package names>\" to install packages"
-  echo "  \"apt-cyg remove <package names>\" to remove packages"
-  echo "  \"apt-cyg update\" to update setup.ini"
-  echo "  \"apt-cyg show\" to show installed packages"
-  echo "  \"apt-cyg find <patterns>\" to find packages matching patterns"
-  echo "  \"apt-cyg describe <patterns>\" to describe packages matching patterns"
-  echo "  \"apt-cyg packageof <commands or files>\" to locate parent packages"
-  echo "  \"apt-cyg pathof <cache|mirror|mirrordir|cache/mirrordir|setup.ini>\""
-  echo "                                                          to show path"
-  echo "  \"apt-cyg key-add <files> ...\" to add keys contained in <files>"
-  echo "  \"apt-cyg key-del <keyids> ...\" to remove keys <keyids>"
-  echo "  \"apt-cyg key-list\" to list keys"
-  echo "  \"apt-cyg key-finger\" to list fingerprints"
-  echo "  \"apt-cyg upgrade-self\" to upgrade apt-cyg"
-  echo "  \"apt-cyg depends <package names>\""
-  echo "         to show forward dependency information for packages with depth."
-  echo "  \"apt-cyg rdepends <package names>\""
-  echo "         to show reverse dependency information for packages with depth."
-  echo "  \"apt-cyg completion-install\" to install completion."
-  echo "  \"apt-cyg completion-uninstall\" to uninstall completion."
-  echo "  \"apt-cyg mirrors-list\" to show list of mirros."
-  echo "  \"apt-cyg benchmark-mirrors <url> ...\" to benchmark mirrors."
-  echo "  \"apt-cyg benchmark-parallel-mirrors <url> ...\" to benchmark mirrors in parallel."
-  echo "  \"apt-cyg benchmark-parallel-mirrors-list\" to benchmark mirrors-list in parallel."
-  echo "  \"apt-cyg scriptinfo\" to show script infomations."
-  echo "  \"apt-cyg show-packages-busyness <package names> ...\" to show packages are busy or noe."
-  echo "  \"apt-cyg dist-upgrade\" to upgrade all packages that is installed. This subcommand uses setup.exe"
-  echo "  \"apt-cyg update-setup\" to update setup.exe"
-  echo "  \"apt-cyg setup\" to call setup.exe"
-  echo "  \"apt-cyg packages-total-count\" count number of total packages from setup.ini"
-  echo "  \"apt-cyg packages-total-size [pattern_of_section]\" count size of total packages from setup.ini"
-  echo "  \"apt-cyg packages-cached-count\" count number of cached packages in cache/mirrordir."
-  echo "  \"apt-cyg packages-cached-size\" count size of cached packages in cache/mirrordir."
-  echo "  \"apt-cyg repair-acl\" repair acl."
-  echo "  \"apt-cyg source\" download source archive."
-  echo "  \"apt-cyg download\" download the binary package into the current directory."
-  echo "  \"apt-cyg mirror\" download the binary package into the current cache/mirrordir as mirror."
-  echo "  \"apt-cyg listfiles\" List files 'owned' by package(s)."
+  echo ""
+  echo "Commands:"
+  echo "  install <package names>           install packages"
+  echo "  remove <package names>            remove packages"
+  echo "  update                            update setup.ini"
+  echo "  show                              show installed packages"
+  echo "  find <patterns>                   find packages matching patterns"
+  echo "  desc <patterns>                   describe packages matching patterns"
+  echo "  outdate <patterns>                check outdated packages"
+  echo "  packageof <commands or files>     locate parent packages"
+  echo "  pathof <mode>                     show path mode:<cache|mirror|mirrordir|cache/mirrordir|setup.ini>"
+  echo "  key-add <files> ...               add keys contained in <files>"
+  echo "  key-del <keyids> ...              remove keys <keyids>"
+  echo "  key-list                          list keys"
+  echo "  key-finger                        list fingerprints"
+  echo "  upgrade-self                      upgrade apt-cyg"
+  echo "  depends <package names>           show forward dependency information for packages with depth."
+  echo "  rdepends <package names>          show reverse dependency information for packages with depth."
+  echo "  mirrors-list                      show list of mirros."
+  echo "  benchmark-mirrors <urls>          benchmark mirrors, do 'wget <urls>/setup.bz2'"
+  echo "  benchmark-parallel-mirrors <urls> benchmark mirrors in parallel."
+  echo "  benchmark-parallel-mirrors-list   benchmark mirrors-list in parallel."
+  echo "  scriptinfo                        show script infomations."
+  echo "  show-packages-busyness <packages> show packages are busy or noe."
+  echo "  dist-upgrade                      upgrade all packages that is installed. This subcommand uses setup.exe"
+  echo "  update-setup                      update setup.exe"
+  echo "  setup                             call setup.exe"
+  echo "  packages-total-count              count number of total packages from setup.ini"
+  echo "  packages-total-size [pattern]     count size of total packages from setup.ini"
+  echo "  packages-cached-count             count number of cached packages in cache/mirrordir."
+  echo "  packages-cached-size              count size of cached packages in cache/mirrordir."
+  echo "  repair-acl                        repair acl."
+  echo "  source                            download source archive."
+  echo "  download                          download the binary package into the current directory."
+  echo "  mirror                            download the binary package into the current cache/mirrordir as mirror."
+  echo "  listfiles                         List files 'owned' by package(s)."
+  echo ""
   echo "Options:"
-  echo "  --ag                     : use the silver searcher (currently work only at packageof subcommand)"
-  echo "  --charch <arch>          : change archetecture"
-  echo "  --use-setuprc            : set cache and mirror with /etc/setup/setup.rc"
-  echo "  --use-own-conf           : use own cache and mirror settings when apt-cyg calls setup.exe"
-  echo "  --ignore-case, -i        : ignore case distinctions for <patterns>"
-  echo "  --force-remove           : force remove"
-  echo "  --force-fetch-trustedkeys: force fetch trustedkeys"
-  echo "  --force-update-packageof-cache:"
-  echo "                             force update packageof cache"
-  echo "  --no-verify, -X          : Don't verify setup.ini signatures"
-  echo "  --no-check-certificate   : Don't validate the server's certificate"
-  echo "  --no-update-setup        : Don't update setup.exe"
-  echo "  --no-header              : Don't print header"
-  echo "  --proxy, -p <auto|inherit|none|URL> :"
-  echo "                             set proxy (default: \${APT_CYG_PROXY:-auto})"
-  echo "  --completion-get-subcommand:"
-  echo "                             get subcommand (for completion internal use)"
-  echo "  --completion-disable-autoupdate:"
-  echo "                             disable completion autoupdate"
-  echo "  --max-jobs, -j <n>       : Run n jobs in parallel"
-  echo "  --mirror, -m <url>       : set mirror"
-  echo "  --cache, -c <dir>        : set cache"
-  echo "  --file, -f <file>        : read package names from file"
-  echo "  --noupdate, -u           : don't update setup.ini from mirror"
-  echo "  --ipv4, -4               : wget prefer ipv4"
-  echo "  --no-progress            : hide the progress bar in any verbosity mode"
-  echo "  --quiet, -q              : quiet (no output)"
-  echo "  --verbose, -v            : verbose"
+  echo "  --ag                              use the silver searcher (currently work only at packageof subcommand)"
+  echo "  --charch <arch>                   change archetecture"
+  echo "  --use-setuprc                     set cache and mirror with /etc/setup/setup.rc"
+  echo "  --use-own-conf                    use own cache and mirror settings when apt-cyg calls setup.exe"
+  echo "  --no_ignore-case, -I              not ignore case distinctions for <patterns>"
+  echo "  --force-remove                    force remove"
+  echo "  --force-fetch-trustedkeys         force fetch trustedkeys"
+  echo "  --force-update-packageof-cache    force update packageof cache"
+  echo "  --no-verify, -X                   Don't verify setup.ini signatures"
+  echo "  --no-check-certificate            Don't validate the server's certificate"
+  echo "  --no-update-setup                 Don't update setup.exe"
+  echo "  --no-header                       Don't print header"
+  echo "  --proxy, -p <mode>                set proxy mode:<auto|inherit|none|URL>"
+  echo "  --completion-get-subcommand       get subcommand (for completion internal use)"
+  echo "  --completion-disable-autoupdate   disable completion autoupdate"
+  echo "  --max-jobs, -j <n>                Run n jobs in parallel"
+  echo "  --mirror, -m <url>                set mirror"
+  echo "  --cache, -c <dir>                 set cache"
+  echo "  --file, -f <file>                 read package names from file"
+  echo "  --noupdate, -u                    don't update setup.ini from mirror"
+  echo "  --ipv4, -4                        wget prefer ipv4"
+  echo "  --no-progress                     hide the progress bar in any verbosity mode"
+  echo "  --quiet, -q                       quiet (no output)"
+  echo "  --verbose, -v                     verbose"
   echo "  --help"
   echo "  --version"
 }
@@ -478,7 +473,7 @@ function verify_signatures ()
       echo -e "\e[31;1mError:\e[30;0m BAD signature: $1" >&2
       return 1
     else
-      verbose 0 -e "\e[32;1msignature verified\e[30;0m: $1"
+      verbose 2 -e "\e[32msignature verified\e[0m: $1"
     fi
     shift
   done
@@ -817,118 +812,6 @@ function apt-cyg-rdepends ()
   local pkg
   [ -z "$OPT_NO_HEADER" ] && printf "%-40s %s\t%s\t%s\n" "PKGNAME" "AVAIL" "SHALLOW" "DEEP"
   dep_check rdepends "$@"
-}
-
-function apt-cyg-completion-install ()
-{
-  if [ ! -d "/etc/bash_completion.d" ]; then
-    echo -e "\e[31;1mError:\e[30;0m /etc/bash_completion.d is not exist."
-    exit 1
-  fi
-  if ! package_db-is_registered "bash-completion"; then
-    echo -e "\e[31;1mError:\e[30;0m bash-completion is not installed."
-    exit 1
-  fi
-  
-  local SUBCMDS
-  local OPTIONS
-  local SCRIPTFILE="$(realpath "$(which apt-cyg)")"
-  local SCRIPTDIR="${SCRIPTNAME%/*}"
-  
-  readarray -t -O ${#SUBCMDS[@]} SUBCMDS < <(grep "^function " "$SCRIPTFILE" | awk 'match($2, /apt-cyg-([-_0-9A-Za-z]+)/,m){print m[1]}')
-  readarray -t -O ${#OPTIONS[@]} OPTIONS < <(
-    awk '
-      /^function *parse_args *\(\)/ {proc=1}
-      /^} *# *\/parse_args( |$)/    {proc=0}
-      proc && match($0, /^ *(-[^()*]+)\)/, m) {
-        split(m[1], x, "|");
-        for (i in x) print x[i];
-      }
-      ' "$SCRIPTFILE"
-    )
-  cat <<-EOD > /etc/bash_completion.d/apt-cyg
-# bash completion for apt-cyg
-
-function __apt-cyg ()
-{
-  local cur prev getsubcmd subcmd
-  
-  # Auto update for completion script.
-  if [ -z "$OPT_COMPLETION_DISABLE_AUTOUPDATE" -a "$SCRIPTFILE" -nt "/etc/bash_completion.d/apt-cyg" ]; then
-    apt-cyg completion-install >/dev/null 2>&1
-    . /etc/bash_completion.d/apt-cyg
-    __apt-cyg "$@"
-    return
-  fi
-  
-  _get_comp_words_by_ref -n : cur prev
-  
-  getsubcmd=( apt-cyg --completion-get-subcommand \$(echo "\${COMP_LINE}" | sed -r -e 's/^[^ \t]+//g' -e 's/[^ \t]+\$//g') )
-  subcmd="\$( "\${getsubcmd[@]}" )"
-  
-  case "\$subcmd" in
-    install|depends|rdepends|describe|find)
-      COMPREPLY=( \$(awk '/^@ /{print \$2}' "$(apt-cyg pathof setup.ini)") )
-      ;;
-    remove)
-      COMPREPLY=( \$(apt-cyg show 2>/dev/null) )
-      ;;
-    pathof)
-      COMPREPLY=( cache mirror mirrordir cache/mirrordir setup.ini )
-      ;;
-    "")
-      COMPREPLY=( "${SUBCMDS[*]}" )
-      ;;
-  esac
-  case "\$prev" in
-    --charch)
-      COMPREPLY=( x86 x86_64 )
-      ;;
-    --cache|-c)
-      COMPREPLY=( \$(compgen -d -- "\$cur") )
-      ;;
-    --mirror|-m)
-      COMPREPLY=( \$(awk '/^[^ \t]+/{section=\$1}section=="mirrors-lst"&&match(\$0,/^[ \t]+([^;]+);/,m){print "\""m[1]"\""}' "/etc/setup/setup.rc") )
-      ;;
-    --file|-f)
-      COMPREPLY=( \$(compgen -f -- "\$cur") )
-      ;;
-    --proxy|-p)
-      COMPREPLY=( auto inherit none http:// )
-      ;;
-    *)
-      COMPREPLY+=( "${OPTIONS[*]}" )
-      ;;
-  esac
-  if [ -n "\$DEBUG_COMPLETION" ]; then
-    echo
-    echo "COMP_WORDBREAKS: \$COMP_WORDBREAKS"
-    echo "getsubcmd: '\${getsubcmd[@]}'"
-    echo "subcmd: '\${subcmd[@]}'"
-    echo "COMP_LINE: '\${COMP_LINE}'"
-    echo "cur: \$cur"
-    echo "prev: \$prev"
-    echo "COMP_WORDS: \${COMP_WORDS[@]}"
-    echo
-    echo -n "\${COMP_LINE}"
-  fi
-  COMPREPLY=( \$(compgen -W "\${COMPREPLY[*]}" -- "\$cur") )
-  __ltrim_colon_completions "\$cur"
-}
-complete -F __apt-cyg apt-cyg
-EOD
-  touch -r "$SCRIPTFILE" "/etc/bash_completion.d/apt-cyg"
-  echo "A bash completion /etc/bash_completion.d/apt-cyg is installed"
-}
-
-function apt-cyg-completion-uninstall ()
-{
-  if [ ! -f /etc/bash_completion.d/apt-cyg ]; then
-    echo -e "\e[31;1mError:\e[30;0m /etc/bash_completion.d/apt-cyg is not exist."
-    exit 1
-  fi
-  rm /etc/bash_completion.d/apt-cyg
-  echo "A bash completion /etc/bash_completion.d/apt-cyg is uninstalled"
 }
 
 function apt-cyg-mirrors-list ()
@@ -1474,7 +1357,7 @@ OPT_USER_PICKED=1
 noupdate=0
 OPT_FILES=()
 SUBCOMMAND=""
-ignore_case=""
+ignore_case=1
 force_remove=""
 force_fetch_trustedkeys=""
 no_verify=""
@@ -1514,8 +1397,8 @@ function parse_args ()
         shift
         ;;
       
-      --ignore-case|-i)
-        ignore_case="$1"
+      --not_ignore-case|-I)
+        ignore_case=0
         shift
         ;;
       
@@ -1770,7 +1653,7 @@ function apt-cyg-find ()
 }
 
 
-function apt-cyg-describe ()
+function apt-cyg-desc ()
 {
   local pkg
   
@@ -1942,6 +1825,137 @@ function apt-cyg-remove()
     verbose 0 "Package $pkg removed"
     
   done
+}
+
+################################################################
+
+function escape_package_name()
+{
+    if test "$1" == "."
+    then
+        # special case - any name
+        echo $1
+        exit
+    fi
+    # escape special chars in package name (if any)
+    echo $1 | sed -e "s/[+.*()&?]/\\\\&/g"
+}
+
+function show_installed_packages()
+{
+    q_verbose=$1
+    query="$(escape_package_name "$2")"
+    # remove ".tar.bz2" extension
+    # print version (cut from "<pkg> <pkg>-version" string)
+    # sort list (started with underscores are last)
+    awk < $PACKAGE_DB -v verbose=$q_verbose -v query="$query" \
+        '/[^ ]+ [^ ]+ 0/ {
+            if (length(query) == 0 || $1 ~ query ) {
+                NF=verbose+1;
+                if (NF > 1) {
+                    sub(/\.tar\.bz2$/, "", $2);
+                    r=$1;
+                    gsub(/[+.*()&#?]/, "\\\\&", r);
+                    r="^"r"-";
+                    sub(r, "", $2)
+                };
+                print
+            }
+        }' | sort | sed -e '/^_/{$!{H;d}}; $G' | sed -e '/^$/d'
+}
+
+function show_available_packages()
+{
+    q_verbose=$1
+    query="$(escape_package_name "$2")"
+    category="$3"
+    # print version (found "version:" field"
+    # sort list (started with underscores are last)
+    awk < setup.ini -v query="$query" -v verbose=$q_verbose -v version_re="^version: " \
+        -v requires_re="^requires: " \
+        -v category_re="^category: " -v category="\\\<$category\\\>" \
+        'BEGIN {
+            RS="\n\n@ ";
+            FS="\n";
+            ORS="\n"
+        }
+        {
+            if ($1 ~ "^#") next;
+            matched=""
+            requires=""
+            if (query == "") {
+                for(i=1; i<=NF; i++) {
+                    if ($i ~ requires_re) {
+                        requires=$i
+                        sub(requires_re, "", requires)
+                    } else if ($i ~ category_re && $i ~ category) {
+                        sub(category_re, "", $i)
+                        matched=$1
+                    }
+                }
+                if (matched) print matched, requires
+            } else if ($1 ~ query) {
+                if (verbose == 0)
+                    NF=1
+                else {
+                    for(i=3; i<=NF; i++) {
+                        if ($i ~ version_re) {
+                            $2=$i;
+                            NF=2;
+                            sub(version_re, "", $2)
+                        }
+                    }
+                };
+                if (NF>2)
+                    NF=1;
+                print
+            }
+        }' | sort | sed -e '/^_/{$!{H;d}}; $G' | sed -e '/^$/d'
+}
+
+function listoutdated()
+{
+    file_installed=/tmp/apt-cyg.installed.$$_
+    file_available=/tmp/apt-cyg.available.$$_
+    >$file_installed
+    >$file_available
+    if test ${#@} -eq 0
+    then
+        show_installed_packages 1 "." >>$file_installed
+        show_available_packages 1 '.' >>$file_available
+    else
+        for pkg do
+            show_installed_packages 1 "$pkg" >>$file_installed
+            show_available_packages 1 "$pkg" >>$file_available
+        done
+    fi
+    if ! test -s $file_available
+    then
+        echo WARNING! Available packages list is empty! 1>&2
+    fi
+    packages_changed=$(diff -d -y $file_installed $file_available  | grep -e '|' | awk '{ print $1 }')
+    q_verbose=1
+    for pkg in $packages_changed
+    do
+        e_pkg="$(escape_package_name "$pkg")"
+        version_installed=$(awk "/^$e_pkg /"'{print $2}' $file_installed)
+        version_available=$(awk "/^$e_pkg /"'{print $2}' $file_available)
+        if test "$version_installed" \< "$version_available"
+        then
+            echo "Package $pkg is outdated ($version_installed < $version_available)"
+        elif test -z "$version_available"
+        then
+            echo -e "\e[33mPackage $pkg ($version_installed) is absent on this mirror\e[0m"
+        fi
+    done
+    rm $file_installed $file_available
+}
+
+function apt-cyg-outdate
+{
+    findworkspace
+    getsetup
+    listoutdated $@
 }
 
 function invoke_subcommand ()
