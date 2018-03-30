@@ -1,0 +1,80 @@
+#compdef apt-cyg
+
+local ret=1
+
+local -a commands
+commands=(
+  "install: install packages"
+  "remove: remove packages"
+  "update: update setup.ini"
+  "show: show installed packages"
+  "find: find packages matching patterns"
+  "desc: describe packages matching patterns"
+  "outdate: check outdated packages"
+  "packageof: locate parent packages"
+  "pathof: show path mode:<cache|mirror|mirrordir|cache/mirrordir|setup.ini>"
+  "upgrade-self: upgrade apt-cyg"
+  "depends: show forward dependency information for packages with depth."
+  "rdepends: show reverse dependency information for packages with depth."
+  "mirrors-list: show list of mirros."
+  "benchmark-mirrors: benchmark mirrors, do 'wget <urls>/setup.bz2'"
+  "benchmark-parallel-mirrors: benchmark mirrors in parallel."
+  "benchmark-parallel-mirrors-list: benchmark mirrors-list in parallel."
+  "show-packages-busyness: show packages are busy or noe."
+  "dist-upgrade: upgrade all packages that is installed. This subcommand uses setup.exe"
+  "update-setup: update setup.exe"
+  "setup: call setup.exe"
+  "packages-total-count: count number of total packages from setup.ini"
+  "packages-total-size: count size of total packages from setup.ini"
+  "packages-cached-count: count number of cached packages in cache/mirrordir."
+  "packages-cached-size: count size of cached packages in cache/mirrordir."
+  "repair-acl: repair acl."
+  "source: download source archive."
+  "download: download the binary package into the current directory."
+  "mirror: download the binary package into the current cache/mirrordir as mirror."
+  "listfiles: List files 'owned' by package(s)."
+)
+
+_arguments -C \
+  '(--no_ignore-case -I)'{--no_ignore-case,-I}'[not ignore case distinctions for <patterns>]' \
+  '(--no-verify -X)'{--no-verify,-X}'[Dont verify setup.ini signatures]' \
+  '(--proxy -p)'{--proxy,-p}'[set proxy mode:<auto|inherit|none|URL>]' \
+  '(--max-jobs -j)'{--max-jobs,-j}'[Run n jobs in parallel]' \
+  '(--mirror -m)'{--mirror,-m}'[set mirror]' \
+  '(--cache -c)'{--cache,-c}'[set cache]' \
+  '(--file -f)'{--file,-f}'[read package names from file]' \
+  '(--noupdate -u)'{--noupdate,-u}'[Dont update setup.ini from mirror]' \
+  '(--ipv4 -4)'{--ipv4,-4}'[wget prefer ipv4]' \
+  '(--no-progress)--no-progress[hide the progress bar in any verbosity mode]' \
+  '(--quiet -q)'{--quiet,-q}'[quiet (no output)]' \
+  '(--verbose -v)'{--verbose,-v}'[verbose]' \
+  '(--ag)--ag[use the silver searcher (currently work only at packageof subcommand)]' \
+  '(--charch)--charch[change archetecture]' \
+  '(--use-setuprc)--use-setuprc[set cache and mirror with /etc/setup/setup.rc]' \
+  '(--use-own-conf)--use-own-conf[use own cache and mirror settings when apt-cyg calls setup.exe]' \
+  '(--force-remove)--force-remove[force remove]' \
+  '(--force-fetch-trustedkeys)--force-fetch-trustedkeys[force fetch trustedkeys]' \
+  '(--force-update-packageof-cache)--force-update-packageof-cache[force update packageof cache]' \
+  '(--no-check-certificate)--no-check-certificate[Dont validate the servers certificate]' \
+  '(--no-update-setup)--no-update-setup[Dont update setup.exe]' \
+  '(--no-header)--no-header[Dont print header]' \
+  '(--help)--help' \
+  '(--version)--version' \
+  '1: :->cmds'\
+  '*: :_files'&& ret=0
+
+case $state in
+  cmds)
+    _describe -t commands 'commands' commands && ret=0
+    ;;
+esac
+
+return ret
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et

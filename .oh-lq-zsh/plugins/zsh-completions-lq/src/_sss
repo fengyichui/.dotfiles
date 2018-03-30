@@ -1,0 +1,18 @@
+#compdef sss
+
+_arguments -C \
+  '(--inside-index -i)'{--inside-index=,-i=}'[inside proxy table index]' \
+  '(--qr-net -n)'{--qr-net=,-n=}'[network QR picture address]' \
+  '(--qr-local -l=)'{--qr-local=,-l=}'[local QR picture path]: :_files' \
+  '(--server -s)'{--server=,-s=}'[encrypt_method: password@ip_addr:port]' \
+  '(--global -g)'{--global,-g}'[use global proxy]' \
+  '(--socks5 -5)'{--socks5,-5}'[use socks5 proxy mode]' \
+  '(--help -h)'{--help,-h}'[show this help]'
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et
