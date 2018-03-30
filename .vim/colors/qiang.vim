@@ -17,6 +17,8 @@ let g:colors_name="qiang"
 " ----------
 hi Normal           guifg=#e4e4e4           guibg=#1b1d1e
 hi Normal           ctermfg=254             ctermbg=234
+hi Invisible        guifg=#1b1d1e           guibg=NONE
+hi Invisible        ctermfg=234             ctermbg=NONE
 
 " Comment Group
 " -------------
