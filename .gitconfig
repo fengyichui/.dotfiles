@@ -7,9 +7,24 @@
     helper = store
 
 [core]
-    editor   = vim
+    # Commands such as commit and tag that let you edit messages by
+    # launching an editor use the value of this variable when it is set
+    editor = vim
+
+    # Set to true if you want to have CRLF line endings in your working
+    # directory and the repository has LF line endings.
     autocrlf = false
+
+    # If true, makes Git check if converting CRLF is reversible when end-of-line
+    # conversion is active. Git will verify if a command modifies a file in the
+    # work tree either directly or indirectly.
+    safecrlf = true
+
+    # Tells Git if the executable bit of files in the working tree is to be honored.
     filemode = true
+
+    # If this variable is set to false, bytes higher than 0x80 are not
+    # considered "unusual" any more.
     quotepath = false
 
 [color]
