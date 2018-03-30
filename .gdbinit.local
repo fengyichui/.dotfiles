@@ -15,6 +15,10 @@ si
 x/i $pc
 end
 
+define xi
+x/16i $pc-16
+end
+
 define connect2local
 target remote localhost:2331
 end
