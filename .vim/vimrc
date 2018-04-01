@@ -334,7 +334,7 @@ autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe 'norm
 " For quickfix command
 autocmd QuickFixCmdPost [^l]* nested copen
 autocmd QuickFixCmdPost    l* nested lopen
-"autocmd QuickFixCmdPost make,lmake call lq#QfMakeConv()
+"autocmd QuickFixCmdPost * call lq#QfMakeConv()
 autocmd BufReadPost quickfix silent! match Invisible /\r$/
 autocmd BufReadPost quickfix nnoremap <buffer> [ :cold<cr> | nnoremap <buffer> ] :cnew<cr> | nnoremap <buffer> q :q<cr>
 autocmd BufReadPost quickfix nnoremap <buffer> <C-c> :AsyncStop<cr>

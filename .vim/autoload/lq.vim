@@ -14,11 +14,14 @@ let g:loaded_lq_autoload = 1
 
 " Quickfix make conv
 function! lq#QfMakeConv()
-   let qflist = getqflist()
-   for i in qflist
-      let i.text = iconv(i.text, "cp936", "utf-8")
-   endfor
-   call setqflist(qflist)
+    let qflist = getqflist()
+    let title = getqflist({'title': 1})
+    for i in qflist
+"        let i.text = iconv(i.text, "cp936", &enc)
+        let i.text = substitute(i.text, "\r$", "", "")
+    endfor
+    call setqflist(qflist, 'r')
+    call setqflist([], 'r', title)
 endfunction
 
 " Command line used in function
