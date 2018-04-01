@@ -71,7 +71,10 @@ export LANG=en_US.UTF-8
 # Editor
 export EDITOR='vim'
 
-# Remove Duplicate History
+# Option
+setopt NO_BEEP                   # i hate beeps
+setopt RM_STAR_WAIT              # if `rm *` wait 10 seconds before performing it!
+# History
 setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
@@ -81,7 +84,11 @@ setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
 setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history file.
 setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
 setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
-setopt HIST_BEEP                 # Beep when accessing nonexistent history.
+setopt NO_SHARE_HISTORY          # Not share history with other window
+
+# Show time a command took if over 3 sec
+export REPORTTIME=3
+export TIMEFMT="%*Es total, %U user, %S system, %P cpu"
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
