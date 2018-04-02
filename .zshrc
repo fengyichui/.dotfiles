@@ -61,15 +61,17 @@ plugins=(safe-paste \
          zsh-syntax-highlighting \
          zsh-history-substring-search)
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
 # Editor
 export EDITOR='vim'
+
+# Run oh-my-zsh
+source $ZSH/oh-my-zsh.sh
+
+# General shell config
+source ~/.gshrc
 
 # Option
 setopt NO_BEEP                   # i hate beeps
@@ -86,28 +88,8 @@ setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording en
 setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
 setopt NO_SHARE_HISTORY          # Not share history with other window
 
-# Show time a command took if over 3 sec
-export REPORTTIME=3
-export TIMEFMT="%J: %*Es total, %U user, %S system, %P cpu"
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. AACliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# Run oh-my-zsh
-source $ZSH/oh-my-zsh.sh
-
-# General shell config
-source ~/.gshrc
+# Show time a command took if over 4 sec
+#autoload -Uz colors && colors
+export REPORTTIME=4
+export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es$reset_color (cpu=%P user=%U kernel=%S)"
 
