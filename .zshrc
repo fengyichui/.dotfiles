@@ -88,7 +88,7 @@ setopt NO_SHARE_HISTORY          # Not share history with other window
 
 # Show time a command took if over 3 sec
 export REPORTTIME=3
-export TIMEFMT="%*Es total, %U user, %S system, %P cpu"
+export TIMEFMT="%J: %*Es total, %U user, %S system, %P cpu"
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"

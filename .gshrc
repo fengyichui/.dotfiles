@@ -96,6 +96,11 @@ vimdiff-dir ()
     vim -c ":DirDiff $1 $2"
 }
 
+# latest
+latest ()
+{
+    find "$@" -type f -printf "%TY-%Tm-%Td %TT \t%p\n" | sort -rn | less -F
+}
 
 #####################################
 #             Export                #
