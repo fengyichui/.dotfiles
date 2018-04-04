@@ -14,7 +14,7 @@ alias l='ls -l --color=auto --time-style=long-iso --group-directories-first'    
 
 # grep file
 alias grep='grep --color'  # show differences in color
-alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
+alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -ni --color"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -100,6 +100,18 @@ vimdiff-dir ()
 latest ()
 {
     find "$@" -type f -printf "%TY-%Tm-%Td %TT \t%p\n" | sort -rn | less -F
+}
+
+# find file
+ff ()
+{
+    find -iname "*$@*"
+}
+
+# find file
+gg ()
+{
+    grep --color -nir "$@"
 }
 
 #####################################

@@ -337,7 +337,6 @@ autocmd QuickFixCmdPost    l* nested lopen
 "autocmd QuickFixCmdPost * call lq#QfMakeConv()
 autocmd BufReadPost quickfix silent! match Invisible /\r$/
 autocmd BufReadPost quickfix nnoremap <buffer> [ :cold<cr> | nnoremap <buffer> ] :cnew<cr> | nnoremap <buffer> q :q<cr>
-autocmd BufReadPost quickfix nnoremap <buffer> <C-c> :AsyncStop<cr>
 autocmd BufReadPost quickfix setlocal statusline=%t%{exists('w:quickfix_title')?\ '\ '.w:quickfix_title\ :\ ''}%<%=%c:%l/%L\ %P
 
 " For Listchars
