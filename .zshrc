@@ -75,7 +75,7 @@ source ~/.gshrc
 
 # Option
 setopt NO_BEEP                   # i hate beeps
-setopt RM_STAR_WAIT              # if `rm *` wait 10 seconds before performing it!
+#setopt RM_STAR_WAIT              # if `rm *` wait 10 seconds before performing it!
 # History
 setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
