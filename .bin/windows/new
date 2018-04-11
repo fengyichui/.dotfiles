@@ -6,8 +6,17 @@
 # Only for cygwin
 #
 
-dir=`pwd`
-echo cd \"$dir\" > /tmp/.init.tmp
-echo $@ >> /tmp/.init.tmp
-cygstart -w --action=open mintty --exec $SHELL --login -i
+# $TMUX env may lead some strange thing
+echo 'unset TMUX' > /tmp/.init.tmp
+
+# Keep PWD
+echo "cd $(pwd)" >> /tmp/.init.tmp
+
+# Execute the param
+echo "$@" >> /tmp/.init.tmp
+
+# Start new window
+cygstart -w --action=open mintty --exec "$SHELL" --login -i
+#cmd /C start /I /B "$(cygpath -w -a /bin/mintty)" -
+
 

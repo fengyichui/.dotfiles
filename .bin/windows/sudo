@@ -6,9 +6,18 @@
 # Only for cygwin
 #
 
-dir=`pwd`
-echo cd \"$dir\" > /tmp/.init.tmp
-echo $@ >> /tmp/.init.tmp
-cygstart -w --action=runas mintty --exec $SHELL --login -i
+# $TMUX env may lead some strange thing
+echo 'unset TMUX' > /tmp/.init.tmp
+
+# Keep PWD
+echo "cd $(pwd)" >> /tmp/.init.tmp
+
+# Execute the param
+echo "$@" >> /tmp/.init.tmp
+
+# Start SUDO window
+cygstart -w --action=runas mintty --exec "$SHELL" --login -i
+
+# Kill parent window
 kill -9 $PPID
 
