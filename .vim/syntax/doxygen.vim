@@ -168,6 +168,7 @@ endif
 
   " Create the single word matching special identifiers.
 
+  if 0 " liqiang- (render is too slow)
   fun! s:DxyCreateSmallSpecial( kword, name )
 
     let mx='[-:0-9A-Za-z_%=&+*/!~>|]\@<!\([-0-9A-Za-z_%=+*/!~>|#]\+[-0-9A-Za-z_%=+*/!~>|]\@!\|\\[\\<>&.]@\|[.,][0-9a-zA-Z_]\@=\|::\|([^)]*)\|&[0-9a-zA-Z]\{2,7};\)\+'
@@ -184,6 +185,7 @@ endif
   delfun s:DxyCreateSmallSpecial
 
   syn match doxygenSmallSpecial contained +[@\\]\(\<[npcbea]\>\|\<em\>\|\<ref\>\|\<link\>\|f\$\|[$\\&<>#]\)\@=+ nextgroup=doxygenOtherLink,doxygenHyperLink,doxygenHashLink,doxygenFormula,doxygenSymbol,doxygenSpecial.*Word
+  endif
 
   " Now for special characters
   syn match doxygenSpecial contained +[@\\]\(\<[npcbea]\>\|\<em\>\|\<ref\|\<link\>\>\|\<f\$\|[$\\&<>#]\)\@!+ nextgroup=doxygenParam,doxygenRetval,doxygenBriefWord,doxygenBold,doxygenBOther,doxygenOther,doxygenOtherTODO,doxygenOtherWARN,doxygenOtherBUG,doxygenPage,doxygenGroupDefine,doxygenCodeRegion,doxygenVerbatimRegion,doxygenDotRegion
@@ -242,7 +244,7 @@ endif
   syn keyword doxygenOther contained par nextgroup=doxygenHeaderLine
   syn region doxygenHeaderLine start=+.+ end=+^+ contained skipwhite nextgroup=doxygenSpecialMultilineDesc
 
-  " (details liqiang +)
+  " (details liqiang+)
   syn keyword doxygenOther contained details arg author authors date deprecated li return returns see invariant note post pre remarks since test nextgroup=doxygenSpecialMultilineDesc
   syn keyword doxygenOtherTODO contained todo attention nextgroup=doxygenSpecialMultilineDesc
   syn keyword doxygenOtherWARN contained warning nextgroup=doxygenSpecialMultilineDesc
