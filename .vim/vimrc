@@ -371,6 +371,7 @@ autocmd FileType c,cpp let &l:formatprg = 'astyle --mode=c --lineend=linux --sty
 autocmd FileType java let &l:formatprg = 'astyle --mode=java --lineend=linux --style=ansi --indent-switches --convert-tabs --align-reference=name --break-blocks --pad-oper --pad-first-paren-out --pad-header'
 autocmd FileType python let &l:formatprg = 'yapf'
 autocmd FileType xml let &l:formatprg = 'tidy -quiet -xml -indent --indent-spaces 4 --newline LF'
+autocmd FileType sh let &l:formatprg = 'shfmt -i 4 -ci'
 
 " Custom Make
 autocmd BufReadPost *.uvproj setlocal makeprg=makekeil    | compiler keil
