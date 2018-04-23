@@ -208,8 +208,8 @@ hi LineNr           ctermfg=243             ctermbg=238
 hi CursorLineNr     guifg=#eeee00           guibg=#444444
 hi CursorLineNr     ctermfg=11              ctermbg=238
 " match parenthesis, brackets
-hi MatchParen       guifg=#ffaa33           guibg=#3d3d4d           gui=bold
-hi MatchParen       ctermfg=214             ctermbg=NONE            cterm=none
+hi MatchParen       guifg=NONE              guibg=NONE              gui=underline
+hi MatchParen       ctermfg=NONE            ctermbg=NONE            cterm=underline
 " text showing what mode you are in
 hi MoreMsg          guifg=#2e8b57                                   gui=none
 hi MoreMsg          ctermfg=29                                      cterm=none
