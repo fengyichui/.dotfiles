@@ -1849,11 +1849,11 @@ function show_installed_packages()
     # print version (cut from "<pkg> <pkg>-version" string)
     # sort list (started with underscores are last)
     awk < $PACKAGE_DB -v verbose=$q_verbose -v query="$query" \
-        '/[^ ]+ [^ ]+ 0/ {
+        '/[^ ]+ [^ ]+ [01]/ {
             if (length(query) == 0 || $1 ~ query ) {
                 NF=verbose+1;
                 if (NF > 1) {
-                    sub(/\.tar\.bz2$/, "", $2);
+                    sub(/\.tar\..+$/, "", $2);
                     r=$1;
                     gsub(/[+.*()&#?]/, "\\\\&", r);
                     r="^"r"-";
@@ -1922,7 +1922,7 @@ function listoutdated()
     if test ${#@} -eq 0
     then
         show_installed_packages 1 "." >>$file_installed
-        show_available_packages 1 '.' >>$file_available
+        show_available_packages 1 "." >>$file_available
     else
         for pkg do
             show_installed_packages 1 "$pkg" >>$file_installed
@@ -1940,12 +1940,11 @@ function listoutdated()
         e_pkg="$(escape_package_name "$pkg")"
         version_installed=$(awk "/^$e_pkg /"'{print $2}' $file_installed)
         version_available=$(awk "/^$e_pkg /"'{print $2}' $file_available)
-        if test "$version_installed" \< "$version_available"
-        then
-            echo "Package $pkg is outdated ($version_installed < $version_available)"
-        elif test -z "$version_available"
+        if test -z "$version_available"
         then
             echo -e "\e[33mPackage $pkg ($version_installed) is absent on this mirror\e[0m"
+        else
+            echo "Package $pkg is outdated ($version_installed => $version_available)"
         fi
     done
     rm $file_installed $file_available
