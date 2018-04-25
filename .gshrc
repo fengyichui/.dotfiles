@@ -11,7 +11,6 @@
 alias ls='ls --color=auto --group-directories-first'                             # classify files in colour
 alias ll='ls -al --color=auto --time-style=long-iso --group-directories-first'   # long list all file
 alias l='ls -l --color=auto --time-style=long-iso --group-directories-first'     # long list file
-alias ls-ttys='ls /dev/ttyS*'
 
 # grep file
 alias grep='grep --color'  # show differences in color
