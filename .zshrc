@@ -91,5 +91,5 @@ setopt NO_SHARE_HISTORY          # Not share history with other window
 # Show time a command took if over 4 sec
 #autoload -Uz colors && colors
 export REPORTTIME=4
-export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es$reset_color (cpu=%P user=%U kernel=%S)"
+export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es $fg[cyan](cpu=%P user=%U kernel=%S)$reset_color"
 
