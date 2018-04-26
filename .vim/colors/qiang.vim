@@ -17,8 +17,8 @@ let g:colors_name="qiang"
 " ----------
 hi Normal           guifg=#e4e4e4           guibg=#1b1d1e
 hi Normal           ctermfg=254             ctermbg=234
-hi Invisible        guifg=#1b1d1e           guibg=NONE
-hi Invisible        ctermfg=234             ctermbg=NONE
+hi Invisible        guifg=bg                guibg=NONE
+hi Invisible        ctermfg=bg              ctermbg=NONE
 
 " Comment Group
 " -------------
@@ -183,10 +183,10 @@ hi CursorIM         guifg=bg                guibg=#96cdcd
 hi CursorIM         ctermfg=bg              ctermbg=116
 " cursor column
 hi CursorColumn                             guibg=#3d3d4d
-hi CursorColumn     cterm=NONE              ctermbg=236
+hi CursorColumn                             ctermbg=236             cterm=none
 " cursor line/row
 hi CursorLine                               guibg=#3d3d4d
-hi CursorLine       cterm=NONE              ctermbg=236
+hi CursorLine                               ctermbg=236             cterm=none
 
 " Misc
 " ----
@@ -238,17 +238,17 @@ hi WildMenu         ctermfg=16              ctermbg=186
 " Diff
 " ----
 " added line
-hi DiffAdd          guifg=#ffaa33           guibg=#3b1d1e              gui=italic
-hi DiffAdd          ctermfg=214             ctermbg=52                 cterm=italic
+hi DiffAdd          guifg=#ffaa33           guibg=#3b1d1e           gui=italic
+hi DiffAdd          ctermfg=214             ctermbg=52              cterm=italic
 " changed line
-hi DiffChange       guifg=#ae81ff           guibg=#3b1d1e              gui=italic
-hi DiffChange       ctermfg=135             ctermbg=52                 cterm=italic
+hi DiffChange       guifg=#ae81ff           guibg=#3b1d1e           gui=italic
+hi DiffChange       ctermfg=135             ctermbg=52              cterm=italic
 " deleted line
-hi DiffDelete       guifg=#ee0000           guibg=#3b1d1e              gui=italic
-hi DiffDelete       ctermfg=196             ctermbg=52                 cterm=italic
+hi DiffDelete       guifg=#ee0000           guibg=#3b1d1e           gui=italic
+hi DiffDelete       ctermfg=196             ctermbg=52              cterm=italic
 " changed text within line
-hi DiffText         guifg=#3eb8e5           guibg=#3b1d1e              gui=italic
-hi DiffText         ctermfg=38              ctermbg=52                 cterm=italic
+hi DiffText         guifg=#3eb8e5           guibg=#3b1d1e           gui=italic
+hi DiffText         ctermfg=38              ctermbg=52              cterm=italic
 
 " Folds
 " -----
