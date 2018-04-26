@@ -1663,7 +1663,7 @@ function apt-cyg-desc ()
   for pkg do
     echo ""
     awk -v query="$pkg" -v IGNORECASE="$ignore_case" \
-      'BEGIN{RS="\n\n@ "; FS="\n"; ORS="\n"} {if ($1 ~ query) {print $0 "\n"}}' \
+      'BEGIN{RS="\n\n@ "; FS="\n"; ORS="\n"} {if ($1 == query) {print $0 "\n"}}' \
       setup.ini
   done
 }
