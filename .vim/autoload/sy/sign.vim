@@ -4,12 +4,12 @@ scriptencoding utf-8
 
 " Init: values {{{1
 if get(g:, 'signify_sign_show_text', 1)
-  let s:sign_delete      = get(g:, 'signify_sign_delete', '_')
-  let s:sign_show_count  = get(g:, 'signify_sign_show_count', 1)
+  let s:sign_delete = get(g:, 'signify_sign_delete', '_')
 else
-  let s:sign_delete     = ' '
-  let s:sign_show_count = 0
+  let s:sign_delete = ' '
 endif
+
+let s:sign_show_count  = get(g:, 'signify_sign_show_count', 1)
 let s:delete_highlight = ['', 'SignifyLineDelete']
 
 " Function: #id_next {{{1
@@ -50,7 +50,7 @@ endfunction
 
 
 " Function: #process_diff {{{1
-function! sy#sign#process_diff(sy, diff) abort
+function! sy#sign#process_diff(sy, vcs, diff) abort
   let a:sy.signtable             = {}
   let a:sy.hunks                 = []
   let [added, modified, deleted] = [0, 0, 0]
@@ -96,11 +96,10 @@ function! sy#sign#process_diff(sy, diff) abort
       if new_line == 0
         call add(ids, s:add_sign(a:sy, 1, 'SignifyRemoveFirstLine'))
       elseif s:sign_show_count
-        if old_count <= 99
-          let text = substitute(s:sign_delete . old_count, '.*\ze..$', '', '')
-        else
-          let text = s:sign_delete .'>'
-        endif
+        let text = s:sign_delete . (old_count <= 99 ? old_count : '>')
+        while strwidth(text) > 2
+          let text = substitute(text, '.', '', '')
+        endwhile
         call add(ids, s:add_sign(a:sy, new_line, 'SignifyDelete'. old_count, text))
       else
         call add(ids, s:add_sign(a:sy, new_line, 'SignifyDeleteMore', s:sign_delete))
@@ -188,6 +187,24 @@ function! sy#sign#process_diff(sy, diff) abort
   for line in filter(keys(a:sy.internal), '!has_key(a:sy.signtable, v:val)')
     execute 'sign unplace' a:sy.internal[line].id 'buffer='.a:sy.buffer
   endfor
+
+  if has('gui_macvim') && has('gui_running') && mode() == 'n'
+    " MacVim needs an extra kick in the butt, when setting signs from the
+    " exit handler. :redraw would trigger a "hanging cursor" issue.
+    call feedkeys("\<c-l>", 'n')
+  endif
+
+  if empty(a:sy.updated_by) && empty(a:sy.hunks)
+    call sy#verbose('Successful exit value, but no diff. Keep VCS for time being.', a:vcs)
+    return
+  endif
+
+  call sy#verbose('Signs updated.', a:vcs)
+  let a:sy.updated_by = a:vcs
+  if len(a:sy.vcs) > 1
+    call sy#verbose('Disable all other VCS.', a:vcs)
+    let a:sy.vcs = [a:vcs]
+  endif
 
   let a:sy.stats = [added, modified, deleted]
 endfunction

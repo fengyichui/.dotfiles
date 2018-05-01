@@ -42,10 +42,7 @@ endfunction
 
 " Function: #enable {{{1
 function! sy#fold#enable(do_tab) abort
-  if !exists('b:sy')
-    echomsg 'signify: I cannot detect any changes!'
-    return
-  endif
+  execute sy#util#return_if_no_changes()
 
   if a:do_tab
     tabedit %
@@ -62,21 +59,21 @@ endfunction
 
 " Function: #disable {{{1
 function! sy#fold#disable() abort
-  let &l:foldmethod = w:sy_folded.method
-  let &l:foldtext = w:sy_folded.text
+  let &l:foldmethod = b:sy_folded.method
+  let &l:foldtext = b:sy_folded.text
   normal! zv
 endfunction
 
 " Function: #toggle {{{1
 function! sy#fold#toggle() abort
-  if exists('w:sy_folded')
+  if exists('b:sy_folded')
     call sy#fold#disable()
-    if w:sy_folded.method == 'manual'
+    if b:sy_folded.method == 'manual'
       loadview
     endif
-    unlet w:sy_folded
+    unlet b:sy_folded
   else
-    let w:sy_folded = { 'method': &foldmethod, 'text': &foldtext }
+    let b:sy_folded = { 'method': &foldmethod, 'text': &foldtext }
     if &foldmethod == 'manual'
       let old_vop = &viewoptions
       mkview

@@ -3,8 +3,6 @@
 scriptencoding utf-8
 
 " Init: values {{{1
-let g:sy_cache = {}
-
 let s:has_doau_modeline = v:version > 703 || v:version == 703 && has('patch442')
 
 " Function: #start {{{1
@@ -17,72 +15,82 @@ function! sy#start() abort
   let sy_path = resolve(expand('%:p'))
 
   if s:skip(sy_path)
-    call sy#verbose('Skip file.')
+    call sy#verbose('Skip file: '. sy_path)
     if exists('b:sy')
       call sy#sign#remove_all_signs(bufnr(''))
-      unlet! b:sy b:sy_info
+      unlet! b:sy
     endif
     return
   endif
 
-  " sy_info is used in autoload/sy/repo
-  let b:sy_info = {
-        \ 'dir':   fnamemodify(sy_path, ':p:h'),
-        \ 'path':  sy#util#escape(sy_path),
-        \ 'file':  sy#util#escape(fnamemodify(sy_path, ':t')),
-        \ }
-
   if !exists('b:sy') || b:sy.path != sy_path
-    call sy#verbose('Register new file.')
+    call sy#verbose('Register new file: '. sy_path)
     let b:sy = {
-          \ 'path'  : sy_path,
-          \ 'buffer': bufnr(''),
-          \ 'active': 0,
-          \ 'vcs'   : 'unknown',
-          \ 'hunks' : [],
-          \ 'signid': 0x100,
-          \ 'stats' : [-1, -1, -1] }
+          \ 'path':       sy_path,
+          \ 'buffer':     bufnr(''),
+          \ 'active':     0,
+          \ 'detecting':  0,
+          \ 'vcs':        [],
+          \ 'hunks':      [],
+          \ 'signid':     0x100,
+          \ 'updated_by': '',
+          \ 'stats':      [-1, -1, -1],
+          \ 'info':       {
+          \    'dir':  fnamemodify(sy_path, ':p:h'),
+          \    'path': sy#util#escape(sy_path),
+          \    'file': sy#util#escape(fnamemodify(sy_path, ':t'))
+          \ }}
     if get(g:, 'signify_disable_by_default')
       call sy#verbose('Disabled by default.')
       return
     endif
     let b:sy.active = 1
-    call sy#repo#detect(1)
+    call sy#repo#detect()
   elseif has('vim_starting')
     call sy#verbose("Don't run Sy more than once during startup.")
     return
   elseif !b:sy.active
     call sy#verbose('Inactive buffer.')
     return
-  elseif b:sy.vcs == 'unknown'
+  elseif empty(b:sy.vcs)
     if get(b:sy, 'retry')
       let b:sy.retry = 0
       call sy#verbose('Redetecting VCS.')
-      call sy#repo#detect(1)
+      call sy#repo#detect()
     else
-      call sy#verbose('No VCS found. Disabling.')
-      call sy#disable()
+      if get(b:sy, 'detecting')
+        call sy#verbose('Detection is already in progress.')
+      else
+        call sy#verbose('No VCS found. Disabling.')
+        call sy#disable()
+      endif
     endif
   else
-    call sy#verbose('Updating signs.')
-    call sy#repo#get_diff_start(b:sy.vcs, 0)
+    for vcs in b:sy.vcs
+      let job_id = get(b:, 'sy_job_id_'. vcs)
+      if type(job_id) != type(0) || job_id > 0
+        call sy#verbose('Update is already in progress.', vcs)
+      else
+        call sy#verbose('Updating signs.', vcs)
+        call sy#repo#get_diff_start(vcs)
+      endif
+    endfor
   endif
 endfunction
 
 " Function: #set_signs {{{1
-function! sy#set_signs(sy, diff, do_register) abort
-  call sy#verbose('set_signs()', a:sy.vcs)
+function! sy#set_signs(sy, vcs, diff) abort
+  call sy#verbose('set_signs()', a:vcs)
 
-  if a:do_register
+  if a:sy.stats == [-1, -1, -1]
     let a:sy.stats = [0, 0, 0]
-    let dir = fnamemodify(a:sy.path, ':h')
-    if !has_key(g:sy_cache, dir)
-      let g:sy_cache[dir] = a:sy.vcs
-    endif
-    if empty(a:diff)
-      call sy#verbose('No changes found.', a:sy.vcs)
-      return
-    endif
+  endif
+
+  if empty(a:diff)
+    call sy#verbose('No changes found.', a:vcs)
+    let a:sy.stats = [0, 0, 0]
+    call sy#sign#remove_all_signs(a:sy.buffer)
+    return
   endif
 
   if get(g:, 'signify_line_highlight')
@@ -91,7 +99,7 @@ function! sy#set_signs(sy, diff, do_register) abort
     call sy#highlight#line_disable()
   endif
 
-  call sy#sign#process_diff(a:sy, a:diff)
+  call sy#sign#process_diff(a:sy, a:vcs, a:diff)
 
   if exists('#User#Signify')
     execute 'doautocmd' (s:has_doau_modeline ? '<nomodeline>' : '') 'User Signify'
