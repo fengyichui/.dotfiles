@@ -26,6 +26,9 @@ alias dumpbin-exports='dumpbin_func exports'
 #alias cp='cp -i'
 alias cpx='rsync --info=progress2'
 
+# cd to git root dir
+alias cdg='git_root_dir=$(git cdup) && [[ $git_root_dir ]] && cd $git_root_dir'
+
 # vim stdin
 alias vim-='vim -c "silent file stdin | set nomodified" -'
 
