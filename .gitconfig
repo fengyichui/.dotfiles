@@ -73,6 +73,7 @@
 
 [alias]
     co = checkout
+    coh = checkout HEAD
     cm = commit
     ca = commit -a
     d  = diff --relative --stat -p
