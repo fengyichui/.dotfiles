@@ -741,6 +741,7 @@ command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>
 command! -complete=file -nargs=1 GITblame    call lq#Scratch("!git blame ".<q-args>)
 command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout ".<q-args>
 command! -complete=file -nargs=1 GITco       exe "silent :!git checkout ".<q-args>
+command! -complete=file -nargs=1 GITcoh      exe "silent :!git checkout HEAD".<q-args>
 command! -complete=file -nargs=1 GITadd      exe "!git add ".<q-args>
 command!                -nargs=0 GITrollback exe "!git reset HEAD~1"
 command!                -nargs=0 GITstatus   call lq#Scratch("!git status")
