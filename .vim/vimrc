@@ -732,12 +732,15 @@ command!                -nargs=0 SVNinfo     call lq#Scratch("!svn info")
 command!                -nargs=0 SVNcleanup  exe "!svn cleanup"
 
 " Git
-command! -complete=file -nargs=+ GITcommit   exe "!git commit -m ".<q-args> | SignifyRefresh
+command! -complete=file -nargs=+ GITcommit   exe "!git commit ".<q-args> | SignifyRefresh
+command! -complete=file -nargs=+ GITcm       exe "!git commit ".<q-args> | SignifyRefresh
+command! -complete=file -nargs=+ GITca       exe "!git commit -a ".<q-args> | SignifyRefresh
 command! -complete=file -nargs=? GITdiff     call lq#Scratch("!git diff HEAD --relative --raw -p ".<q-args>, "git")
 command! -complete=file -nargs=? GITlog      call lq#Scratch("!git log ".<q-args>, "git")
 command! -complete=file -nargs=? GITmerge    exe "!git merge ".<q-args>
 command! -complete=file -nargs=1 GITblame    call lq#Scratch("!git blame ".<q-args>)
-command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout HEAD ".<q-args>
+command! -complete=file -nargs=1 GITcheckout exe "silent :!git checkout ".<q-args>
+command! -complete=file -nargs=1 GITco       exe "silent :!git checkout ".<q-args>
 command! -complete=file -nargs=1 GITadd      exe "!git add ".<q-args>
 command!                -nargs=0 GITrollback exe "!git reset HEAD~1"
 command!                -nargs=0 GITstatus   call lq#Scratch("!git status")
