@@ -14,7 +14,7 @@ alias l='ls -l --color=auto --time-style=long-iso --group-directories-first'    
 
 # grep file
 alias grep='grep --color'  # show differences in color
-alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -ni --color"
+alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -ni --color"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -31,9 +31,6 @@ alias cdg='git_root_dir=$(git cdup) && [[ $git_root_dir ]] && cd $git_root_dir'
 
 # vim stdin
 alias vim-='vim -c "silent file stdin | set nomodified" -'
-
-# grep
-alias grepc="find -type f | awk 'gsub(/ /, \"\\\\ \"){}; /.*\.(c|h)$/;' | xargs grep -n --color"
 
 # diff
 alias diff='diff --color=auto'
