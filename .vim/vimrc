@@ -650,10 +650,13 @@ vnoremap Q gq
 " delete the characters under the cursor until the begin of the line
 nnoremap <BS> v^d
 
+" Completion
 " <TAB> for select the completion suggestions
 inoremap <expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
 " <S-TAB> also for file completion
 inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<C-X>\<C-F>"
+" <Enter> to select item
+inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
 
 " e/E for extra paste and yank:
 " e normal: paste wowd without yank
