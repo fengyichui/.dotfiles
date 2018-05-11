@@ -652,7 +652,8 @@ nnoremap <BS> v^d
 
 " <TAB> for select the completion suggestions
 inoremap <expr> <TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<S-TAB>"
+" <S-TAB> also for file completion
+inoremap <expr> <S-TAB> pumvisible() ? "\<C-p>" : "\<C-X>\<C-F>"
 
 " e/E for extra paste and yank:
 " e normal: paste wowd without yank
