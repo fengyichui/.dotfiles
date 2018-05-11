@@ -4,7 +4,7 @@
 # Cygwin
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
     cmd /c chcp 437 >/dev/null
-    wmic path win32_pnpentity get caption /format:list | awk -e '/COM[0-9]/{match($0,/COM[0-9]+/);ttys=substr($0,RSTART+3,RLENGTH-3); name=substr($0,9,RSTART-9-2); printf "\033[33m/dev/ttyS%d\033[0m (%s) (COM%d)\n",ttys-1,name,ttys}'
+    wmic path win32_pnpentity get caption /format:list | LC_ALL=C awk -e '/COM[0-9]/{match($0,/COM[0-9]+/);ttys=substr($0,RSTART+3,RLENGTH-3); name=substr($0,9,RSTART-9-2); printf "\033[33m/dev/ttyS%d\033[0m (%s) (COM%d)\n",ttys-1,name,ttys}'
 
 # linux
 elif [[ "$OSTYPE" =~ "linux" ]]; then
