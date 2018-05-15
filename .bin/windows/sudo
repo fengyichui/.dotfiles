@@ -10,7 +10,7 @@
 echo 'unset TMUX' > /tmp/.init.tmp
 
 # Keep PWD
-echo "cd $(pwd)" >> /tmp/.init.tmp
+echo "cd '$(pwd)'" >> /tmp/.init.tmp
 
 # Execute the param
 echo "$@" >> /tmp/.init.tmp
