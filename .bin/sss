@@ -130,7 +130,7 @@ fi
 
 # Get network QR
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path ]]; then
-    wget $qr_net_path -O $qr_local_path
+    wget -U mozilla $qr_net_path -O $qr_local_path
     if [ $? != 0 ]; then
         exit 1
     fi
