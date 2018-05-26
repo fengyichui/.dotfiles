@@ -118,14 +118,14 @@ done
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
     if [[ "$inside_qr_index" -ge "${#res[*]}" ]]; then
-        echo "ss: invalid index"
+        echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
     qr_net_path=${res[$inside_qr_index]}
 
     if [[ $qr_net_path == $x ]]; then
-        echo "ss: invalid index"
+        echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
@@ -137,6 +137,10 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
                 match(\$0, \"\\\"[^\\\"]+server[^\\\"]+\\\"\");
                 print substr(\$0, RSTART+1, RLENGTH-2);
             }")
+        if [[ -z $qr ]]; then
+            echo -e "\e[31msss: can't curl valid QR image!\e[0m"
+            exit 1
+        fi
         qr_net_path="$qr_net_path/$qr"
     fi
 fi
@@ -145,6 +149,7 @@ fi
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path ]]; then
     wget -U mozilla $qr_net_path -O $qr_local_path
     if [ $? != 0 ]; then
+        echo -e "\e[31msss: wget fail!\e[0m"
         exit 1
     fi
 fi
@@ -155,13 +160,19 @@ if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path || $
     server_info=$(zbarimg -q --raw $qr_local_path | sed 's#^ss://##' | base64 -d)
 fi
 
-# link: -m rc4-md5 -k 52918214 -s 138.68.61.42 -p 23456
-serverparam=$(echo $server_info | sed 's/^/-m /; s/:/ -k /; s/@/ -s /; s/:/ -p /')
+# Check server params
+if [[ -z $server_info ]]; then
+    echo -e "\e[31msss: invalid server information!\e[0m"
+    exit 1
+fi
 
+# like: -m rc4-md5 -k 52918214 -s 138.68.61.42 -p 23456
+serverparam=$(echo $server_info | sed 's/^/-m /; s/:/ -k /; s/@/ -s /; s/:/ -p /')
 localparam='-b 127.0.0.1 -l 1080'
 
-echo -e "\e[31mServer: $server_info\e[0m"
-echo -e "\e[31mProxy: 127.0.0.1:1080\e[0m"
+# show
+echo -e "\e[32mServer: $server_info\e[0m"
+echo -e "\e[32mProxy: 127.0.0.1:1080\e[0m"
 
 if [ $global_proxy -eq 1 ]; then
     # open system proxy
@@ -173,7 +184,7 @@ fi
 echo ""
 
 # catch interrupt
-trap 'echo "interrupt"' HUP INT QUIT ABRT TERM
+trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
 # ss
 shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
