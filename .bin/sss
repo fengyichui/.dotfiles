@@ -34,11 +34,11 @@
 
 # inside proxy table
 x='x'
-ss8='ss8.pm/images/'
+ss8='ss8.pm'
 isx='isx.yt/img/qr/'
 fvs='jn9.org/img/'
 res=( \
-    ${ss8}server01.png ${ss8}server02.png ${ss8}server03.png $x $x $x $x $x $x $x \
+    ${ss8} ${ss8} ${ss8} $x $x $x $x $x $x $x \
     ${isx}sgaxxoo.png ${isx}sgbxxoo.png ${isx}sgcxxoo.png ${isx}usaxxoo.png ${isx}usbxxoo.png ${isx}uscxxoo.png ${isx}jpaxxoo.png ${isx}jpbxxoo.png ${isx}jpcxxoo.png $x \
     ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png $x $x $x $x $x $x $x \
     )
@@ -121,10 +121,23 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
         echo "ss: invalid index"
         exit 1
     fi
+
     qr_net_path=${res[$inside_qr_index]}
+
     if [[ $qr_net_path == $x ]]; then
         echo "ss: invalid index"
         exit 1
+    fi
+
+    # curl ss8 website
+    if [[ $qr_net_path == ${ss8} ]]; then
+        index=$[$inside_qr_index+1]
+        qr=$(curl -A foxfire -L ${ss8} | awk "
+            /server0${index}/ {
+                match(\$0, \"\\\"[^\\\"]+server[^\\\"]+\\\"\");
+                print substr(\$0, RSTART+1, RLENGTH-2);
+            }")
+        qr_net_path="$qr_net_path/$qr"
     fi
 fi
 
