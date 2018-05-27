@@ -131,8 +131,9 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
 
     # curl ss8 website
     if [[ $qr_net_path == ${ss8} ]]; then
+        echo "curl '${ss8}' ..."
         index=$[$inside_qr_index+1]
-        qr=$(curl -A foxfire -L ${ss8} | awk "
+        qr=$(curl --progress-bar -A foxfire -L ${ss8} | awk "
             /server0${index}/ {
                 match(\$0, \"\\\"[^\\\"]+server[^\\\"]+\\\"\");
                 print substr(\$0, RSTART+1, RLENGTH-2);
@@ -142,11 +143,13 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
             exit 1
         fi
         qr_net_path="$qr_net_path/$qr"
+        echo ""
     fi
 fi
 
 # Get network QR
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path ]]; then
+    echo "wget '${qr_net_path}' ..."
     wget -U mozilla $qr_net_path -O $qr_local_path
     if [ $? != 0 ]; then
         echo -e "\e[31msss: wget fail!\e[0m"
