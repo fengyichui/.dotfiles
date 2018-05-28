@@ -37,7 +37,7 @@ fi
 shift 1
 
 # Parsing params
-while getopts b:g:c:T:s:h opt; do
+while getopts b:g:c:Tsh opt; do
     case $opt in
         b) baudrate="${OPTARG}" ;;
         g) grep_re="$OPTARG" ;;
