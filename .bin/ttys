@@ -53,7 +53,11 @@ cmd="picocom $dev -b $baudrate"
 
 # timestamp (`ts` tool is in moreutils package)
 if [[ "$timestamp" == "1" ]]; then
-    cmd="$cmd | ts $timestamp_from_start"
+    if [[ -n "$timestamp_from_start" ]]; then
+        cmd="$cmd | ts $timestamp_from_start '%H:%M:%S '"
+    else
+        cmd="$cmd | ts '%Y/%m/%d %H:%M:%S '"
+    fi
 fi
 
 # filter
