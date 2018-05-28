@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# usage
+function print_usage ()
+{
+    echo "Show serial port output (use 'picocom')"
+    echo ""
+    echo "Usage:"
+    echo "  ttys /dev/ttySn <options>"
+    echo ""
+    echo "Options:"
+    echo "  -b <baudrate>  set baudrate (default is 115200)"
+    echo "  -g <regex>     just show greped line"
+    echo "  -c <regex>     colorize <regex> line"
+    echo "  -T             Disable timestamp (default add system time)"
+    echo "  -s             timestamp with 'elapsed since start of the program'"
+    echo "  -h             show this help and exit"
+    echo ""
+    echo "by liqiang"
+    exit 1
+}
+
+# default params
+dev=$1
+baudrate="115200"
+timestamp=1
+timestamp_from_start=''
+color_re=''
+grep_re=''
+
+# check dev params
+if [[ ! $dev =~ 'dev' ]]; then
+    print_usage
+fi
+
+# Remove first param
+shift 1
+
+# Parsing params
+while getopts b:g:c:T:s:h opt; do
+    case $opt in
+        b) baudrate="${OPTARG}" ;;
+        g) grep_re="$OPTARG" ;;
+        c) color_re="$OPTARG" ;;
+        T) timestamp=0 ;;
+        s) timestamp_from_start='-s' ;;
+        ?) print_usage ;;
+    esac
+done
+
+# command
+cmd="picocom $dev -b $baudrate"
+
+# timestamp (`ts` tool is in moreutils package)
+if [[ "$timestamp" == "1" ]]; then
+    cmd="$cmd | ts $timestamp_from_start"
+fi
+
+# filter
+if [[ -n "$grep_re" ]]; then
+    cmd="$cmd | awk -v IGNORECASE=1 '/$grep_re/'"
+fi
+
+# color
+if [[ -n "$color_re" ]]; then
+    cmd="$cmd | awk -v IGNORECASE=1 '{if(match(\$0,/$color_re/)){print \"\\033[32m\" \$0 \"\\033[0m\"}else{print}}'"
+fi
+
+# show
+echo "$cmd"
+echo ""
+
+# execute
+eval "$cmd"
+
