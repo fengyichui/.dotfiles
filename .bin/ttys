@@ -17,7 +17,7 @@ function print_usage ()
     echo "  -s             timestamp with 'elapsed since start of the program'"
     echo "  -h             show this help and exit"
     echo ""
-    echo "by liqiang"
+    echo "by liqiang (2018/05/29)"
     exit 1
 }
 
