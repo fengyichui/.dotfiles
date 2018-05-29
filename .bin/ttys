@@ -12,6 +12,7 @@ function print_usage ()
     echo "  -b <baudrate>  set baudrate (default is 115200)"
     echo "  -g <regex>     just show greped line"
     echo "  -c <regex>     colorize <regex> line"
+    echo "  -C             colorize line sequentially"
     echo "  -T             Disable timestamp (default add system time)"
     echo "  -s             timestamp with 'elapsed since start of the program'"
     echo "  -h             show this help and exit"
@@ -23,10 +24,14 @@ function print_usage ()
 # default params
 dev=$1
 baudrate="115200"
-timestamp=1
+timestamp_show=1
 timestamp_from_start=''
-color_re=''
+timestamp_len=0
+color_re_index=0
+color_fail_re='fail|error|bad|wrong|assert|fault'
+color_seq=0
 grep_re=''
+
 
 # check dev params
 if [[ ! $dev =~ 'dev' ]]; then
@@ -37,12 +42,13 @@ fi
 shift 1
 
 # Parsing params
-while getopts b:g:c:Tsh opt; do
+while getopts b:g:c:CTsh opt; do
     case $opt in
         b) baudrate="${OPTARG}" ;;
         g) grep_re="$OPTARG" ;;
-        c) color_re="$OPTARG" ;;
-        T) timestamp=0 ;;
+        c) eval color_re_${color_re_index}="${OPTARG}"; color_re_index=$((color_re_index + 1)) ;;
+        C) color_seq=1 ;;
+        T) timestamp_show=0 ;;
         s) timestamp_from_start='-s' ;;
         ?) print_usage ;;
     esac
@@ -52,27 +58,40 @@ done
 cmd="picocom $dev -b $baudrate"
 
 # timestamp (`ts` tool is in moreutils package)
-if [[ "$timestamp" == "1" ]]; then
+if [[ "$timestamp_show" == "1" ]]; then
     if [[ -n "$timestamp_from_start" ]]; then
         cmd="$cmd | ts $timestamp_from_start '%H:%M:%S '"
+        timestamp_len=8
     else
-        cmd="$cmd | ts '%Y/%m/%d %H:%M:%S '"
+        cmd="$cmd | ts '%m/%d %H:%M:%S '"
+        timestamp_len=14
     fi
 fi
 
-# filter
-if [[ -n "$grep_re" ]]; then
-    cmd="$cmd | awk -v IGNORECASE=1 '/$grep_re/'"
-fi
-
-# color
-if [[ -n "$color_re" ]]; then
-    cmd="$cmd | awk -v IGNORECASE=1 '{if(match(\$0,/$color_re/)){print \"\\033[32m\" \$0 \"\\033[0m\"}else{print}}'"
-fi
+# filter and colorize
+function awk_colorize ()
+{
+    if [[ "$1" == "0" && "$color_seq" == "1" ]]; then
+        echo -n "t=substr(\$0,1,$timestamp_len); a=substr(\$0,$timestamp_len+1); c=32+NR%6; print \"\\033[1;30m\" t \"\\033[0;\" c \"m\" a \"\\033[0m\";"
+    else
+        echo -n "t=substr(\$0,1,$timestamp_len); a=substr(\$0,$timestamp_len+1); print \"\\033[1;30m\" t \"\\033[0;${1}m\" a \"\\033[0m\";"
+    fi
+}
+colorize_fail="if(match(\$0,/$color_fail_re/)){$(awk_colorize 31)}
+        else"
+colorize_user=""
+for((i=0; i<color_re_index; i++))
+{
+    eval color_user=\$color_re_${i}
+    colorize_user="${colorize_user} if(match(\$0,/$color_user/)){$(awk_colorize $((32+(i%5))))}
+        else"
+}
+cmd="$cmd | awk -v IGNORECASE=1 '/$grep_re/{
+        ${colorize_fail}${colorize_user}{$(awk_colorize 0)}}'"
 
 # show
-echo "$cmd"
-echo ""
+#echo "$cmd"
+#echo ""
 
 # execute
 eval "$cmd"
