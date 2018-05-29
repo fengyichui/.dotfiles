@@ -57,6 +57,11 @@ done
 # command
 cmd="picocom $dev -b $baudrate"
 
+# filter
+if [[ -n "$grep_re" ]]; then
+    cmd="$cmd | stdbuf -o0 awk -v IGNORECASE=1 '/$grep_re/'"
+fi
+
 # timestamp (`ts` tool is in moreutils package)
 if [[ "$timestamp_show" == "1" ]]; then
     if [[ -n "$timestamp_from_start" ]]; then
@@ -86,7 +91,7 @@ for((i=0; i<color_re_index; i++))
     colorize_user="${colorize_user} if(match(\$0,/$color_user/)){$(awk_colorize $((32+(i%5))))}
         else"
 }
-cmd="$cmd | awk -v IGNORECASE=1 '/$grep_re/{
+cmd="$cmd | stdbuf -o0 awk -v IGNORECASE=1 '{
         ${colorize_fail}${colorize_user}{$(awk_colorize 0)}}'"
 
 # show
