@@ -1,29 +1,6 @@
 #!/bin/bash
 
-# usage
-function print_usage ()
-{
-    echo "Show serial port output (use 'picocom')"
-    echo ""
-    echo "Usage:"
-    echo "  ttys /dev/ttySn <options>"
-    echo ""
-    echo "Options:"
-    echo "  -b <baudrate>  set baudrate (default is 115200)"
-    echo "  -g <regex>     just show greped line"
-    echo "  -c <regex>     colorize <regex> line"
-    echo "  -C             colorize line sequentially"
-    echo "  -T             Disable timestamp (default add system time)"
-    echo "  -s             timestamp with 'elapsed since start of the program'"
-    echo "  -h             show this help and exit"
-    echo ""
-    echo "by liqiang (2018/05/29)"
-    exit 1
-}
-
 # default params
-dev=$1
-baudrate="115200"
 timestamp_show=1
 timestamp_from_start=''
 timestamp_len=0
@@ -32,19 +9,25 @@ color_fail_re='fail|error|bad|wrong|assert|fault'
 color_seq=0
 grep_re=''
 
-
-# check dev params
-if [[ ! $dev =~ 'dev' ]]; then
-    print_usage
-fi
-
-# Remove first param
-shift 1
+# usage
+function print_usage ()
+{
+    echo "Process stdin with 'timestamp/filter/colorize'"
+    echo "Options:"
+    echo "  -g <regex>  just show greped line"
+    echo "  -c <regex>  colorize <regex> line, default colorize:"
+    echo "              '$color_fail_re' with RED"
+    echo "  -C          colorize line sequentially"
+    echo "  -T          Disable timestamp (default add system time)"
+    echo "  -s          timestamp with 'elapsed since start of the program'"
+    echo "  -h          show this help and exit"
+    echo "by liqiang (2018/05/30)"
+    exit 1
+}
 
 # Parsing params
-while getopts b:g:c:CTsh opt; do
+while getopts g:c:CTsh opt; do
     case $opt in
-        b) baudrate="${OPTARG}" ;;
         g) grep_re="$OPTARG" ;;
         c) eval color_re_${color_re_index}="${OPTARG}"; color_re_index=$((color_re_index + 1)) ;;
         C) color_seq=1 ;;
@@ -54,8 +37,8 @@ while getopts b:g:c:CTsh opt; do
     esac
 done
 
-# command
-cmd="picocom $dev -b $baudrate"
+# command (output the stdin)
+cmd='cat -'
 
 # filter
 if [[ -n "$grep_re" ]]; then
