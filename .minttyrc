@@ -26,6 +26,7 @@ ScrollMod=alt
 CtrlAltIsAltGr=no
 PgUpDnScroll=yes
 Language=en
+ScrollbackLines=1000000
 
 # Solarized colorscheme
 #ForegroundColour=131,148,150
