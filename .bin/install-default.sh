@@ -44,7 +44,7 @@ apt-cyg install gnuplot # for plot
 #apt-cyg install xinit # for X window system (start with: $ startxwin)
 apt-cyg install fzf
 #apt-cyg install multitail # better than tail
-apt-cyg install moreutils # more utils
+apt-cyg install moreutils # more utils for parallel,ts and so on
 
 # Python packages
 pip3 install qrcode # QR encode
