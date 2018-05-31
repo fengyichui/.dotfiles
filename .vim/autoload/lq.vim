@@ -792,23 +792,17 @@ function! lq#CommandItV() range
 endfunction
 
 " Hex folder
-let b:hexfoldexpr_matching = ''
 function! lq#HexFoldexpr(lnum)
     let l      = getline(a:lnum+0)[10:]
     let l_next = getline(a:lnum+1)[10:]
-    if b:hexfoldexpr_matching == ''
-        if l == l_next
-            let b:hexfoldexpr_matching = l
-            return 1 " fold start
+    if l == l_next
+        return 1 " fold start
+    else
+        let l_prev = getline(a:lnum-1)[10:]
+        if l == l_prev
+            return "<1" " fold end
         else
             return 0 " not fold
-        endif
-    else
-        if b:hexfoldexpr_matching == l_next
-            return 1 " fold keep
-        else
-            let b:hexfoldexpr_matching = ''
-            return "<1" " fold end
         endif
     endif
 endfunction
