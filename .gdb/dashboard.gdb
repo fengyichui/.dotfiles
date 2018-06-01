@@ -932,7 +932,7 @@ class Source(Dashboard.Module):
         return {
             'context': {
                 'doc': 'Number of context lines.',
-                'default': 5,
+                'default': 9,
                 'type': int,
                 'check': check_ge_zero
             },
@@ -1076,7 +1076,7 @@ instructions constituting the current statement are marked, if available."""
             },
             'opcodes': {
                 'doc': 'Opcodes visibility flag.',
-                'default': False,
+                'default': True,
                 'name': 'show_opcodes',
                 'type': bool
             },
@@ -1221,7 +1221,7 @@ location, if available. Optionally list the frame arguments and locals too."""
         return {
             'limit': {
                 'doc': 'Maximum number of displayed frames (0 means no limit).',
-                'default': 2,
+                'default': 5,
                 'type': int,
                 'check': check_ge_zero
             },
@@ -1239,11 +1239,12 @@ location, if available. Optionally list the frame arguments and locals too."""
             },
             'compact': {
                 'doc': 'Single-line display flag.',
-                'default': False,
+                'default': True,
                 'type': bool
             }
         }
 
+'''
 class History(Dashboard.Module):
     """List the last entries of the value history."""
 
@@ -1272,6 +1273,7 @@ class History(Dashboard.Module):
                 'check': check_gt_zero
             }
         }
+'''
 
 class Memory(Dashboard.Module):
     """Allow to inspect memory regions."""
