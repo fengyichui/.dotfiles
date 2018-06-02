@@ -904,3 +904,10 @@ function! lq#ExcelRead(excelfile)
     set filetype=csv
 endfunction
 
+" ARM gdb, need vim-8.1
+function! lq#TermArmGdb()
+    packadd termdebug
+    let g:termdebugger = "arm-none-eabi-gdb"
+    Termdebug
+endfunction
+
