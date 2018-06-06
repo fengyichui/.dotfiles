@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# read stdin
+IFS='' read -d '' -r input
+
+# cygwin dir keyword
+user_dir=$(cygpath ~)       # /home/username
+root_dir=$(cygpath -w / | sed 's#\\#/#g')    # /D:\cygwin64
+
+# var
+cmd=''
+execute=''
+
+# Parsing params
+while getopts c:e opt; do
+    case $opt in
+        c) cmd="$OPTARG"; execute=1 ;;
+        e) execute=1 ;;
+        ?) ;;
+    esac
+done
+
+# change
+result=$(echo "$input" | sed "s#${user_dir}#${root_dir}${user_dir}#g; s#/cygdrive/\([a-z]\)#\1:#g;")
+
+# cmd
+if [[ -n "$cmd" ]]; then
+    result="${cmd} ${result}"
+fi
+
+# excute
+if [[ -n "$execute" ]]; then
+#    echo "$result"
+    eval "$result"
+else
+    echo "$result"
+fi
