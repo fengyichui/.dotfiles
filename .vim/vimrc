@@ -408,6 +408,11 @@ autocmd FileType help if &readonly | nnoremap <buffer> q :q<cr> | endif
 " Avoid silent shell command lead screen mess up
 autocmd ShellCmdPost * if !has('gui_running') | redraw! | endif
 
+" autoread in terminal (only worked for tmux)
+if !has("gui_running")
+autocmd FocusGained * silent! checktime
+endif
+
 augroup END
 
 
