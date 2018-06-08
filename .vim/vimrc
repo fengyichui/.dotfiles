@@ -548,6 +548,9 @@ nnoremap <C-n> :call lq#LineNumberToggle()<cr>
 nnoremap <silent> <C-cr> :call lq#CommandIt()<cr>
 vnoremap <silent> <C-cr> :call lq#CommandItV()<cr>
 
+" trans
+nnoremap <C-K> :call lq#Scratch("!trans en:zh '".expand("<cword>")."'")<cr>:AnsiEsc<cr>
+vnoremap <C-K> :call lq#Scratch("!trans en:zh '".lq#GetVisualSelectText()."'")<cr>:AnsiEsc<cr>
 
 " Shortcut: Alt {{{2
 
