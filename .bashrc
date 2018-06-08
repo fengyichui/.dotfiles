@@ -51,7 +51,7 @@ shopt -s histappend
 
 # LANG to english
 export LANG='en_US.UTF-8'
-export LC_ALL=C
+#export LC_ALL=C
 
 # Editor
 export EDITOR='vim'
