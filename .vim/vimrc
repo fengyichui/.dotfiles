@@ -486,6 +486,7 @@ nnoremap <F7> :call lq#CompileIt()<cr>
 
 " Create highlist type file, :ts / Ctrl+] / Ctrl+T
 nnoremap <F9> :UpdateTypesFile<cr>
+nnoremap <C-F9> :call lq#MakeTags()<cr>
 
 " YouCompleteMe
 nnoremap <F10> :YcmDiags<CR>
@@ -503,12 +504,15 @@ inoremap <A-F11> <C-o>:YcmCompleter GoToDeclaration<CR>
 nmap <F12> <C-]>
 vmap <F12> <C-]>
 imap <F12> <C-o><C-]>
+nmap <A-F12> g<C-]>
+vmap <A-F12> g<C-]>
+imap <A-F12> <C-o>g<C-]>
+nmap <S-F12> :tprevious<cr>
+vmap <S-F12> :tprevious<cr>
+imap <S-F12> <C-o>:tprevious<cr>
 nmap <C-F12> :tnext<cr>
 vmap <C-F12> :tnext<cr>
 imap <C-F12> <C-o>:tnext<cr>
-nmap <A-F12> :tprevious<cr>
-vmap <A-F12> :tprevious<cr>
-imap <A-F12> <C-o>:tprevious<cr>
 
 
 " Shortcut: Ctrl {{{2

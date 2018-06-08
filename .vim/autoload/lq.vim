@@ -143,7 +143,8 @@ function! lq#MakeTags()
     if &filetype == 'help'
         :helptags .
     else
-        execute ':silent !ctags -R --c-kinds=+cdefgmnpstuv --c++-kinds=+cdefgmnpstuv --fields=+iaS --extra=+q .'
+"        execute ':silent !ctags -R --c-kinds=+cdefgmnpstuv --c++-kinds=+cdefgmnpstuv --fields=+iaS --extra=+q .'
+        execute ':silent !ctags -R --fields=+iaSszt --c-kinds=+p --c++-kinds=+p --extra=+q --totals .'
     endif
 endfunction
 
