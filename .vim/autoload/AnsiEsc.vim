@@ -30,14 +30,18 @@ set cpo&vim
 " AnsiEsc#AnsiEsc: toggles ansi-escape code visualization {{{2
 fun! AnsiEsc#AnsiEsc(rebuild)
 "  call Dfunc("AnsiEsc#AnsiEsc(rebuild=".a:rebuild.")")
+  let bn= bufnr("%")
   if a:rebuild
 "   call Decho("rebuilding AnsiEsc tables")
-   call AnsiEsc#AnsiEsc(0)   " toggle AnsiEsc off
+   " liqiang+ {
+   if exists("s:AnsiEsc_enabled_{bn}") && s:AnsiEsc_enabled_{bn}
+    call AnsiEsc#AnsiEsc(0)   " toggle AnsiEsc off
+   endif
+   " }
    call AnsiEsc#AnsiEsc(0)   " toggle AnsiEsc back on
 "   call Dret("AnsiEsc#AnsiEsc")
    return
   endif
-  let bn= bufnr("%")
   if !exists("s:AnsiEsc_enabled_{bn}")
    let s:AnsiEsc_enabled_{bn}= 0
   endif

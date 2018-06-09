@@ -548,10 +548,6 @@ nnoremap <C-n> :call lq#LineNumberToggle()<cr>
 nnoremap <silent> <C-cr> :call lq#CommandIt()<cr>
 vnoremap <silent> <C-cr> :call lq#CommandItV()<cr>
 
-" trans
-nnoremap <A-k> :call lq#Scratch("!trans :zh+en '".expand("<cword>")."'")<cr>:if exists("b:ae") \| exe "AnsiEsc!" \| else \| let b:ae=1 \| exe "AnsiEsc" \| endif<cr>
-vnoremap <A-k> :call lq#Scratch("!trans :zh+en '".lq#GetVisualSelectText()."'")<cr>:if exists("b:ae") \| exe "AnsiEsc!" \| else \| let b:ae=1 \| exe "AnsiEsc" \| endif<cr>
-
 " Shortcut: Alt {{{2
 
 " Repeat last command, like .
@@ -570,6 +566,9 @@ nnoremap <A-p> :CtrlPBuffer<cr>
 nnoremap <A-n> :cnext<cr>zvzz
 nnoremap <A-S-n> :cprevious<cr>zvzz
 
+" trans
+nnoremap <A-k> :call lq#Scratch("!trans :zh+en '".expand("<cword>")."'")<cr>:AnsiEsc!<cr>
+vnoremap <A-k> :call lq#Scratch("!trans :zh+en '".lq#GetVisualSelectText()."'")<cr>:AnsiEsc!<cr>
 
 " Shortcut: Leader {{{2
 
