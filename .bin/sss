@@ -35,12 +35,12 @@
 # inside proxy table
 x='x'
 ss8='ss8.pm'
-isx='isx.yt'
+isx='isx.yt' # dwz.pm/x
 fvs='jn9.org/img/'
 res=( \
-    '\"images/server01-[^\"]+\"' \
-    '\"images/server02-[^\"]+\"' \
     '\"images/server03-[^\"]+\"' \
+    '\"images/server02-[^\"]+\"' \
+    '\"images/server01-[^\"]+\"' \
     $x $x $x $x $x $x $x \
     \
     '\"img/qr/usa-[^\"]+\"' \
