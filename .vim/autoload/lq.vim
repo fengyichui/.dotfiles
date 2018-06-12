@@ -912,3 +912,12 @@ function! lq#TermArmGdb()
     Termdebug
 endfunction
 
+" Open current directory
+function! lq#OpenDir()
+    if has('win32')
+        execute ':silent !explorer "' . expand("%:p:h") . '"'
+    else
+        execute ':silent !open "' . expand("%:p:h") . '"'
+    endif
+endfunction
+

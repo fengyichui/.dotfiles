@@ -783,6 +783,7 @@ command! -nargs=0 Xundotree   UndotreeToggle
 command! -nargs=0 Xcolorizer  ColorToggle
 command! -nargs=0 Xtail       TailToggle
 command! -nargs=0 Xmatrix     Matrix
+command! -nargs=0 Xdir        call lq#OpenDir()
 
 " Plugin {{{1
 
