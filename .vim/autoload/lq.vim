@@ -913,11 +913,19 @@ function! lq#TermArmGdb()
 endfunction
 
 " Open current directory
-function! lq#OpenDir()
+function! lq#OpenDir(is_cwd)
     if has('win32')
-        execute ':silent !explorer "' . expand("%:p:h") . '"'
+        let tool = 'explorer'
     else
-        execute ':silent !open "' . expand("%:p:h") . '"'
+        let tool = 'open'
     endif
+
+    if a:is_cwd
+        let path = getcwd()
+    else
+        let path = expand("%:p:h")
+    endif
+
+    execute ':silent !' . tool . ' "' . path . '"'
 endfunction
 
