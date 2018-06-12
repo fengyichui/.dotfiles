@@ -62,13 +62,16 @@ source $ZSH_CUSTOM/plugins/zsh-completions-lq/zsh-completions-lq.plugin.zsh
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(safe-paste \
-         vi-mode \
-         extract \
-         dircycle \
-         zsh-fzf \
-         zsh-syntax-highlighting \
-         zsh-history-substring-search)
+plugins=(
+    safe-paste
+    vi-mode
+    extract
+    dircycle
+    zsh-fzf
+    pip
+    zsh-syntax-highlighting
+    zsh-history-substring-search
+)
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
@@ -105,4 +108,9 @@ export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es $fg[cyan](cpu=%P user=%U kernel=%S
 
 # default open with $EDITER
 for s in c cc cpp h hpp asm s java bin hex map dis sct symdefs mk mak ini log md xml txt; do alias -s $s=$EDITOR; done
+
+# fix git files completion slowly
+__git_files () { 
+    _wanted files expl 'local files' _files     
+}
 
