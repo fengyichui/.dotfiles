@@ -74,6 +74,7 @@ plugins=(
 )
 
 # You may need to manually set your language environment
+# locale priority: LC_ALL > LC_* > LANG
 export LANG=en_US.UTF-8
 #export LC_ALL=C
 
