@@ -111,7 +111,5 @@ export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es $fg[cyan](cpu=%P user=%U kernel=%S
 for s in c cc cpp h hpp asm s java bin hex map dis sct symdefs mk mak ini log md xml txt; do alias -s $s=$EDITOR; done
 
 # fix git files completion slowly
-__git_files () { 
-    _wanted files expl 'local files' _files     
-}
-
+__git_files () { _wanted files expl 'local files' _files }
+__git_changed_files () { _wanted files expl 'local files' _files }
