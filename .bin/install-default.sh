@@ -15,6 +15,7 @@ apt-cyg install python python-pip
 apt-cyg install python3 python3-pip
 apt-cyg install git
 apt-cyg install git-svn # git svn clone ...
+apt-cyg install git-gui gitk # git gui
 apt-cyg install tig # git graph mode
 apt-cyg install subversion # svn
 apt-cyg install the_silver_searcher # ag search
