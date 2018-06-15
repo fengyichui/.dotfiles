@@ -138,14 +138,28 @@ function! s:tmux_fix()
     cnoremap <silent> <F25> <C-\>e<SID>do_autocmd('FocusGained')<CR>
 endfunction
 
-let s:tmux_is_running = 0
-
 " FocusGaine
+let s:tmux_is_running = 0
+let s:tmux_vim_focus_losting_lock = '/tmp/tmux_vim_focus_losting'
 function! s:tmux_focus_gained()
     if s:tmux_is_running
+        " When gain focus, vim can't handle normal-mode cursor sharp
         if mode() == 'n'
-            " FIXME:
-            " sleep 100m
+            " Check locking
+            let timeout = 100
+            while timeout > 0
+                " delay 10ms to wait losting-lock file create
+                sleep 10m
+                if empty(glob(s:tmux_vim_focus_losting_lock))
+                    break
+                endif
+                let timeout -= 1
+            endwhile
+            if timeout == 0
+                call delete(s:tmux_vim_focus_losting_lock)
+                echoerr "Force to delete 'tmux_vim_focus_losting_lock' file!"
+            endif
+            " force cursor to normal mode
             silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
         endif
     endif
@@ -154,7 +168,12 @@ endfunction
 
 " FocusLosted
 function! s:tmux_focus_losted()
+    " Lock
+    call writefile([], s:tmux_vim_focus_losting_lock)
+    " When lost focus, vim can't handle terminal-default cursor sharp. So force cursor to insert mode
     silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_insert, 0)
+    " Unlock
+    call delete(s:tmux_vim_focus_losting_lock)
 endfunction
 
 " Fix tmux issue
