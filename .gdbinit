@@ -300,3 +300,141 @@ Syntax: search <START> <END> <PATTERN>
 | Search for the given pattern beetween $start and $end address.
 end
 
+
+define sii
+si
+x/i $pc
+end
+document sii
+Syntax: sii
+| Like si, but show the next instruction
+end
+
+
+define xi
+x/16i $pc-16
+end
+document xi
+Syntax: xi
+| Show instructions around $pc
+end
+
+
+define memset
+    if $argc != 3
+        help memset
+    else
+        set $start = (unsigned char *) $arg0
+        set $value = (unsigned char) $arg1
+        set $end = $start + $arg2
+        set $p = $start
+        while $p < $end
+            set *(unsigned char *) $p = $value
+            set $p++
+        end
+    end
+end
+document memset
+Syntax: memset <ADDR> <VALUE> <LENGTH>
+| Like memset
+end
+
+
+define memset32
+    if $argc != 3
+        help memset32
+    else
+        set $start = (unsigned int *) $arg0
+        set $value = (unsigned int) $arg1
+        set $end = $start + $arg2
+        set $p = $start
+        while $p < $end
+            set *(unsigned int *) $p = $value
+            set $p++
+        end
+    end
+end
+document memset32
+Syntax: memset32 <ADDR> <VALUE> <LENGTH>
+| Like memset, but unit is 32bit
+end
+
+
+define memcpy
+    if $argc != 3
+        help memcpy
+    else
+        set $dst = (unsigned char *) $arg0
+        set $src = (unsigned char *) $arg1
+        set $end = $dst + $arg2
+        while $dst < $end
+            set *(unsigned char *) $dst = *(unsigned char *) $src
+            set $dst++
+            set $src++
+        end
+    end
+end
+document memcpy
+Syntax: memcpy <ADDR_DST> <ADDR_SRC> <LENGTH>
+| Like memcpy
+end
+
+
+define memcpy_str
+    if $argc != 3
+        help memcpy
+    else
+        set $dst = (unsigned char *) $arg0
+        set $src = $arg1
+        set $end = $dst + $arg2
+        set $index = 0
+        while $dst < $end
+            set *(unsigned char *) $dst = $src[$index]
+            set $dst++
+            set $index++
+        end
+    end
+end
+document memcpy_str
+Syntax: memcpy_str <ADDR_DST> <"string"> <LENGTH>
+| Like memcpy, but copy the "string" to memery
+end
+
+
+define strcpy
+    if $argc != 2
+        help strcpy
+    else
+        set $dst = (char *) $arg0
+        set $src = $arg1
+        set $index = 0
+        while $src[$index] != 0
+            set *(char *) $dst = $src[$index]
+            set $dst++
+            set $index++
+        end
+        set *(char *) $dst = 0
+    end
+end
+document strcpy
+Syntax: strcpy <ADDR> <"string">
+| Like strcpy
+end
+
+define strcat
+    if $argc != 2
+        help strcpy
+    else
+        set $dst = (char *) $arg0
+        set $src = $arg1
+        while *(char *)$dst != 0
+            set $dst++
+        end
+        strcpy $dst $src
+    end
+end
+document strcat
+Syntax: strcpy <ADDR> <"string">
+| Like strcat
+end
+
