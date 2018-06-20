@@ -302,21 +302,19 @@ end
 
 
 define sii
-si
-x/i $pc
+    si
+    x/1i $pc
 end
 document sii
-Syntax: sii
-| Like si, but show the next instruction
+Like si, but show the next disassembler instruction
 end
 
 
 define xi
-x/16i $pc-16
+    x/16i $pc-16
 end
 document xi
-Syntax: xi
-| Show instructions around $pc
+Show disassembler instructions around $pc
 end
 
 
@@ -356,7 +354,7 @@ define memset32
 end
 document memset32
 Syntax: memset32 <ADDR> <VALUE> <LENGTH>
-| Like memset, but unit is 32bit
+| Like memset, but value is 32bit
 end
 
 
@@ -382,7 +380,7 @@ end
 
 define memcpy_str
     if $argc != 3
-        help memcpy
+        help memcpy_str
     else
         set $dst = (unsigned char *) $arg0
         set $src = $arg1
@@ -396,7 +394,7 @@ define memcpy_str
     end
 end
 document memcpy_str
-Syntax: memcpy_str <ADDR_DST> <"string"> <LENGTH>
+Syntax: memcpy_str <ADDR> <"string"> <LENGTH>
 | Like memcpy, but copy the "string" to memery
 end
 
@@ -423,7 +421,7 @@ end
 
 define strcat
     if $argc != 2
-        help strcpy
+        help strcat
     else
         set $dst = (char *) $arg0
         set $src = $arg1
@@ -434,7 +432,7 @@ define strcat
     end
 end
 document strcat
-Syntax: strcpy <ADDR> <"string">
+Syntax: strcat <ADDR> <"string">
 | Like strcat
 end
 

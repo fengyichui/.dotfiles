@@ -61,7 +61,7 @@ class loop_command_register(gdb.Command):
 # loop memery change
 class loop_memery_change_register(gdb.Command):
 
-    """loop command
+    """loop memery change
     """
 
     def __init__(self):
