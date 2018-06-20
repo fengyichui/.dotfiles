@@ -419,6 +419,7 @@ Syntax: strcpy <ADDR> <"string">
 | Like strcpy
 end
 
+
 define strcat
     if $argc != 2
         help strcat
@@ -434,5 +435,94 @@ end
 document strcat
 Syntax: strcat <ADDR> <"string">
 | Like strcat
+end
+
+
+define bitset
+    set $ok = 1
+    if $argc == 3
+        set $addr = $arg0
+        set $start = $arg1
+        set $length = 1
+        set $value = $arg2
+    else
+        if $argc == 4
+            set $addr = $arg0
+            set $start = $arg1
+            set $length = $arg2
+            set $value = $arg3
+        else
+            help bitset
+            set $ok = 0
+        end
+    end
+
+    if $ok
+        set $bits_value = *$addr
+        set $mask = (1<<$length) - 1
+        set $value = $value & $mask
+        set $mask = $mask << $start
+        set $value_shift = $value << $start
+        set *$addr = ($bits_value & (~$mask)) | ($value_shift)
+
+        output/x $addr
+        echo [
+        output $start
+        echo :
+        set $end = $start + $length - 1
+        output $end
+        echo ] = '
+        output/x $value
+        echo (
+        output $value
+        echo )'\n
+    end
+end
+document bitset
+Syntax: bitset <ADDR> <START_BIT> [<BIT_LENGTH>] <VALUE>
+| bit set for register operation
+| if no <BIT_LENGTH> field, BIT_LENGTH=1
+end
+
+
+define bitget
+    set $ok = 1
+    if $argc == 2
+        set $addr = $arg0
+        set $start = $arg1
+        set $length = 1
+    else
+        if $argc == 3
+            set $addr = $arg0
+            set $start = $arg1
+            set $length = $arg2
+        else
+            help bitget
+            set $ok = 0
+        end
+    end
+
+    if $ok
+        set $bits_value = *$addr
+        set $mask = ((1<<$length) - 1) << $start
+        set $value = ($bits_value & $mask) >> $start
+        output/x $addr
+        echo [
+        output $start
+        echo :
+        set $end = $start + $length - 1
+        output $end
+        echo ] = '
+        output/x $value
+        echo (
+        output $value
+        echo )'\n
+    end
+
+end
+document bitget
+Syntax: bitget <ADDR> <START_BIT> [<BIT_LENGTH>]
+| bit get for register operation
+| if no <BIT_LENGTH> field, BIT_LENGTH=1
 end
 
