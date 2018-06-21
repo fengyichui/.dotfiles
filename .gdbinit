@@ -1,11 +1,12 @@
-# INSTALL INSTRUCTIONS: save as ~/.gdbinit
-#
-# __________________gdb options_________________
+######################################################################
+# @file .gdbinit
+# @brief
+# @date Tue, Mar  6, 2018  4:37:46 PM
+# @author liqiang
+######################################################################
 
-# set to 0 if you have problems with the colorized prompt - reported by Plouj with Ubuntu gdb 7.2
-set $COLOREDPROMPT = 1
-# use colorized output or not
-set $USECOLOR = 1
+#
+# __________________GDB OPTIONS_________________
 
 # misc
 set confirm off
@@ -37,91 +38,12 @@ set logging on
 #set height unlimited
 #set width unlimited
 
-# __________________end gdb options_________________
+# prompt
+set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
+#set extended-prompt \[\e[1;33m\](gdb) \[\e[0m\]
+
+# __________________END GDB OPTIONS_________________
 #
-
-# __________________color functions_________________
-#
-# color codes
-set $BLACK = 0
-set $RED = 1
-set $GREEN = 2
-set $YELLOW = 3
-set $BLUE = 4
-set $MAGENTA = 5
-set $CYAN = 6
-set $WHITE = 7
-
-# CHANGME: If you want to modify the "theme" change the colors here
-#          or just create a ~/.gdbinit.local and set these variables there
-set $COLOR_REGNAME = $GREEN
-set $COLOR_REGVAL = $WHITE
-set $COLOR_REGVAL_MODIFIED  = $RED
-set $COLOR_SEPARATOR = $BLUE
-set $COLOR_CPUFLAGS = $RED
-
-# this is ugly but there's no else if available :-(
-define color
- if $USECOLOR == 1
-    # BLACK
-    if $arg0 == 0
-        echo \033[30m
-    else
-        # RED
-        if $arg0 == 1
-            echo \033[31m
-        else
-            # GREEN
-            if $arg0 == 2
-                echo \033[32m
-            else
-                # YELLOW
-                if $arg0 == 3
-                    echo \033[33m
-                else
-                    # BLUE
-                    if $arg0 == 4
-                        echo \033[34m
-                    else
-                        # MAGENTA
-                        if $arg0 == 5
-                            echo \033[35m
-                        else
-                            # CYAN
-                            if $arg0 == 6
-                                echo \033[36m
-                            else
-                                # WHITE
-                                if $arg0 == 7
-                                    echo \033[37m
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-     end
- end
-end
-
-define color_reset
-    if $USECOLOR == 1
-       echo \033[0m
-    end
-end
-
-define color_bold
-    if $USECOLOR == 1
-       echo \033[1m
-    end
-end
-
-define color_underline
-    if $USECOLOR == 1
-       echo \033[4m
-    end
-end
 
 # this way anyone can have their custom prompt - argp's idea :-)
 # can also be used to redefine anything else in particular the colors aka theming
@@ -129,13 +51,10 @@ end
 source ~/.gdbinit.local
 source ~/.gdbinit.local.py
 
-# can't use the color functions because we are using the set command
-if $COLOREDPROMPT == 1
-    set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
-#    set extended-prompt \[\e[1;33m\](gdb) \[\e[0m\]
-end
+#
+# __________________USER COMMAND_________________
 
-# __________hex/ascii dump an address_________
+
 define ascii_char
     if $argc != 1
         help ascii_char
@@ -173,6 +92,40 @@ Syntax: hex_quad ADDR
 end
 
 
+define hexdump_aux
+    if $argc != 1
+        help hexdump_aux
+    else
+        printf "%08X: ", $arg0
+        hex_quad $arg0
+        printf "  "
+        hex_quad $arg0+8
+        printf "  |"
+        ascii_char $arg0+0x0
+        ascii_char $arg0+0x1
+        ascii_char $arg0+0x2
+        ascii_char $arg0+0x3
+        ascii_char $arg0+0x4
+        ascii_char $arg0+0x5
+        ascii_char $arg0+0x6
+        ascii_char $arg0+0x7
+        ascii_char $arg0+0x8
+        ascii_char $arg0+0x9
+        ascii_char $arg0+0xA
+        ascii_char $arg0+0xB
+        ascii_char $arg0+0xC
+        ascii_char $arg0+0xD
+        ascii_char $arg0+0xE
+        ascii_char $arg0+0xF
+        printf "|\n"
+    end
+end
+document hexdump_aux
+Syntax: hexdump_aux ADDR
+| Display a 16-byte hex/ASCII dump of memory at address ADDR.
+end
+
+
 define hexdump
     if $argc == 1
         hexdump_aux $arg0
@@ -190,114 +143,37 @@ define hexdump
     end
 end
 document hexdump
-Syntax: hexdump ADDR <NR_LINES>
+Syntax: hexdump <ADDR> [<NR_LINES>]
 | Display a 16-byte hex/ASCII dump of memory starting at address ADDR.
 | Optional parameter is the number of lines to display if you want more than one. 
 end
 
 
-define hexdump_aux
-    if $argc != 1
-        help hexdump_aux
-    else
-        color_bold
-        printf "0x%08X : ", $arg0
-        color_reset
-        hex_quad $arg0
-        color_bold
-        printf " - "
-        color_reset
-        hex_quad $arg0+8
-        printf " "
-        color_bold
-        ascii_char $arg0+0x0
-        ascii_char $arg0+0x1
-        ascii_char $arg0+0x2
-        ascii_char $arg0+0x3
-        ascii_char $arg0+0x4
-        ascii_char $arg0+0x5
-        ascii_char $arg0+0x6
-        ascii_char $arg0+0x7
-        ascii_char $arg0+0x8
-        ascii_char $arg0+0x9
-        ascii_char $arg0+0xA
-        ascii_char $arg0+0xB
-        ascii_char $arg0+0xC
-        ascii_char $arg0+0xD
-        ascii_char $arg0+0xE
-        ascii_char $arg0+0xF
-        color_reset
-        printf "\n"
-    end
-end
-document hexdump_aux
-Syntax: hexdump_aux ADDR
-| Display a 16-byte hex/ASCII dump of memory at address ADDR.
-end
-
-
-# _______________data window__________________
-define ddump
-    if $argc != 1
-        help ddump
-    else
-        color $COLOR_SEPARATOR
-        printf "[0x%08X]", $data_addr
-
-        color $COLOR_SEPARATOR
-        printf "-------------------------------"
-        color_bold
-        color $COLOR_SEPARATOR
-        printf "[data]\n"
-        color_reset
-        set $_count = 0
-        while ($_count < $arg0)
-            set $_i = ($_count * 0x10)
-            hexdump $data_addr+$_i
-            set $_count++
-        end
-    end
-end
-document ddump
-Syntax: ddump NUM
-| Display NUM lines of hexdump for address in $data_addr global variable.
-end
-
 define dump_hexfile
-    dump ihex memory $arg0 $arg1 $arg2
+    if $argc != 3
+        help dump_hexfile
+    else
+        dump ihex memory $arg0 $arg1 $arg2
+    end
 end
 document dump_hexfile
-Syntax: dump_hexfile FILENAME START_ADDR STOP_ADDR
+Syntax: dump_hexfile <FILENAME> <START_ADDR> <STOP_ADDR>
 | Write a range of memory to a file in Intel ihex (hexdump) format.
 | The range is specified by START_ADDR and STOP_ADDR addresses.
 end
 
 
 define dump_binfile
-    dump memory $arg0 $arg1 $arg2
-end
-document dump_binfile
-Syntax: dump_binfile FILENAME START_ADDR STOP_ADDR
-| Write a range of memory to a binary file.
-| The range is specified by START_ADDR and STOP_ADDR addresses.
-end
-
-
-define search
-    set $start = (char *) $arg0
-    set $end = (char *) $arg1
-    set $pattern = (short) $arg2
-    set $p = $start
-    while $p < $end
-        if (*(short *) $p) == $pattern
-            printf "pattern 0x%hx found at 0x%x\n", $pattern, $p
-        end
-        set $p++
+    if $argc != 3
+        help dump_binfile
+    else
+        dump memory $arg0 $arg1 $arg2
     end
 end
-document search
-Syntax: search <START> <END> <PATTERN>
-| Search for the given pattern beetween $start and $end address.
+document dump_binfile
+Syntax: dump_binfile <FILENAME> <START_ADDR> <STOP_ADDR>
+| Write a range of memory to a binary file.
+| The range is specified by START_ADDR and STOP_ADDR addresses.
 end
 
 
@@ -364,7 +240,8 @@ define memcpy
     else
         set $dst = (unsigned char *) $arg0
         set $src = (unsigned char *) $arg1
-        set $end = $dst + $arg2
+        set $length = $arg2
+        set $end = $dst + $length
         while $dst < $end
             set *(unsigned char *) $dst = *(unsigned char *) $src
             set $dst++
@@ -379,23 +256,82 @@ end
 
 
 define memcpy_s
-    if $argc != 3
+    if $argc < 2
         help memcpy_s
     else
         set $dst = (unsigned char *) $arg0
         set $src = $arg1
-        set $end = $dst + $arg2
-        set $index = 0
+        if $argc > 2
+            set $length = $arg2
+        else
+            set $i = 0
+            while $src[$i] != 0
+                set $i++
+            end
+            set $length = $i
+        end
+        set $end = $dst + $length
+        set $i = 0
         while $dst < $end
-            set *(unsigned char *) $dst = $src[$index]
+            set *(unsigned char *) $dst = $src[$i]
             set $dst++
-            set $index++
+            set $i++
         end
     end
 end
 document memcpy_s
-Syntax: memcpy_s <ADDR> <"string"> <LENGTH>
+Syntax: memcpy_s <ADDR> <"STRING"> [<LENGTH>]
 | Like memcpy, but copy the "string" to memery
+| if no LENGTH field, LENGTH is strlen(STRING)
+end
+
+
+define memfind
+    if $argc < 3
+        help memfind
+    else
+        set $start = (char *) $arg0
+        set $end = (char *) $arg1
+        set $pattern = $arg2
+        if $argc > 3
+            set $length = $arg3
+        else
+            set $length = 0
+        end
+        set $p = $start
+        while $p < $end
+            set $loop = 1
+            set $i = 0
+            while $loop
+                if (*(unsigned char*) $p) == $pattern[$i]
+                    set $i++
+                    set $finish = 0
+                    if $length == 0
+                        if $pattern[$i] == 0
+                            set $finish = 1
+                        end
+                    else
+                        if $i == $length
+                            set $finish = 1
+                        end
+                    end
+                    if $finish
+                        set $loop = 0
+                        set $found = $p - ($i - 1)
+                        printf "found at 0x%08x\n", $found
+                    end
+                else
+                    set $loop = 0
+                end
+                set $p++
+            end
+        end
+    end
+end
+document memfind
+Syntax: memfind <START> <END> <"PATTERN"> [<PATTERN_LENGTH>]
+| search for the given pattern beetween $start and $end address.
+| if no PATTERN_LENGTH field, PATTERN_LENGTH is strlen(PATTERN)
 end
 
 
@@ -405,17 +341,17 @@ define strcpy
     else
         set $dst = (char *) $arg0
         set $src = $arg1
-        set $index = 0
-        while $src[$index] != 0
-            set *(char *) $dst = $src[$index]
+        set $i = 0
+        while $src[$i] != 0
+            set *(char *) $dst = $src[$i]
             set $dst++
-            set $index++
+            set $i++
         end
         set *(char *) $dst = 0
     end
 end
 document strcpy
-Syntax: strcpy <ADDR> <"string">
+Syntax: strcpy <ADDR> <"STRING">
 | Like strcpy
 end
 
@@ -433,17 +369,15 @@ define strcat
     end
 end
 document strcat
-Syntax: strcat <ADDR> <"string">
+Syntax: strcat <ADDR> <"STRING">
 | Like strcat
 end
 
 
 define hex_dec_show
-    output $arg0
+    printf "%d", $arg0
     if $arg0 > 9
-        echo (
-        output/x $arg0
-        echo )
+        printf "(0x%X)", $arg0
     end
 end
 document hex_dec_show
@@ -479,26 +413,20 @@ define bitset
         set $result_value = ($bits_value & $mask) >> $start
 
         # show
-        output/x $addr
-        echo [
-        output $start
-        echo :
         set $end = $start + $length - 1
-        output $end
-        echo ] ==> '
+        printf "0x%08X[%d:%d] ==> '", $addr, $start, $end
         hex_dec_show $value
-
         if $result_value != $value
-            echo ', but read is '
+            printf "', but read is '"
             hex_dec_show $result_value
         end
-        echo '\n
+        printf "'\n"
     end
 end
 document bitset
 Syntax: bitset <ADDR> <START_BIT> [<BIT_LENGTH>] <VALUE>
 | bit set for register operation
-| if no <BIT_LENGTH> field, BIT_LENGTH=1
+| if no <BIT_LENGTH> field, BIT_LENGTH is 1
 end
 
 
@@ -522,7 +450,7 @@ end
 document bitset_e
 Syntax: bitset_e <ADDR> <START_BIT> [<END_BIT>] <VALUE>
 | bit set for register operation
-| if no <END_BIT> field, END_BIT=START_BIT
+| if no <END_BIT> field, END_BIT is START_BIT
 end
 
 
@@ -544,21 +472,16 @@ define bitget
         set $value = ($bits_value & $mask) >> $start
 
         # show
-        output/x $addr
-        echo [
-        output $start
-        echo :
         set $end = $start + $length - 1
-        output $end
-        echo ] = '
+        printf "0x%08X[%d:%d] = '", $addr, $start, $end
         hex_dec_show $value
-        echo '\n
+        printf "'\n"
     end
 end
 document bitget
 Syntax: bitget <ADDR> <START_BIT> [<BIT_LENGTH>]
 | bit get for register operation
-| if no <BIT_LENGTH> field, BIT_LENGTH=1
+| if no <BIT_LENGTH> field, BIT_LENGTH is 1
 end
 
 
@@ -580,6 +503,10 @@ end
 document bitget_e
 Syntax: bitget_e <ADDR> <START_BIT> [<END_BIT>]
 | bit get for register operation
-| if no <END_BIT> field, END_BIT=START_BIT
+| if no <END_BIT> field, END_BIT is START_BIT
 end
+
+
+# __________________END USER COMMAND_________________
+#
 
