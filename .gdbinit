@@ -322,6 +322,7 @@ define memfind
                     end
                 else
                     set $loop = 0
+                    set $p = $p - $i
                 end
                 set $p++
             end
