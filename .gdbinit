@@ -378,9 +378,9 @@ Syntax: memcpy <ADDR_DST> <ADDR_SRC> <LENGTH>
 end
 
 
-define memcpy_str
+define memcpy_s
     if $argc != 3
-        help memcpy_str
+        help memcpy_s
     else
         set $dst = (unsigned char *) $arg0
         set $src = $arg1
@@ -393,8 +393,8 @@ define memcpy_str
         end
     end
 end
-document memcpy_str
-Syntax: memcpy_str <ADDR> <"string"> <LENGTH>
+document memcpy_s
+Syntax: memcpy_s <ADDR> <"string"> <LENGTH>
 | Like memcpy, but copy the "string" to memery
 end
 
@@ -438,26 +438,35 @@ Syntax: strcat <ADDR> <"string">
 end
 
 
+define hex_dec_show
+    output $arg0
+    if $arg0 > 9
+        echo (
+        output/x $arg0
+        echo )
+    end
+end
+document hex_dec_show
+Syntax: hex_dec_show <VALUE>
+| hex and dec show the value, if value < 10, the hex-value will be hidded.
+end
+
+
 define bitset
-    set $ok = 1
-    if $argc == 3
+    if $argc < 3
+        help bitset
+    else
         set $addr = $arg0
         set $start = $arg1
-        set $length = 1
-        set $value = $arg2
-    else
-        if $argc == 4
-            set $addr = $arg0
-            set $start = $arg1
+        if $argc == 3
+            set $length = 1
+            set $value = $arg2
+        else
             set $length = $arg2
             set $value = $arg3
-        else
-            help bitset
-            set $ok = 0
         end
-    end
 
-    if $ok
+        # set
         set $bits_value = *$addr
         set $mask = (1<<$length) - 1
         set $value = $value & $mask
@@ -465,17 +474,25 @@ define bitset
         set $value_shift = $value << $start
         set *$addr = ($bits_value & (~$mask)) | ($value_shift)
 
+        # get
+        set $bits_value = *$addr
+        set $result_value = ($bits_value & $mask) >> $start
+
+        # show
         output/x $addr
         echo [
         output $start
         echo :
         set $end = $start + $length - 1
         output $end
-        echo ] = '
-        output/x $value
-        echo (
-        output $value
-        echo )'\n
+        echo ] ==> '
+        hex_dec_show $value
+
+        if $result_value != $value
+            echo ', but read is '
+            hex_dec_show $result_value
+        end
+        echo '\n
     end
 end
 document bitset
@@ -485,27 +502,48 @@ Syntax: bitset <ADDR> <START_BIT> [<BIT_LENGTH>] <VALUE>
 end
 
 
-define bitget
-    set $ok = 1
-    if $argc == 2
+define bitset_e
+    if $argc < 3
+        help bitset_e
+    else
         set $addr = $arg0
         set $start = $arg1
-        set $length = 1
-    else
         if $argc == 3
-            set $addr = $arg0
-            set $start = $arg1
-            set $length = $arg2
+            set $length = 1
+            set $value = $arg2
         else
-            help bitget
-            set $ok = 0
+            set $length = $arg2 - $start + 1
+            set $value = $arg3
         end
-    end
 
-    if $ok
+        bitset $addr $start $length $value
+    end
+end
+document bitset_e
+Syntax: bitset_e <ADDR> <START_BIT> [<END_BIT>] <VALUE>
+| bit set for register operation
+| if no <END_BIT> field, END_BIT=START_BIT
+end
+
+
+define bitget
+    if $argc < 2
+        help bitget
+    else
+        set $addr = $arg0
+        set $start = $arg1
+        if $argc == 2
+            set $length = 1
+        else
+            set $length = $arg2
+        end
+
+        # get
         set $bits_value = *$addr
         set $mask = ((1<<$length) - 1) << $start
         set $value = ($bits_value & $mask) >> $start
+
+        # show
         output/x $addr
         echo [
         output $start
@@ -513,16 +551,35 @@ define bitget
         set $end = $start + $length - 1
         output $end
         echo ] = '
-        output/x $value
-        echo (
-        output $value
-        echo )'\n
+        hex_dec_show $value
+        echo '\n
     end
-
 end
 document bitget
 Syntax: bitget <ADDR> <START_BIT> [<BIT_LENGTH>]
 | bit get for register operation
 | if no <BIT_LENGTH> field, BIT_LENGTH=1
+end
+
+
+define bitget_e
+    if $argc < 2
+        help bitget_e
+    else
+        set $addr = $arg0
+        set $start = $arg1
+        if $argc == 2
+            set $length = 1
+        else
+            set $length = $arg2 - $start + 1
+        end
+
+        bitget $addr $start $length
+    end
+end
+document bitget_e
+Syntax: bitget_e <ADDR> <START_BIT> [<END_BIT>]
+| bit get for register operation
+| if no <END_BIT> field, END_BIT=START_BIT
 end
 
