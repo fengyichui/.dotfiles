@@ -79,6 +79,7 @@ bindkey -a 'gg' beginning-of-buffer-or-history
 bindkey -a 'G' end-of-buffer-or-history
 bindkey -a 'u' undo
 bindkey -a '^R' redo
+bindkey -a '=' vi-pound-insert
 
 #
 # Allow Copy/Paste with the system clipboard
