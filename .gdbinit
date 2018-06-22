@@ -170,6 +170,32 @@ Syntax: dump_binfile <FILENAME> <START_ADDR> <STOP_ADDR>
 end
 
 
+define restore_hexfile
+    if $argc != 1
+        help restore_hexfile
+    else
+        restore $arg0
+    end
+end
+document restore_hexfile
+Syntax: restore_hexfile <FILENAME>
+| Restore the contents of FILE to target memory.
+end
+
+
+define restore_binfile
+    if $argc != 2
+        help restore_binfile
+    else
+        restore $arg0 binary $arg1
+    end
+end
+document restore_binfile
+Syntax: restore_binfile <FILENAME> <ADDR>
+| Restore the contents of FILE to target memory.
+end
+
+
 define sii
     si
     x/1i $pc
