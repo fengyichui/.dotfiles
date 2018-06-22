@@ -45,11 +45,9 @@ set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
 # __________________END GDB OPTIONS_________________
 #
 
-# this way anyone can have their custom prompt - argp's idea :-)
-# can also be used to redefine anything else in particular the colors aka theming
-# just remap the color variables defined above
+# source python_init and local_init
+source ~/.gdbinit.py
 source ~/.gdbinit.local
-source ~/.gdbinit.local.py
 
 #
 # __________________USER COMMAND_________________
@@ -66,35 +64,37 @@ end
 
 
 define hexdump
-    if $argc == 1
-        hexdump $arg0 16
+    if $argc < 1
+        help hexdump
     else
-        if $argc == 2
-            set $count = 0
-            while ($count < $arg1)
-                set $addr = $arg0 + ($count * 0x10)
-                printf "%08X: ", $addr
-                set $i = 0
-                while $i < 0x08
-                    printf "%02X ", *(unsigned char *)($addr+$i)
-                    set $i++
-                end
-                printf " "
-                while $i < 0x10
-                    printf "%02X ", *(unsigned char *)($addr+$i)
-                    set $i++
-                end
-                printf " |"
-                set $i = 0
-                while $i < 0x10
-                    ascii_char $addr+$i
-                    set $i++
-                end
-                printf "|\n"
-                set $count++
-            end
+        set $daddr = $arg0
+        if $argc == 1
+            set $dlines = 16
         else
-            help hexdump
+            set $dlines = $arg1
+        end
+        set $line = 0
+        while ($line < $dlines)
+            set $addr = $daddr + ($line * 0x10)
+            printf "%08X: ", $addr
+            set $i = 0
+            while $i < 0x08
+                printf "%02X ", *(unsigned char *)($addr+$i)
+                set $i++
+            end
+            printf " "
+            while $i < 0x10
+                printf "%02X ", *(unsigned char *)($addr+$i)
+                set $i++
+            end
+            printf " |"
+            set $i = 0
+            while $i < 0x10
+                ascii_char $addr+$i
+                set $i++
+            end
+            printf "|\n"
+            set $line++
         end
     end
 end
@@ -106,30 +106,32 @@ end
 
 
 define hexdump32
-    if $argc == 1
-        hexdump32 $arg0 16
+    if $argc < 1
+        help hexdump32
     else
-        if $argc == 2
-            set $count = 0
-            while ($count < $arg1)
-                set $addr = $arg0 + ($count * 0x10)
-                printf "%08X: ", $addr
-                set $i = 0
-                while $i < 0x10
-                    printf "%08X ", *(unsigned int *)($addr+$i)
-                    set $i += 4
-                end
-                printf " |"
-                set $i = 0
-                while $i < 0x10
-                    ascii_char $addr+$i
-                    set $i++
-                end
-                printf "|\n"
-                set $count++
-            end
+        set $daddr = $arg0
+        if $argc == 1
+            set $dlines = 16
         else
-            help hexdump
+            set $dlines = $arg1
+        end
+        set $line = 0
+        while ($line < $dlines)
+            set $addr = $daddr + ($line * 0x10)
+            printf "%08X: ", $addr
+            set $i = 0
+            while $i < 0x10
+                printf "%08X ", *(unsigned int *)($addr+$i)
+                set $i += 4
+            end
+            printf " |"
+            set $i = 0
+            while $i < 0x10
+                ascii_char $addr+$i
+                set $i++
+            end
+            printf "|\n"
+            set $line++
         end
     end
 end
