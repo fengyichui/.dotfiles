@@ -527,7 +527,7 @@ Syntax: bitget_e <ADDR> <START_BIT> [<END_BIT>]
 end
 
 
-define fault_dump_cortex
+define fault_dump_armcm
     set $ok = 1
     set $_ispr = $xpsr & 0x1FF
     if $_ispr == 0
@@ -781,7 +781,7 @@ define fault_dump_cortex
         end
     end
 end
-document fault_dump_cortex
+document fault_dump_armcm
 Dump cortex-M0/M1/M3/M4 fault information
 end
 
