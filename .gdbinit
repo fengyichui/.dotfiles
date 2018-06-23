@@ -527,6 +527,252 @@ Syntax: bitget_e <ADDR> <START_BIT> [<END_BIT>]
 end
 
 
+define fault_dump_cortex
+    set $ok = 1
+    set $_ispr = $xpsr & 0x1FF
+    if $_ispr == 0
+        printf "No Any Faults!\n"
+        set $ok = 0
+    else
+        if $_ispr == 3
+            printf "Hardware Fault IRQ Pending\n"
+        else
+            if $_ispr == 4
+                printf "Memory Manage Fault IRQ Pending\n"
+            else
+                if $_ispr == 5
+                    printf "Bus Fault IRQ Pending\n"
+                else
+                    if $_ispr == 6
+                        printf "Usage Fault IRQ Pending\n"
+                    else
+                        if $_ipsr > 15
+                            printf "General IRQ Pending: %d\n", $_ipsr
+                            set $ok = 0
+                        else
+                            printf "Unkown Fault IRQ Pending: %d\n", $_ipsr
+                        end
+                    end
+                end
+            end
+        end
+    end
+    printf "\n"
+
+    if $ok
+        set $mem_fault_status   = *(unsigned char  *)0xE000ED28
+        set $bus_fault_status   = *(unsigned char  *)0xE000ED29
+        set $usage_fault_status = *(unsigned short *)0xE000ED2A
+        set $hard_fault_status  = *(unsigned int   *)0xE000ED2C
+        set $debug_fault_status = *(unsigned int   *)0xE000ED30
+        set $aux_fault_status   = *(unsigned int   *)0xE000ED3C
+
+        # Hardware fault
+        printf "Hardware fault status:\n"
+        if $hard_fault_status & (1<<1)
+            printf "- Indicates hard fault is caused by failed vector fetch\n"
+            printf "  Vector fetch failed. It could be caused by\n"
+            printf "  1. Bus fault at vector fetch.\n"
+            printf "  2. Incorrect vector table offset setup.\n"
+        end
+        if $hard_fault_status & (1<<30)
+            printf "- Indicates hard fault is taken because of bus fault, memory management fault, or usage fault\n"
+            printf "  1. Trying to run SVC/BKPT within SVC/monitor or another handler with same or\n"
+            printf "     higher priority.\n"
+            printf "  2. A fault occurred if the corresponding handler is disabled or cannot be started\n"
+            printf "     because another exception with the same or higher priority is running, or because\n"
+            printf "     exception mask is set.\n"
+        end
+        if $hard_fault_status & (1<<30)
+            printf "- Indicates hard fault is triggered by debug event\n"
+            printf "  Fault is caused by debug event:\n"
+            printf "  1. Breakpoint/watchpoint events.\n"
+            printf "  2. If the hard fault handler is executing, it might be caused by execution of BKPT\n"
+            printf "     without enable monitor handler (MON_EN = 0) and halt debug is not enabled\n"
+            printf "     (C_DEBUGEN = 0). By default, some C compilers might include semihosting\n"
+            printf "     code that use BKPT.\n"
+        end
+        printf "\n"
+
+        # Memory fault
+        printf "Memory fault status:\n"
+        if $mem_fault_status & (1<<0)
+            printf "- Instruction access violation\n"
+            printf "  1. Violation to memory access protection, which is defined by MPU setup. For\n"
+            printf "     example, user application trying to access privileged-only region. Stacked PC\n"
+            printf "     might be able to locate the code that has caused the problem.\n"
+            printf "  2. Branch to nonexecutable regions.\n"
+            printf "  3. Invalid exception return code.\n"
+            printf "  4. Invalid entry in exception vector table. For example, loading of an executable\n"
+            printf "     image for traditional ARM core into the memory, or exception happened before\n"
+            printf "     vector table was set.\n"
+            printf "  5. Stacked PC corrupted during exception handling.\n"
+        end
+        if $mem_fault_status & (1<<1)
+            printf "- Data access violation\n"
+            printf "  Violation to memory access protection, which is defined by MPU setup. For\n"
+            printf "  example, user application trying to access privileged-only region.\n"
+        end
+        if $mem_fault_status & (1<<3)
+            printf "- Unstacking error\n"
+            printf "  Error occurred during unstacking (ending of exception). If there was no error\n"
+            printf "  stacking but error occurred during unstacking, it might be because of the\n"
+            printf "  following reasons:\n"
+            printf "  1. Stack pointer was corrupted during exception.\n"
+            printf "  2. MPU configuration was changed by exception handler.\n"
+        end
+        if $mem_fault_status & (1<<4)
+            printf "- Stacking error\n"
+            printf "  Error occurred during stacking (starting of exception).\n"
+            printf "  1. Stack pointer is corrupted.\n"
+            printf "  2. Stack size is too large, reaching a region not defined by the MPU or disallowed\n"
+            printf "     in the MPU configuration.\n"
+        end
+        if $mem_fault_status & (1<<7)
+            # Indicates MMAR is valid
+            set $mem_fault_addr = *(unsigned int *)0xE000ED34
+            printf "- Address that caused memory manage fault: 0x%08X\n", $mem_fault_addr
+        end
+        printf "\n"
+
+        # Bus fault
+        printf "Bus fault status:\n"
+        if $bus_fault_status & (1<<0)
+            printf "- Instruction access violation\n"
+            printf "  1. Branch to invalid memory regions; for example, caused by incorrect function\n"
+            printf "     pointers in program code.\n"
+            printf "  2. I nvalid exception return code; for example, a stacked EXC_RETURN code is\n"
+            printf "     corrupted, and as a result, an exception return incorrectly treated as a branch.\n"
+            printf "  3. Invalid entry in exception vector table. For example, loading of an executable\n"
+            printf "     image for traditional ARM core into the memory, or exception, happens before\n"
+            printf "     the vector table is set.\n"
+            printf "  4. Stacked PC corrupted during function calls.\n"
+            printf "  5. Access to NVIC or SCB in user mode (nonprivileged).\n"
+        end
+        if $bus_fault_status & (1<<1)
+            printf "- Precise data access violation\n"
+            printf "  Bus error during data access. The fault address may be indicated by BFAR. A bus\n"
+            printf "  error could be caused by the device not being initialized, access of privileged-only\n"
+            printf "  device in user mode, or the transfer size is incorrect for the specific device.\n"
+        end
+        if $bus_fault_status & (1<<2)
+            printf "- Imprecise data access violation\n"
+            printf "  Bus error during data access. Bus error could be caused by the device not being\n"
+            printf "  initialized, access of privileged-only device in user mode, or the transfer size is\n"
+            printf "  incorrect for the specific device.\n"
+        end
+        if $bus_fault_status & (1<<3)
+            printf "- Unstacking error\n"
+            printf "  Error occurred during unstacking (ending of exception). If there was no error\n"
+            printf "  stacking but error occurred during unstacking, it might be that the stack pointer\n"
+            printf "  was corrupted during exception.\n"
+        end
+        if $bus_fault_status & (1<<4)
+            printf "- Stacking error\n"
+            printf "  Error occurred during stacking (starting of exception).\n"
+            printf "  1. Stack pointer is corrupted.\n"
+            printf "  2. Stack size became too large, reaching an undefined memory region.\n"
+            printf "  3. PSP is used but not initialized.\n"
+        end
+        if $bus_fault_status & (1<<7)
+            # Indicates BFAR is valid
+            set $bus_fault_addr = *(unsigned int *)0xE000ED38
+            printf "- Address that caused bus fault: 0x%08X\n", $bus_fault_addr
+        end
+        printf "\n"
+
+        # Usage fault
+        printf "Usage fault status:\n"
+        if $usage_fault_status & (1<<0)
+            printf "- Attempts to execute an undefined instruction\n"
+            printf "  1. Use of instructions not supported in Cortex-M3.\n"
+            printf "  2. Bad/corrupted memory contents.\n"
+            printf "  3. Loading of ARM object code during link stage. Checks compile steps.\n"
+            printf "  4. Instruction align problem. For example, if GNU Tool chain is used, omitting\n"
+            printf "     of .align after .ascii might cause next instruction to be unaligned (start in odd\n"
+            printf "     memory address instead of halfword addresses).\n"
+        end
+        if $usage_fault_status & (1<<1)
+            printf "- Attempts to switch to invalid state (e.g., ARM)\n"
+            printf "  1. Loading branch target address to PC with LSB equals 0. Stacked PC should\n"
+            printf "     show the branch target.\n"
+            printf "  2. LSB of vector address in vector table is 0. Stacked PC should show the starting\n"
+            printf "     of exception handler.\n"
+            printf "  3. Stacked PSR corrupted during exception handling, so after the exception the\n"
+            printf "     core tries to return to the interrupted code in ARM state.\n"
+        end
+        if $usage_fault_status & (1<<2)
+            printf "- Attempts to do exception with bad value in EXC_RETURN number\n"
+            printf "  1. Invalid value in EXC_RETURN number during exception return. For example,\n"
+            printf "     a. Return to thread with EXC_RETURN = 0xFFFFFFF1\n"
+            printf "     b. Return to handler with EXC_RETURN = 0xFFFFFFF9\n"
+            printf "     To investigate the problem, the current LR value provides the value of LR at\n"
+            printf "     the failing exception return.\n"
+            printf "  2. Invalid exception active status. For example,\n"
+            printf "     a. Exception return with exception active bit for the current exception already\n"
+            printf "        cleared. Possibly caused by use of VECTCLRACTIVE, or clearing of exception\n"
+            printf "        active status in NVIC SHCSR.\n"
+            printf "     b. Exception return to thread with one or more exception active bits still active.\n"
+            printf "  3. Stack corruption causing the stacked IPSR to be incorrect.\n"
+            printf "     For INVPC fault, the stacked PC shows the point where the faulting exception\n"
+            printf "     interrupted the main/preempted program. To investigate the cause of the\n"
+            printf "     problem, it is best to use exception trace feature in the DWT.\n"
+            printf "  4. ICI/IT bit invalid for current instruction. This can happen when a multiple-load/\n"
+            printf "     store instruction gets interrupted and, during the interrupt handler, the stacked\n"
+            printf "     PC is modified. When the interrupt return takes place, the nonzero ICI bit is\n"
+            printf "     applied to an instruction that does not use ICI bits. The same problem can also\n"
+            printf "     happen because of corruption of stacked PSR.\n"
+        end
+        if $usage_fault_status & (1<<3)
+            printf "- Attempts to execute a coprocessor instruction\n"
+            printf "  Attempt to execute a coprocessor instruction. The code causing the fault can be\n"
+            printf "  located using stacked PC.\n"
+        end
+        if $usage_fault_status & (1<<8)
+            printf "- Indicates unaligned access takes place (can only be set if UNALIGN_TRP is set)\n"
+            printf "  Unaligned access attempted with UNALIGN_TRP is set. The code causing the fault\n"
+            printf "  can be located using stacked PC.\n"
+        end
+        if $usage_fault_status & (1<<9)
+            printf "- Indicates divide by zero takes place (can only be set if DIV_0_TRP is set)\n"
+            printf "  Divide by 0 takes place and DIV_0_TRP is set. The code causing the fault can be\n"
+            printf "  located using stacked PC.\n"
+        end
+        printf "\n"
+
+        # Debug Fault
+        printf "Debug fault status:\n"
+        if $debug_fault_status & (1<<0)
+            printf "- Halt requested in NVIC\n"
+        end
+        if $debug_fault_status & (1<<1)
+            printf "- BKPT instruction executed\n"
+            printf "  1. Breakpoint instruction is executed.\n"
+            printf "  2. FPB unit generated a breakpoint event.\n"
+            printf "  In some cases, BKPT instructions are inserted by C startup code as part of the\n"
+            printf "  semihosting debugging setup. This should be removed for a real application code.\n"
+            printf "  Please refer to your compiler document for details.\n"
+        end
+        if $debug_fault_status & (1<<2)
+            printf "- DWT match occurred\n"
+        end
+        if $debug_fault_status & (1<<3)
+            printf "- Vector fetch occurred\n"
+        end
+        if $debug_fault_status & (1<<4)
+            printf "- EDBGRQ signal asserted\n"
+        end
+        printf "\n"
+
+        # Auxiliary Fault
+        printf "Auxiliary Fault Status: 0x%08X\n", $aux_fault_status
+        printf "\n"
+    end
+end
+document fault_dump_cortex
+Dump cortex-M0/M1/M3/M4 fault information
+end
+
 # __________________END USER COMMAND_________________
 #
 
