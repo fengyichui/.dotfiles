@@ -584,7 +584,7 @@ define dump_fault_armcm
                 printf "     because another exception with the same or higher priority is running, or because\n"
                 printf "     exception mask is set.\n"
             end
-            if $hard_fault_status & (1<<30)
+            if $hard_fault_status & (1<<31)
                 printf "- Indicates hard fault is triggered by debug event\n"
                 printf "  Fault is caused by debug event:\n"
                 printf "  1. Breakpoint/watchpoint events.\n"
