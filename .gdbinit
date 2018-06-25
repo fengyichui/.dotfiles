@@ -527,7 +527,7 @@ Syntax: bitget_e <ADDR> <START_BIT> [<END_BIT>]
 end
 
 
-define fault_dump_armcm
+define dump_fault_armcm
     set $ok = 1
     set $_ispr = $xpsr & 0x1FF
     if $_ispr == 0
@@ -781,8 +781,64 @@ define fault_dump_armcm
         end
     end
 end
-document fault_dump_armcm
+document dump_fault_armcm
 Dump cortex-M0/M1/M3/M4 fault information
+end
+
+
+define dump_reg_armcm
+    printf "SCB:\n"
+    printf "- CPUID Base Register: 0x%08X\n", *0xe000ed00
+    printf "- Interrupt Control and State Register: 0x%08X\n", *0xe000ed04
+    printf "- Vector Table Offset Register: 0x%08X\n", *0xe000ed08
+    printf "- Application Interrupt and Reset Control Register: 0x%08X\n", *0xe000ed0C
+    printf "- System Control Register: 0x%08X\n", *0xe000ed10
+    printf "- Configuration Control Register: 0x%08X\n", *0xe000ed14
+    printf "- System Handlers Priority Registers (4-15): %02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X\n", \
+        *(unsigned char *)0xe000ed18, *(unsigned char *)0xe000ed19,*(unsigned char *)0xe000ed1a,*(unsigned char *)0xe000ed1b, \
+        *(unsigned char *)0xe000ed1c, *(unsigned char *)0xe000ed1d,*(unsigned char *)0xe000ed1e,*(unsigned char *)0xe000ed1f, \
+        *(unsigned char *)0xe000ed20, *(unsigned char *)0xe000ed21,*(unsigned char *)0xe000ed22,*(unsigned char *)0xe000ed23
+    printf "- System Handler Control and State Register: 0x%08X\n", *0xe000ed24
+    printf "- Configurable Fault Status Register: 0x%08X\n", *0xe000ed28
+    printf "- HardFault Status Register: 0x%08X\n", *0xe000ed2C
+    printf "- Debug Fault Status Register: 0x%08X\n", *0xe000ed30
+    printf "- MemManage Fault Address Register: 0x%08X\n", *0xe000ed34
+    printf "- BusFault Address Register: 0x%08X\n", *0xe000ed38
+    printf "- Auxiliary Fault Status Register: 0x%08X\n", *0xe000ed3C
+    printf "- Processor Feature Register: 0x%08X,%08X\n", *0xe000ed40, *0xe000ed44
+    printf "- Debug Feature Register: 0x%08X\n", *0xe000ed48
+    printf "- Auxiliary Feature Register: 0x%08X\n", *0xe000ed4C
+    printf "- Memory Model Feature Register: 0x%08X,%08X,%08X,%08X\n", *0xe000ed50, *0xe000ed54, *0xe000ed58, *0xe000ed5C
+    printf "- Instruction Set Attributes Register: 0x%08X,%08X,%08X,%08X,%08X\n", *0xe000ed60, *0xe000ed64, *0xe000ed68, *0xe000ed6C, *0xe000ed70
+    printf "- Coprocessor Access Control Register: 0x%08X\n", *0xe000ed88
+    printf "\n"
+
+    printf "NVIC:\n"
+    printf "- Enable for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E100, *0xE000E104
+    printf "- Pending for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E200, *0xE000E204
+    printf "- Active status for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E300, *0xE000E304
+    printf "- Priority-level external Interrupt:"
+    set $i = 0
+    while $i < 64
+        if ($i % 4) == 0
+            printf "\n  #%02d-%02d: ", $i, $i+3
+        end
+        if $i < 32
+            set $enable = *0xE000E100 & (1<<$i)
+        else
+            set $enable = *0xE000E104 & (1<<($i-32))
+        end
+        if $enable
+            printf "%02X* ", *(unsigned char *)(0xE000E400+$i)
+        else
+            printf "%02X  ", *(unsigned char *)(0xE000E400+$i)
+        end
+        set $i++
+    end
+    printf "\n"
+end
+document dump_reg_armcm
+Dump cortex-M0/M1/M3/M4 register information
 end
 
 # __________________END USER COMMAND_________________
