@@ -814,7 +814,9 @@ define dump_reg_armcm
     printf "\n"
 
     printf "NVIC:\n"
-    printf "- Enable for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E100, *0xE000E104
+    set $irq_en_0_31 = *0xE000E100
+    set $irq_en_32_63 = *0xE000E104
+    printf "- Enable for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", $irq_en_0_31, $irq_en_32_63
     printf "- Pending for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E200, *0xE000E204
     printf "- Active status for external Interrupt #0–31: 0x%08X, #32-63: %08X\n", *0xE000E300, *0xE000E304
     printf "- Priority-level external Interrupt:"
@@ -824,9 +826,9 @@ define dump_reg_armcm
             printf "\n  #%02d-%02d: ", $i, $i+3
         end
         if $i < 32
-            set $enable = *0xE000E100 & (1<<$i)
+            set $enable = $irq_en_0_31 & (1<<$i)
         else
-            set $enable = *0xE000E104 & (1<<($i-32))
+            set $enable = $irq_en_32_63 & (1<<($i-32))
         end
         if $enable
             printf "%02X* ", *(unsigned char *)(0xE000E400+$i)
