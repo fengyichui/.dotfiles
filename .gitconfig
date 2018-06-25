@@ -79,11 +79,11 @@
     d  = diff --relative --stat -p
     dw = diff --relative --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+" --stat -p
     st = status -s -uno
+    cleanall = clean -dxf
 
     # authors
     rank    = shortlog -sn --no-merges
     authors = "!f() { git log --no-merges --pretty='format:%<(26)%an <%ae>' --author \"$*\" | sort | uniq; }; f"
-    by      = "!f() { IFS=$'\n'; select a in `git authors \"$*\"`; do git l --no-merges --author \"${a%%  *<*}\"; break; done; }; f"
 
     # commits not pushed to $1, master by default
     unpushed = cherry -v
@@ -93,35 +93,25 @@
     lc = !git lg ORIG_HEAD.. --stat
     lf = !git lg --name-only
 
-    # what branch contains the sha
-    contains = branch --contains
-
     # show a list of tags sorted by when they were tagged
     tagage = !sh -c 'git for-each-ref --sort=taggerdate refs/tags --format=\"%(refname:short)\"'
-
-    # show a list of tags sorted by `sort` version compare (ie, more or less rpmvercmp)
-    tagsort = !sh -c 'git tag -l $1 | sort --version-sort'
 
     # https://github.com/prabirshrestha/ProfilesAndSettings/blob/master/.gitconfig
     # show tags and any tag annotation (tito adds tag annotations for example)
     tags = tag -n1 -l
 
-    # url of origin, about 99% of what I use git config --list for
-    cloneurl = config --get remote.origin.url
-
     # for ansible, with its submodules
-    #ap = "!f() { git pull ; git submodule update --recursive } `f`"
-    ap = "!f() { git pull; git submodule update --recursive; } ; f"
+    pullall = "!f() { git pull; git submodule update --recursive; } ; f"
 
     # from https://git.wiki.kernel.org/index.php/Aliases
-    #whois = !sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\\" --author=\"$1\"' -
+    whois = !sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -
     whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
 
     # what tag contains the sha
     whatrelease = name-rev --name-only
 
     # from http://serverfault.com/questions/175052/how-to-tell-which-local-branch-is-tracking-which-remote-branch-in-git
-    #upstream = rev-parse --symbolic-full-name --abbrev-ref HEAD@{upstream}
+    upstream = rev-parse --symbolic-full-name --abbrev-ref HEAD@{upstream}
 
     # also from http://serverfault.com/questions/175052/how-to-tell-which-local-branch-is-tracking-which-remote-branch-in-git
     tbranch = branch -vv
@@ -161,7 +151,6 @@
 
     # TODO: make these options of 'git-brage' script
     tbrage = "!f() { git for-each-ref --sort=committerdate refs/heads $1  --format=\"%(refname:short)\" ; }; g() { for C in $(f $1) ; do UP=$(git rev-parse --symbolic-full-name --abbrev-ref $C@{upstream} 2> /dev/null); TRACKING=$?; UP=\"-> $UP \"; if [ $TRACKING -ne 0 ] ; then UP=\"\"; fi;  git show -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C $UP\" \"$C\" -- ; done; }; g "
-
     tbrageall = !git tbrage refs/remotes
 
     # show a list of every branch and show their latests commit, sorted by last commit
@@ -273,28 +262,10 @@
     # from http://blog.blindgaenger.net/advanced_git_aliases.html
     alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\ = \\2/' | sort
 
-    # http://superuser.com/a/169696
-    # prettier than my version of this
-    #  doesn't really work, should probably use git for-each-ref 
-    # heads = !"git log origin/master.. --format='%Cred%h%Creset;%C(yellow)%an%Creset;%H;%Cblue%f%Creset' | git name-rev --stdin --always --name-only | column -t -s';'"
-
-    pconfig = config -f .git/config
-
-    # for "reverse" bisects, where you are trying to find the
-    # first working commit
-    bisect-fixed = bisect bad
-    bisect-unfixed = bisect good
-
     # from https://gist.github.com/awood/11189030
     oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
     branchdiff = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor $1 $head` ; git diff $ancestor..$head ; }; f"
     visual-branchdiff = "!f() { head=${1:-HEAD} ; ancestor=`git oldest-ancestor master $head` ; git diff --name-only $ancestor..$head | xargs diffuse -s -r $ancestor ; }; f &"
-
-    # root = !pwd
-    # shell = !$1
-    # shell = !$0
-    # shell = !sh -c $0
-    # shell = showvirtualenv systempkgtest -c 'bash'
 
     # find what commit a file was added
     # usage: `git whatadded --foo.c`
