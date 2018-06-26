@@ -47,7 +47,7 @@ endfunction
 " grep automatically, use 'ag'
 function! lq#GrepAuto(pattern, ...)
     if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'asm'
-        let l:files = '(?i:.*\.[chs](pp)?$)'
+        let l:files = '(?i:.*\.([ch](pp)?\|cc\|s)$)'
     elseif &filetype == 'make'
         let l:files = '(?i:makefile\|.*\.ma?k$)'
     else
