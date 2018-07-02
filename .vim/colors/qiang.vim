@@ -151,6 +151,8 @@ hi Ignore           ctermfg=243
 " any erroneous construct
 hi Error            guifg=#ff8787           guibg=#870000           gui=none
 hi Error            ctermfg=160             ctermbg=NONE            cterm=none
+hi qfError          guifg=#ff8787           guibg=#444444
+hi qfError          ctermfg=160             ctermbg=238
 
 " Todo Group
 " ----------
