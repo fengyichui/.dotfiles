@@ -71,6 +71,9 @@
     #  prompted to indicate the success of the merge.
     trustExitCode = true
 
+[tar "tar.xz"]
+    command = xz -c
+
 [alias]
     co = checkout
     coh = checkout HEAD
@@ -80,6 +83,8 @@
     dw = diff --relative --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+" --stat -p
     st = status -s -uno
     cleanall = clean -dxf
+    archivethis = archive HEAD -o archive.zip
+    archivethis-xz = archive HEAD -o archive.tar.xz
 
     # authors
     rank    = shortlog -sn --no-merges
@@ -279,3 +284,4 @@
     fontdiff = -family \"DejaVu Sans Mono\" -size 11 -weight normal -slant roman -underline 0 -overstrike 0
     tabsize = 4
     displayuntracked = false
+
