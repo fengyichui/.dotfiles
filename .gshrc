@@ -136,6 +136,13 @@ tmx ()
     eval "tmux $TMUXARG"
 }
 
+# Count the number of times a word appears in files
+# $ count <PATTERN> <FILES>
+count ()
+{
+    grep -o "$@" | wc -l
+}
+
 #####################################
 #             Export                #
 #####################################
