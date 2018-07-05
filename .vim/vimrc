@@ -821,7 +821,7 @@ let g:load_doxygen_syntax = 1
 
 " Signify
 let g:signify_disable_by_default = 1
-let g:signify_vcs_list = ['svn', 'git']
+let g:signify_vcs_list = ['git', 'svn']
 let g:signify_sign_show_count = 0
 let g:signify_skip_filetype = {'xxd':1}
 let g:signify_skip_filename_pattern = ['*.log']
@@ -873,7 +873,7 @@ let g:ConqueGdb_SaveHistory = 1
 let g:ConqueGdb_SrcSplit = 'right'
 
 " DirDiff
-let g:DirDiffExcludes = "*.svn*,*.o,*.a,*.lib,tags,*.taghl"
+let g:DirDiffExcludes = ".git,.svn,*.o,*.a,*.lib,tags,*.taghl"
 
 " neocomplcache
 let g:neocomplcache_enable_at_startup = 0
