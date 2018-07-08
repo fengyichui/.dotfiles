@@ -60,8 +60,9 @@ alias armgdb3="tmuxinator start armgdb -n armgdb3"
 # gdb for hs662x
 alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.gdb/hs662x.gdb.py"'
 
-# faster download files
+# faster download files (aria2 tool)
 alias dl='aria2c -k 1M -s 64 -x 16'
+alias aria2c-rpc='aria2c --enable-rpc --rpc-listen-all'
 
 #####################################
 #             Function              #
