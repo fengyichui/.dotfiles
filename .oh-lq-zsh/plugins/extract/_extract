@@ -4,5 +4,6 @@
 _arguments \
   '(-r --remove)'{-r,--remove}'[Remove archive.]' \
   '(-l --list)'{-l,--list}'[List archive files.]' \
+  '(-c --compress)'{-c,--compress}'[compress files/directories to archive file.]' \
   "*::archive file:_files -g '(#i)*.(7z|Z|apk|bz2|deb|gz|ipsw|jar|lzma|rar|sublime-package|tar|tar.bz2|tar.gz|tar.xz|tar.zma|tbz|tbz2|tgz|tlz|txz|war|xpi|xz|zip)(-.)'" \
     && return 0
