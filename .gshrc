@@ -63,6 +63,7 @@ alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.gdb/hs662x.gdb.
 # faster download files (aria2 tool)
 alias dl="aria2c --dir=$HOME/downloads --save-session=$HOME/downloads/aria2.session"
 alias dl-resume="aria2c --dir=$HOME/downloads --save-session=$HOME/downloads/aria2.session --input-file=$HOME/downloads/aria2.session"
+alias dl-ui="open ~/github/webui-aria2/index.html"
 
 #####################################
 #             Function              #
