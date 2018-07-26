@@ -28,6 +28,10 @@
     quotepath = false
 
 [color]
+    branch = auto
+    diff = auto
+    interactive = auto
+    status = auto
     ui = auto
 
 [push]
@@ -85,6 +89,9 @@
     cleanall = clean -dxf
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
+    ls = "!f() { git ls-files | grep "${@:-''}"; }; f"
+    lso = ls-files --others --exclude-standard
+    lsr = ls-remote
 
     # authors
     rank    = shortlog -sn --no-merges
