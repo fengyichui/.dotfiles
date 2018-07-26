@@ -207,8 +207,12 @@ echo ""
 # catch interrupt
 trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
-# ss
-shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
+# ss (FIXME: global proxy must use old version)
+if [ $global_proxy -eq 1 ]; then
+    shadowsocks-libqss_v1.10.0 -t 600 $proxy_mode $localparam $serverparam
+else
+    shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
+fi
 
 # sslocal only support socks5
 # request:
