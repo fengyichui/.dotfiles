@@ -154,7 +154,7 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
 
     if [[ $mode -eq 0 ]]; then
         echo "curl '${net}' ..."
-        qr=$(curl --progress-bar -A foxfire -L ${net} | 
+        qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
              awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+1, RLENGTH-2);}")
         if [[ -z $qr ]]; then
             echo -e "\e[31msss: can't curl valid QR image!\e[0m"
@@ -168,7 +168,7 @@ fi
 # Get network QR
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path ]]; then
     echo "wget '${qr_net_path}' ..."
-    wget -U mozilla $qr_net_path -O $qr_local_path
+    wget --no-check-certificate -U mozilla $qr_net_path -O $qr_local_path
     if [ $? != 0 ]; then
         echo -e "\e[31msss: wget fail!\e[0m"
         exit 1
