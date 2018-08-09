@@ -305,7 +305,7 @@ class flash_download_image_register(gdb.Command):
         file_size = flash_addr_end - flash_addr
 
         # show burn application info
-        print('{}: {}kB -> 0x{:08X}'.format(file_path, file_size/1024, flash_addr))
+        print('{}: {}kB -> 0x{:X}'.format(file_path, file_size/1024, flash_addr))
 
         # get buffer
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
