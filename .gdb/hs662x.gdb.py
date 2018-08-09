@@ -291,34 +291,39 @@ class flash_download_image_register(gdb.Command):
         flash_prepare_and_show()
 
         # Get file name
-        if args == '':
-            file_path = 'flash_image.bin'
-        else:
-            file_path = args
+        file_path = 'flash_image.bin'
+        flash_addr = 0
+        for opt in args.split():
+            try:
+                flash_addr = int(opt, 0)
+            except:
+                file_path = opt
 
         # Get file size
-        file_size = os.path.getsize(file_path)
-        file_size = min(file_size, (flash_size-flash_sector_size)) # last is CPFT data
+        file_real_size = os.path.getsize(file_path)
+        flash_addr_end = min(flash_addr+file_real_size, (flash_size-flash_sector_size)) # last is CPFT data
+        file_size = flash_addr_end - flash_addr
 
         # show burn application info
-        print('{}: {}kB'.format(file_path, file_size/1024))
+        print('{}: {}kB -> 0x{:08X}'.format(file_path, file_size/1024, flash_addr))
 
         # get buffer
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
         # Erase
         print("  Erase...")
-        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(0, flash_size-flash_sector_size)) # last is CPFT data
+        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(flash_addr, file_size)) # last is CPFT data
 
         # Program
         print("  Program...")
-        addr = 0
-        while addr < file_size:
-            left = file_size - addr
+        i = 0
+        while flash_addr < flash_addr_end:
+            left = file_size - i
             len = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
-            gdb.execute('set $res=flash_write({}, {}, {})'.format(addr, buffer, len))
-            addr += flash_sector_size
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-i, i, i+len), to_string=True)
+            gdb.execute('set $res=flash_write({}, {}, {})'.format(flash_addr, buffer, len))
+            i += flash_sector_size
+            flash_addr += flash_sector_size
 
         # Finish
         print("Finish")
