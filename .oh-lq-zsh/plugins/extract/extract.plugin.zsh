@@ -62,20 +62,18 @@ extract() {
             else
                 # extract
                 success=0
-                extract_dir="${1:t:r}"
                 case "$1" in
-                    (*.tar.gz|*.tgz) (( $+commands[pigz] )) && { pigz -dc "$1" | tar xv } || tar zxvf "$1" ;;
-                    (*.tar.bz2|*.tbz|*.tbz2) tar xvjf "$1" ;;
-                    (*.tar.xz|*.txz)
-                        tar --xz --help &> /dev/null \
-                        && tar --xz -xvf "$1" \
-                        || xzcat "$1" | tar xvf - ;;
-                    (*.tar.zma|*.tlz)
-                        tar --lzma --help &> /dev/null \
-                        && tar --lzma -xvf "$1" \
-                        || lzcat "$1" | tar xvf - ;;
-                    (*.tar) tar xvf "$1" ;;
-                    (*.gz) (( $+commands[pigz] )) && pigz -d "$1" || gunzip "$1" ;;
+                    (*.tar.gz|*.tar.bz2|*.tar.xz|*.tar.zma) extract_dir="${1:t:r:r}" ;;
+                    (*) extract_dir="${1:t:r}" ;;
+                esac
+                mkdir $extract_dir 2>/dev/null
+                case "$1" in
+                    (*.tar.gz|*.tgz) tar zxvf "$1" -C $extract_dir ;;
+                    (*.tar.bz2|*.tbz|*.tbz2) tar xvjf "$1" -C $extract_dir ;;
+                    (*.tar.xz|*.txz) tar --xz -xvf "$1" -C $extract_dir ;;
+                    (*.tar.zma|*.tlz) tar --lzma -xvf "$1" -C $extract_dir ;;
+                    (*.tar) tar xvf "$1" -C $extract_dir ;;
+                    (*.gz) gunzip "$1" ;;
                     (*.bz2) bunzip2 "$1" ;;
                     (*.xz) unxz "$1" ;;
                     (*.lzma) unlzma "$1" ;;
@@ -97,6 +95,15 @@ extract() {
                         success=1
                     ;;
                 esac
+                rmdir --ignore-fail-on-non-empty "$extract_dir"
+
+                # remove double dir
+                extract_sub_dir=$(ls $extract_dir)
+                if [[ "$extract_sub_dir" == "$extract_dir" ]]; then
+                    mv "$extract_dir/$extract_sub_dir" "${extract_dir}.tmp"
+                    rmdir --ignore-fail-on-non-empty $extract_dir
+                    mv "${extract_dir}.tmp" $extract_dir
+                fi
 
                 (( success = $success > 0 ? $success : $? ))
                 (( $success == 0 )) && (( $remove_archive == 0 )) && rm "$1"
