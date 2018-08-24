@@ -36,6 +36,7 @@
 x='x'
 ss8='ss8.pm'
 isx='isx.yt' # dwz.pm/x
+freess='f55.fun'
 fvs='jn9.org/img/'
 res=( \
     '\"images/server03-[^\"]+\"' \
@@ -53,6 +54,14 @@ res=( \
     '\"img/qr/sgb-[^\"]+\"' \
     '\"img/qr/sgc-[^\"]+\"' \
     $x \
+    \
+    'id=\"jp01\" href=\"[^\"]+\"' \
+    'id=\"jp02\" href=\"[^\"]+\"' \
+    'id=\"jp03\" href=\"[^\"]+\"' \
+    'id=\"us01\" href=\"[^\"]+\"' \
+    'id=\"us02\" href=\"[^\"]+\"' \
+    'id=\"us03\" href=\"[^\"]+\"' \
+    $x $x $x $x \
     \
     ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png $x $x $x $x $x $x $x \
     )
@@ -149,16 +158,19 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
         exit 1
     fi
 
-    mode=0
     if [[ $inside_qr_index -lt 10 ]]; then
         net=$ss8
+        parse_mode=0
     elif [[ $inside_qr_index -lt 20 ]]; then
         net=$isx
-    else
-        mode=1
+        parse_mode=0
+    elif [[ $inside_qr_index -lt 30 ]]; then
+        net=$freess
+        parse_mode=1
     fi
 
-    if [[ $mode -eq 0 ]]; then
+    # ss8 and isx
+    if [[ $parse_mode -eq 0 ]]; then
         echo "curl '${net}' ..."
         qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
              awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+1, RLENGTH-2);}")
@@ -167,6 +179,19 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
             exit 1
         fi
         qr_net_path="$net/$qr"
+        echo ""
+
+    # freess
+    elif [[ $parse_mode -eq 1 ]]; then
+        echo "curl '${net}' ..."
+        qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
+             awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+38, RLENGTH-39);}")
+        if [[ -z $qr ]]; then
+            echo -e "\e[31msss: can't curl valid QR image!\e[0m"
+            exit 1
+        fi
+        echo $qr | base64 -d >$qr_local_path
+        mode=$mode_usr_qr_local_path
         echo ""
     fi
 fi
