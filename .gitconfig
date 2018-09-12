@@ -79,13 +79,15 @@
     command = xz -c
 
 [alias]
-    co = checkout
+    co  = checkout
     coh = checkout HEAD
-    cm = commit
-    ca = commit -a
-    d  = diff --relative --stat -p
-    dw = diff --relative --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+" --stat -p
-    st = status -s -uno
+    cm  = commit
+    ca  = commit -a
+    d   = diff --relative --patch-with-raw --shortstat
+    dw  = diff --relative --patch-with-raw --shortstat --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
+    s   = status --short --untracked-files=no
+    st  = status --short
+    st2 = status --porcelain=2 --untracked-files=no
     cleanall = clean -dxf
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
