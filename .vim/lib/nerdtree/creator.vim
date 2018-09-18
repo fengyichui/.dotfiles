@@ -178,24 +178,28 @@ function! s:Creator.createMirror()
 endfunction
 
 " FUNCTION: s:Creator._createTreeWin() {{{1
-" Inits the NERD tree window. ie. opens it, sizes it, sets all the local
-" options etc
+" Initialize the NERDTree window.  Open the window, size it properly, set all
+" local options, etc.
 function! s:Creator._createTreeWin()
-    "create the nerd tree window
-    let splitLocation = g:NERDTreeWinPos ==# "left" ? "topleft " : "botright "
-    let splitSize = g:NERDTreeWinSize
+    let l:splitLocation = g:NERDTreeWinPos ==# 'left' ? 'topleft ' : 'botright '
+    let l:splitSize = g:NERDTreeWinSize
 
-    if !exists('t:NERDTreeBufName')
+    if !g:NERDTree.ExistsForTab()
         let t:NERDTreeBufName = self._nextBufferName()
-        silent! exec splitLocation . 'vertical ' . splitSize . ' new'
-        silent! exec "edit " . t:NERDTreeBufName
+        silent! execute l:splitLocation . 'vertical ' . l:splitSize . ' new'
+        silent! execute 'edit ' . t:NERDTreeBufName
     else
-        silent! exec splitLocation . 'vertical ' . splitSize . ' split'
-        silent! exec "buffer " . t:NERDTreeBufName
+        silent! execute l:splitLocation . 'vertical ' . l:splitSize . ' split'
+        silent! execute 'buffer ' . t:NERDTreeBufName
+    endif
+
+    call self._setCommonBufOptions()
+
+    if has('patch-7.4.1925')
+        clearjumps
     endif
 
     setlocal winfixwidth
-    call self._setCommonBufOptions()
 endfunction
 
 " FUNCTION: s:Creator._isBufHidden(nr) {{{1
@@ -280,16 +284,21 @@ endfunction
 
 " FUNCTION: s:Creator._setCommonBufOptions() {{{1
 function! s:Creator._setCommonBufOptions()
-    "throwaway buffer options
-    setlocal noswapfile
-    setlocal buftype=nofile
+
+    " Options for a non-file/control buffer.
     setlocal bufhidden=hide
-    setlocal nowrap
+    setlocal buftype=nofile
+    setlocal noswapfile
+
+    " Options for controlling buffer/window appearance.
     setlocal foldcolumn=0
     setlocal foldmethod=manual
-    setlocal nofoldenable
     setlocal nobuflisted
+    setlocal nofoldenable
+    setlocal nolist
     setlocal nospell
+    setlocal nowrap
+
     if g:NERDTreeShowLineNumbers
         setlocal nu
     else
@@ -307,6 +316,7 @@ function! s:Creator._setCommonBufOptions()
 
     call self._setupStatusline()
     call self._bindMappings()
+
     setlocal filetype=nerdtree
 endfunction
 
