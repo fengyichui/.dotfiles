@@ -126,7 +126,7 @@ dictcommand file:///$LIB/w3mdict.cgi
 use_dictcommand 0
 dirlist_cmd file:///$LIB/dirlist.cgi
 ext_dirlist 1
-display_lineinfo 0
+display_lineinfo 1
 decode_url 0
 display_link_number 0
 display_link 0
@@ -136,4 +136,4 @@ target_self 0
 frame 0
 pixel_per_char 8
 indent_incr 4
-tabstop 8
+tabstop 4
