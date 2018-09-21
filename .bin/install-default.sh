@@ -71,3 +71,8 @@ cd rename
 make install
 cd ..
 rm -rf rename
+
+# link cygwin to windows (mklink must be sudo)
+cmd /c mklink /D "$(cygpath -w $(cygpath -O)/../vimfiles)" "$(cygpath -w ~/.vim)"  # .vim->vimfiles
+cmd /c mklink "$(cygpath -w $(cygpath -O)/../.gitconfig)" "$(cygpath -w ~/.gitconfig)"  # .gitconfig
+
