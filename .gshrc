@@ -67,6 +67,10 @@ alias dl-resume="aria2c --dir=$HOME/downloads --save-session=$HOME/downloads/ari
 alias dl-ui="open ~/github/webui-aria2/index.html"
 alias dl-tracker-update='list=$(wget -O- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt | awk NF | sed ":a;N;s/\n/,/g;ta"); sed -i "s@bt-tracker.*@bt-tracker=$list@g" ~/.config/aria2/aria2.conf'
 
+# curl
+alias whereami="curl https://freegeoip.app/xml/"
+alias weather="curl wttr.in"
+
 #####################################
 #             Function              #
 #####################################
