@@ -72,14 +72,30 @@ def flash_prepare_and_show():
 
     # Flash ID
     global flash_size
+    # Ext
+    flash_id_ext = int(gdb.parse_and_eval('sf_readId(1)'))
+    if flash_id_ext in flash_info_table:
+        flash_size_ext = flash_info_table[flash_id_ext]['size']
+        flash_name_ext = flash_info_table[flash_id_ext]['name']
+    elif flash_id_ext==0x0 or flash_id_ext==0xFFFFFF:
+        flash_size_ext = 0
+        flash_name_ext = 'None'
+    else:
+        flash_size_ext = 1 << (flash_id_ext&0xff)
+        flash_size_ext = 'Unknown'
+    # Inside
     flash_id = int(gdb.parse_and_eval('sf_readId(0)'))
     if flash_id in flash_info_table:
         flash_size = flash_info_table[flash_id]['size']
         flash_name = flash_info_table[flash_id]['name']
+    elif flash_id==0x0 or flash_id==0xFFFFFF:
+        flash_size = 0
+        flash_name = 'None'
     else:
         flash_size = 1 << (flash_id&0xff)
         flash_name = 'Unknown'
     print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
+    print('FlashExt: {} {}KB (0x{:06X})'.format(flash_name_ext, flash_size_ext/1024, flash_id_ext))
 
 
 def flash_finish():
