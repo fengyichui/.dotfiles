@@ -16,7 +16,21 @@ if exists('g:loaded_terminal') && g:loaded_terminal
 endif
 let g:loaded_terminal = 1
 
-function! s:alt_fix()
+" key fix
+function! s:key_fix()
+    " Get the keycode
+    "   :iunmap <c-v>
+    "   <ctrl-v><something-key> (insert mode)
+    "
+    " Get terminfo:
+    "   $ infocmp
+    "
+    " map <C-Fx> is equal to map <Fy> where y = x + 24.
+    " So if want to map <C-F12> to something, you can also map <F36> to the same thing.
+
+    """""""
+    " ALT "
+    """""""
     " leaving out problematic characters: 'O', double quote, pipe and '['
     let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(94, 123) + [125, 126]
     let printable_characters = map(ascii_nums, 'nr2char(v:val)')
@@ -33,13 +47,10 @@ function! s:alt_fix()
     " exe "set <M-\>>=\>"
     " left bracket just messes vim up
     " exe 'set <M-[>=['
-endfunction
 
-function! s:ctrl_fix()
-    " Get the keycode
-    "   :iunmap <c-v>
-    "   <ctrl-v><something-key> (insert mode)
-
+    """"""""
+    " CTRL "
+    """"""""
     " for <ctrl-enter> in mintty
     exe 'set <F20>='
     map <F20> <C-CR>
@@ -47,8 +58,7 @@ function! s:ctrl_fix()
 endfunction
 
 " fix alt/ctrl key
-call s:alt_fix()
-call s:ctrl_fix()
+call s:key_fix()
 
 " xterm cursor
 " 1 or 0 -> blinking block
@@ -71,6 +81,26 @@ if !exists('$TMUX')
     endif
     finish
 endif
+
+" tmux key fix
+function! s:tmux_key_fix()
+    """"""""
+    " CTRL "
+    """"""""
+    " for CTRL-F12
+    exe 'set <F36>=[24;5~'
+    map <F36> <C-F12>
+    map! <F36> <C-F12>
+
+    """""""""
+    " SHIFT "
+    """""""""
+    " for SHIFT-F12
+    exe 'set <S-F12>=[24;2~'
+endfunction
+
+" fix key
+call s:tmux_key_fix()
 
 " Wrap for tmux
 function! s:tmux_wrap(s) " {{{
