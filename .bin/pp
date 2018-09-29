@@ -31,7 +31,7 @@ function print_usage ()
 while getopts g:c:f:CTsh opt; do
     case $opt in
         g) grep_re="$OPTARG" ;;
-        c) eval color_re_${color_re_index}="${OPTARG}"; color_re_index=$((color_re_index + 1)) ;;
+        c) eval "color_re_${color_re_index}='${OPTARG}'"; color_re_index=$((color_re_index + 1)) ;;
         C) color_seq=1 ;;
         T) timestamp_show=0 ;;
         s) timestamp_from_start='-s' ;;
@@ -79,7 +79,7 @@ colorize_fail="if(match(\$0,/$color_fail_re/)){$(awk_colorize 31)}
 colorize_user=""
 for((i=0; i<color_re_index; i++))
 {
-    eval color_user=\$color_re_${i}
+    eval "color_user=\$color_re_${i}"
     colorize_user="${colorize_user} if(match(\$0,/$color_user/)){$(awk_colorize $((32+(i%5))))}
         else"
 }
