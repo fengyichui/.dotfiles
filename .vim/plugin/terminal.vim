@@ -87,16 +87,16 @@ function! s:tmux_key_fix()
     """"""""
     " CTRL "
     """"""""
-    " for CTRL-F12
-    exe 'set <F36>=[24;5~'
-    map <F36> <C-F12>
-    map! <F36> <C-F12>
+    " for CTRL-F12 (only for TERM=tmux_256color)
+"    exe 'set <F36>=[24;5~'
+"    map <F36> <C-F12>
+"    map! <F36> <C-F12>
 
     """""""""
     " SHIFT "
     """""""""
-    " for SHIFT-F12
-    exe 'set <S-F12>=[24;2~'
+    " for SHIFT-F12 (only for TERM=tmux_256color)
+"    exe 'set <S-F12>=[24;2~'
 endfunction
 
 " fix key
