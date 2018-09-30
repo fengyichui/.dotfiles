@@ -1,6 +1,27 @@
 
+# language environment
+# locale priority: LC_ALL > LC_* > LANG
+export LANG=en_US.UTF-8
+#export LC_ALL=C
+
+# Editor
+export EDITOR='vim'
+
+# Add my PATH (Must be in front of executed tmux)
+if [[ "$OSTYPE" =~ "linux" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+elif [[ "$OSTYPE" =~ "cygwin" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+fi
+
 # Auto startup tmux
-[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
+#[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
+if [[ -z "$TMUX" && -n ${commands[tmux]} ]]; then
+    # try to reattach sessions
+    TMUXARG=""
+    tmux ls 2>/dev/null | grep -vq attached && TMUXARG="attach-session -d"
+    exec eval "tmux $TMUXARG"
+fi
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -66,14 +87,6 @@ plugins=(
     zsh-syntax-highlighting
     zsh-history-substring-search
 )
-
-# You may need to manually set your language environment
-# locale priority: LC_ALL > LC_* > LANG
-export LANG=en_US.UTF-8
-#export LC_ALL=C
-
-# Editor
-export EDITOR='vim'
 
 # Run oh-my-zsh
 source $ZSH/oh-my-zsh.sh

@@ -29,6 +29,13 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
+# Add my PATH (Must be in front of executed tmux)
+if [[ "$OSTYPE" =~ "linux" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+elif [[ "$OSTYPE" =~ "cygwin" ]]; then
+    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+fi
+
 # Shell Options
 #
 # See man bash for more options...
