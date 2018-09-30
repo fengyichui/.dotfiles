@@ -1,12 +1,6 @@
 
 # Auto startup tmux
-#[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
-#if [[ -z "$TMUX" && -n ${commands[tmux]} ]]; then
-#    # try to reattach sessions
-#    TMUXARG=""
-#    tmux ls 2>/dev/null | grep -vq attached && TMUXARG="attach-session -d"
-#    exec eval "tmux $TMUXARG"
-#fi
+[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
