@@ -16,7 +16,7 @@ fi
 
 # Auto startup tmux
 #[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
-if [[ -z "$TMUX" && -n ${commands[tmux]} ]]; then
+if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
     # try to reattach sessions
     TMUXARG=""
     tmux ls 2>/dev/null | grep -vq attached && TMUXARG="attach-session -d"
