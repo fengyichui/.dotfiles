@@ -14,10 +14,10 @@ unset TMUX_PANE
 export NOTMUX=1
 
 # Keep PWD
-echo "cd '$(pwd)'" >> /tmp/.init.tmp
+export CHERE_INVOKING=1
 
 # Execute the param
-echo "exec tmuxinator $@" >> /tmp/.init.tmp
+echo "exec tmuxinator $@" > /tmp/.init.tmp
 
 # Start new window
 cygstart -w --action=open mintty --window max --exec "$SHELL" --login -i

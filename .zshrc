@@ -91,9 +91,6 @@ plugins=(
 # Run oh-my-zsh
 source $ZSH/oh-my-zsh.sh
 
-# General shell config
-source ~/.gshrc
-
 # Option
 setopt NO_BEEP                   # i hate beeps
 #setopt RM_STAR_WAIT              # if `rm *` wait 10 seconds before performing it!
@@ -124,4 +121,7 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     __git_changed-in-working-tree_files () { _wanted files expl 'local files' _files }
     __git_changed-in-index_files () { _wanted files expl 'local files' _files }
 fi
+
+# General shell config
+source ~/.gshrc
 

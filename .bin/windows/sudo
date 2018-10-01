@@ -11,10 +11,10 @@ unset TMUX
 unset TMUX_PANE
 
 # Keep PWD
-echo "cd '$(pwd)'" >> /tmp/.init.tmp
+export CHERE_INVOKING=1
 
 # Execute the param
-echo "$@" >> /tmp/.init.tmp
+echo "$@" > /tmp/.init.tmp
 
 # Start SUDO window
 cygstart -w --action=runas mintty --exec "$SHELL" --login -i
