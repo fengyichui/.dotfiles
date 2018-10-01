@@ -17,6 +17,7 @@ endif
 let g:loaded_terminal = 1
 
 
+" Fixkey_setKey() and Fixkey_setNewKey() fork from: https://github.com/drmikehenry/vim-fixkey
 function! Fixkey_setKey(key, keyCode)
     execute "set " . a:key . "=" . a:keyCode
 endfunction
