@@ -16,6 +16,44 @@ if exists('g:loaded_terminal') && g:loaded_terminal
 endif
 let g:loaded_terminal = 1
 
+
+function! Fixkey_setKey(key, keyCode)
+    execute "set " . a:key . "=" . a:keyCode
+endfunction
+
+function! Fixkey_mapKey(key, value)
+    execute "map  " . a:key . " " . a:value
+    execute "map! " . a:key . " " . a:value
+endfunction
+
+let g:Fixkey_numSpareKeys = 50
+let g:Fixkey_spareKeysUsed = 0
+
+" Allocate a new key, set it to use the passed-in keyCode, then map it to
+" the passed-in key.
+" New keys are taken from <F13> through <F37> and <S-F13> through <S-F37>,
+" for a total of 50 keys.
+" <F13>,<F14> used for focus
+function! Fixkey_setNewKey(key, keyCode)
+    if g:Fixkey_spareKeysUsed >= g:Fixkey_numSpareKeys
+        echohl WarningMsg
+        echomsg "Unable to map " . a:key . ": ran out of spare keys"
+        echohl None
+        return
+    endif
+    let fn = g:Fixkey_spareKeysUsed
+    let half = g:Fixkey_numSpareKeys / 2
+    let shift = ""
+    if fn >= half
+        let fn -= half
+        let shift = "S-"
+    endif
+    let newKey = "<" . shift . "F" . (15 + fn) . ">"
+    call Fixkey_setKey(newKey, a:keyCode)
+    call Fixkey_mapKey(newKey, a:key)
+    let g:Fixkey_spareKeysUsed += 1
+endfunction
+
 " key fix
 function! s:key_fix()
     " Get the keycode
@@ -24,9 +62,6 @@ function! s:key_fix()
     "
     " Get terminfo:
     "   $ infocmp
-    "
-    " map <C-Fx> is equal to map <Fy> where y = x + 24.
-    " So if want to map <C-F12> to something, you can also map <F36> to the same thing.
 
     """""""
     " ALT "
@@ -35,26 +70,14 @@ function! s:key_fix()
     let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(94, 123) + [125, 126]
     let printable_characters = map(ascii_nums, 'nr2char(v:val)')
     for char in printable_characters
-        exe "set <M-".char.">=\<Esc>".char
+        call Fixkey_setKey("<M-".char.">", "\e".char)
     endfor
-    " double quote
-    exe 'set <M-\">=\"'
-    " pipe
-    exe 'set <M-bar>=\|'
-    " space - messes all other mappings
-    " exe "set <M-space>= "
-    " Can't get this one to work
-    " exe "set <M-\>>=\>"
-    " left bracket just messes vim up
-    " exe 'set <M-[>=['
 
     """"""""
     " CTRL "
     """"""""
     " for <ctrl-enter> in mintty
-    exe 'set <F20>='
-    map <F20> <C-CR>
-    map! <F20> <C-CR>
+    call Fixkey_setNewKey("<C-CR>", "")
 endfunction
 
 " fix alt/ctrl key
@@ -97,6 +120,23 @@ function! s:tmux_key_fix()
     """""""""
     " for SHIFT-F12 (only for TERM=tmux_256color)
 "    exe 'set <S-F12>=[24;2~'
+
+    """""""
+    " ALT "
+    """""""
+    " ALT-[F1-F12] (RVCT, TMUX)
+"    call Fixkey_setNewKey("<M-F1>",  "\e\e[11~")
+"    call Fixkey_setNewKey("<M-F2>",  "\e\e[12~")
+"    call Fixkey_setNewKey("<M-F3>",  "\e\e[13~")
+"    call Fixkey_setNewKey("<M-F4>",  "\e\e[14~")
+"    call Fixkey_setNewKey("<M-F5>",  "\e\e[15~")
+"    call Fixkey_setNewKey("<M-F6>",  "\e\e[17~")
+"    call Fixkey_setNewKey("<M-F7>",  "\e\e[18~")
+"    call Fixkey_setNewKey("<M-F8>",  "\e\e[19~")
+"    call Fixkey_setNewKey("<M-F9>",  "\e\e[20~")
+"    call Fixkey_setNewKey("<M-F10>", "\e\e[21~")
+    call Fixkey_setNewKey("<M-F11>", "\e\e[23~")
+    call Fixkey_setNewKey("<M-F12>", "\e\e[24~")
 endfunction
 
 " fix key
@@ -149,23 +189,23 @@ function! s:tmux_fix()
 
     " When Tmux 'focus-events' option is on, Tmux will send <Esc>[O when the
     " window loses focus and <Esc>[I when it gains focus.
-    exec "set <F24>=\e[O"
-    exec "set <F25>=\e[I"
+    exec "set <F13>=\e[O"
+    exec "set <F14>=\e[I"
 
-    nnoremap <silent> <F24> :silent doautocmd FocusLost %<CR>
-    nnoremap <silent> <F25> :silent doautocmd FocusGained %<CR>
+    nnoremap <silent> <F13> :silent doautocmd FocusLost %<CR>
+    nnoremap <silent> <F14> :silent doautocmd FocusGained %<CR>
 
-    onoremap <silent> <F24> <Esc>:silent doautocmd FocusLost %<CR>
-    onoremap <silent> <F25> <Esc>:silent doautocmd FocusGained %<CR>
+    onoremap <silent> <F13> <Esc>:silent doautocmd FocusLost %<CR>
+    onoremap <silent> <F14> <Esc>:silent doautocmd FocusGained %<CR>
 
-    vnoremap <silent> <F24> <Esc>:silent doautocmd FocusLost %<CR>gv
-    vnoremap <silent> <F25> <Esc>:silent doautocmd FocusGained %<CR>gv
+    vnoremap <silent> <F13> <Esc>:silent doautocmd FocusLost %<CR>gv
+    vnoremap <silent> <F14> <Esc>:silent doautocmd FocusGained %<CR>gv
 
-    inoremap <silent> <F24> <C-O>:silent doautocmd FocusLost %<CR>
-    inoremap <silent> <F25> <C-O>:silent doautocmd FocusGained %<CR>
+    inoremap <silent> <F13> <C-O>:silent doautocmd FocusLost %<CR>
+    inoremap <silent> <F14> <C-O>:silent doautocmd FocusGained %<CR>
 
-    cnoremap <silent> <F24> <C-\>e<SID>do_autocmd('FocusLost')<CR>
-    cnoremap <silent> <F25> <C-\>e<SID>do_autocmd('FocusGained')<CR>
+    cnoremap <silent> <F13> <C-\>e<SID>do_autocmd('FocusLost')<CR>
+    cnoremap <silent> <F14> <C-\>e<SID>do_autocmd('FocusGained')<CR>
 endfunction
 
 " FocusGaine
@@ -209,7 +249,7 @@ endfunction
 " Fix tmux issue
 call <SID>tmux_fix()
 
-" When '&term' changes values for '<F24>', '<F25>', '&t_ti' and '&t_te' are
+" When '&term' changes values for '<F13>', '<F14>', '&t_ti' and '&t_te' are
 " reset. Below autocmd restores values for those options.
 autocmd TermChanged * call <SID>tmux_fix()
 
