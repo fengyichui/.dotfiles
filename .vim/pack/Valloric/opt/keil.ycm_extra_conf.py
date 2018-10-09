@@ -69,8 +69,8 @@ flags = [
 #Include folders
 '-ISUB', '.',
 '-I', '.',
-'-isystem', 'D:/Keil_v522/ARM/ARMCLANG/include',
-'-isystem', 'D:/Keil_v522/ARM/ARMCLANG/lib',
+'-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/include',
+'-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/lib',
 ]
 
 
