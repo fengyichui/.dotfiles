@@ -421,6 +421,9 @@ class flash_erase_register(gdb.Command):
 
     def invoke(self, args, from_tty):
 
+        # Prepare
+        flash_prepare_and_show()
+
         # param
         argv = gdb.string_to_argv(args)
         if len(argv) == 0:
@@ -431,9 +434,6 @@ class flash_erase_register(gdb.Command):
             length = int(argv[1]) * 1024
         else:
             raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
-
-        # Prepare
-        flash_prepare_and_show()
 
         # Info
         print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
