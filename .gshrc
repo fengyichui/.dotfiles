@@ -163,6 +163,9 @@ export DISPLAY=:0.0
 #               Misc                #
 #####################################
 
+# Disable flow control (ctrl-s, ctrl-q)
+stty -ixon
+
 # For sudo and new command
 if [[ -f "/tmp/.init.tmp" ]]; then
     mv -f /tmp/.init.tmp /tmp/.init.tmp2
