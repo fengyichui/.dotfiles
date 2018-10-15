@@ -9,9 +9,9 @@ fi
 fpath=($ZSH/functions $ZSH/completions $fpath)
 
 # Load all stock functions (from $fpath files) called below.
-autoload -U compaudit compinit
+autoload -U compinit # liqiang <>
 
-: ${ZSH_DISABLE_COMPFIX:=true}
+#: ${ZSH_DISABLE_COMPFIX:=true} # liqiang -
 
 # Set ZSH_CUSTOM to the path where your custom config files
 # and plugins exists, or else we will use the default custom/
@@ -64,17 +64,30 @@ if [ -z "$ZSH_COMPDUMP" ]; then
   ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
 fi
 
-if [[ $ZSH_DISABLE_COMPFIX != true ]]; then
-  # If completion insecurities exist, warn the user
-  if ! compaudit &>/dev/null; then
-    handle_completion_insecurities
-  fi
-  # Load only from secure directories
-  compinit -i -d "${ZSH_COMPDUMP}"
+# liqiang - {
+#if [[ $ZSH_DISABLE_COMPFIX != true ]]; then
+#  # If completion insecurities exist, warn the user
+#  if ! compaudit &>/dev/null; then
+#    handle_completion_insecurities
+#  fi
+#  # Load only from secure directories
+#  compinit -i -d "${ZSH_COMPDUMP}"
+#else
+#  # If the user wants it, load from all found directories
+#  compinit -u -d "${ZSH_COMPDUMP}"
+#fi
+# }
+
+# liqiang + {
+# On slow systems, checking the cached .zcompdump file to see if it must be 
+# regenerated adds a noticable delay to zsh startup.  This little hack restricts 
+# it to once a day.  It should be pasted into your own completion file.
+if [[ -f "${ZSH_COMPDUMP}" ]]; then
+  compinit -C -d "${ZSH_COMPDUMP}"
 else
-  # If the user wants it, load from all found directories
-  compinit -u -d "${ZSH_COMPDUMP}"
+  compinit -d "${ZSH_COMPDUMP}"
 fi
+# }
 
 # Load all of the plugins that were defined in ~/.zshrc
 for plugin ($plugins); do

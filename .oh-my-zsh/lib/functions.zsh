@@ -97,7 +97,7 @@ function default() {
 #    0 if the env variable exists, 3 if it was set
 #
 function env_default() {
-    env | grep -q "^$1=" && return 0
+#    env | grep -q "^$1=" && return 0 # liqiang -
     export "$1=$2"       && return 3
 }
 
