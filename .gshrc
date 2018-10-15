@@ -170,7 +170,7 @@ export DISPLAY=:0.0
 #####################################
 
 # Disable flow control (ctrl-s, ctrl-q)
-stty -ixon
+#stty -ixon
 
 # For sudo and new command
 if [[ -f "/tmp/.init.tmp" ]]; then
