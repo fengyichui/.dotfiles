@@ -19,9 +19,13 @@ fi
 
 # Auto startup tmux
 #[[ -z "$TMUX" && -n ${commands[tmux]} ]] && exec tmux
-if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
-    # try to reattach sessions
-    tmux ls 2>/dev/null | grep -vq attached && exec tmux attach-session -d || exec tmux
+if [[ -f "/tmp/.notmux.tmp" ]]; then
+    rm -f /tmp/.notmux.tmp
+else
+    if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
+        # try to reattach sessions
+        tmux ls 2>/dev/null | grep -vq attached && exec tmux attach-session -d || exec tmux new-session -E
+    fi
 fi
 
 # Path to your oh-my-zsh installation.

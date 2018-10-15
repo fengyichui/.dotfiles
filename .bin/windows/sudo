@@ -17,11 +17,14 @@ fi
 unset TMUX
 unset TMUX_PANE
 
-# Keep PWD
-export CHERE_INVOKING=1
+# notmux (use file instead of NOTMUX in tmux)
+touch /tmp/.notmux.tmp
+
+# Keep PWD (use file instead of CHERE_INVOKING in tmux)
+echo "cd '$(pwd)'" > /tmp/.init.tmp
 
 # Execute the param
-echo "$@" > /tmp/.init.tmp
+echo "$@" >> /tmp/.init.tmp
 
 # Start SUDO window
 cygstart -w --action=runas mintty --exec "$SHELL" --login -i
