@@ -6,6 +6,13 @@
 # Only for cygwin
 #
 
+root=$(id -G)
+# 544 is windows administrators group
+if [[ $root =~ "544" ]]; then
+    eval "$@"
+    exit
+fi
+
 # $TMUX env may lead some strange thing
 unset TMUX
 unset TMUX_PANE
