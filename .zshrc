@@ -1,4 +1,7 @@
 
+# prof start
+#zmodload zsh/zprof
+
 # language environment
 # locale priority: LC_ALL > LC_* > LANG
 export LANG=en_US.UTF-8
@@ -124,4 +127,7 @@ fi
 
 # General shell config
 source ~/.gshrc
+
+# prof finish
+#zprof
 
