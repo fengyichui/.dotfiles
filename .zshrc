@@ -24,7 +24,7 @@ if [[ -f "/tmp/.notmux.tmp" ]]; then
 else
     if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
         # try to reattach sessions
-        tmux ls 2>/dev/null | grep -vq attached && exec tmux attach-session -d || exec tmux new-session -E
+        tmux ls 2>/dev/null | grep -vq attached && exec tmux attach-session -d || exec tmux
     fi
 fi
 
