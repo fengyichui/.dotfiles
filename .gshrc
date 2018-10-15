@@ -13,8 +13,8 @@ alias ll='ls -al --color=auto --time-style=long-iso --group-directories-first'  
 alias l='ls -l --color=auto --time-style=long-iso --group-directories-first'     # long list file
 
 # grep file
-alias grep='grep --color'  # show differences in color
-alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -ni --color"
+alias grep='grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
+alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -ni --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -70,6 +70,12 @@ alias dl-tracker-update='list=$(wget -O- https://raw.githubusercontent.com/ngosa
 # curl
 alias whereami="curl https://freegeoip.app/xml/"
 alias weather="curl wttr.in"
+
+# http file server
+alias www="python -m SimpleHTTPServer 8000"
+
+# check zsh startup time
+alias zsh_startup_time="zsh -i -xv -c exit 2>&1 | ts -i "%.s" > zsh_startup.log"
 
 #####################################
 #             Function              #
