@@ -45,7 +45,7 @@ ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${ZSH_VERSION}"
 if [[ -f "${ZSH_COMPDUMP}" ]]; then
   compinit -C -d "${ZSH_COMPDUMP}"
 else
-  compinit -d "${ZSH_COMPDUMP}"
+  compinit -u -d "${ZSH_COMPDUMP}"
 fi
 
 # Load all of the plugins that were defined in ~/.zshrc
