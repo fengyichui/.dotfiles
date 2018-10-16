@@ -1,8 +1,3 @@
-# Check for updates on initial load...
-#if [ "$DISABLE_AUTO_UPDATE" != "true" ]; then
-#  env ZSH=$ZSH DISABLE_UPDATE_PROMPT=$DISABLE_UPDATE_PROMPT zsh -f $ZSH/tools/check_for_upgrade.sh
-#fi
-
 # Initializes Oh My Zsh
 
 # add a function path
@@ -11,20 +6,11 @@ fpath=($ZSH/functions $ZSH/completions $fpath)
 # Load all stock functions (from $fpath files) called below.
 autoload -U compinit # liqiang <>
 
-#: ${ZSH_DISABLE_COMPFIX:=true} # liqiang -
-
 # Set ZSH_CUSTOM to the path where your custom config files
 # and plugins exists, or else we will use the default custom/
 if [[ -z "$ZSH_CUSTOM" ]]; then
-    ZSH_CUSTOM="$ZSH/custom"
+  ZSH_CUSTOM="$ZSH/custom"
 fi
-
-# Set ZSH_CACHE_DIR to the path where cache files should be created
-# or else we will use the default cache/
-if [[ -z "$ZSH_CACHE_DIR" ]]; then
-  ZSH_CACHE_DIR="$ZSH/cache"
-fi
-
 
 # Load all of the config files in ~/oh-my-zsh that end in .zsh
 # TIP: Add files you don't want in git to .gitignore
@@ -33,6 +19,7 @@ for config_file ($ZSH/lib/*.zsh); do
   [ -f "${custom_config_file}" ] && config_file=${custom_config_file}
   source $config_file
 done
+unset config_file
 
 
 is_plugin() {
@@ -51,34 +38,9 @@ for plugin ($plugins); do
   fi
 done
 
-# Figure out the SHORT hostname
-if [[ "$OSTYPE" = darwin* ]]; then
-  # macOS's $HOST changes with dhcp, etc. Use ComputerName if possible.
-  SHORT_HOST=$(scutil --get ComputerName 2>/dev/null) || SHORT_HOST=${HOST/.*/}
-else
-  SHORT_HOST=${HOST/.*/}
-fi
-
 # Save the location of the current completion dump file.
-if [ -z "$ZSH_COMPDUMP" ]; then
-  ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${SHORT_HOST}-${ZSH_VERSION}"
-fi
+ZSH_COMPDUMP="${ZDOTDIR:-${HOME}}/.zcompdump-${ZSH_VERSION}"
 
-# liqiang - {
-#if [[ $ZSH_DISABLE_COMPFIX != true ]]; then
-#  # If completion insecurities exist, warn the user
-#  if ! compaudit &>/dev/null; then
-#    handle_completion_insecurities
-#  fi
-#  # Load only from secure directories
-#  compinit -i -d "${ZSH_COMPDUMP}"
-#else
-#  # If the user wants it, load from all found directories
-#  compinit -u -d "${ZSH_COMPDUMP}"
-#fi
-# }
-
-# liqiang + {
 # On slow systems, checking the cached .zcompdump file to see if it must be 
 # regenerated adds a noticable delay to zsh startup.  This little hack restricts 
 # it to once a day.  It should be pasted into your own completion file.
@@ -87,7 +49,6 @@ if [[ -f "${ZSH_COMPDUMP}" ]]; then
 else
   compinit -d "${ZSH_COMPDUMP}"
 fi
-# }
 
 # Load all of the plugins that were defined in ~/.zshrc
 for plugin ($plugins); do
@@ -98,32 +59,13 @@ for plugin ($plugins); do
   fi
 done
 
-# Load all of your custom configurations from custom/
-for config_file ($ZSH_CUSTOM/*.zsh(N)); do
-  source $config_file
-done
-unset config_file
-
 # Load the theme
-if [[ "$ZSH_THEME" == "random" ]]; then
-  if [[ "${(t)ZSH_THEME_RANDOM_CANDIDATES}" = "array" ]] && [[ "${#ZSH_THEME_RANDOM_CANDIDATES[@]}" -gt 0 ]]; then
-    themes=($ZSH/themes/${^ZSH_THEME_RANDOM_CANDIDATES}.zsh-theme)
-  else
-    themes=($ZSH/themes/*zsh-theme)
-  fi
-  N=${#themes[@]}
-  ((N=(RANDOM%N)+1))
-  RANDOM_THEME=${themes[$N]}
-  source "$RANDOM_THEME"
-  echo "[oh-my-zsh] Random theme '$RANDOM_THEME' loaded..."
+if [ ! "$ZSH_THEME" = ""  ]; then
+if [ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]; then
+  source "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme"
+elif [ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]; then
+  source "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme"
 else
-  if [ ! "$ZSH_THEME" = ""  ]; then
-    if [ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]; then
-      source "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme"
-    elif [ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]; then
-      source "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme"
-    else
-      source "$ZSH/themes/$ZSH_THEME.zsh-theme"
-    fi
-  fi
+  source "$ZSH/themes/$ZSH_THEME.zsh-theme"
+fi
 fi
