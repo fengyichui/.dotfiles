@@ -23,6 +23,9 @@ touch /tmp/.notmux.tmp
 # Keep PWD (use file instead of CHERE_INVOKING in tmux)
 echo "cd '$(pwd)'" > /tmp/.init.tmp
 
+# Update prompt
+echo "prompt_update" >> /tmp/.init.tmp
+
 # Execute the param
 echo "$@" >> /tmp/.init.tmp
 
