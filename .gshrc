@@ -142,14 +142,6 @@ dirdo ()
     find . -maxdepth 1 -mindepth 1 -type d -exec sh -c "(echo -e \"\e[33m{}:\e[0m\" && cd '{}' && eval '$*'; echo)" \;
 }
 
-# tmux: if have valid session but no attached then attach it, otherwise create one
-tmx ()
-{
-    TMUXARG=""
-    tmux ls 2>/dev/null | grep -vq attached && TMUXARG="attach-session -d"
-    eval "tmux $TMUXARG"
-}
-
 # Count the number of times a word appears in files
 # $ count <PATTERN> <FILES>
 count ()
