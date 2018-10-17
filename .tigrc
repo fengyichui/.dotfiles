@@ -69,7 +69,7 @@
 
 set blame-view	= id:yes,color file-name:auto author:full date:default line-number:yes,interval=1 text
 set grep-view	= file-name:no line-number:yes,interval=1 text
-set main-view	= line-number:no,interval=5 id:no date:default author:full commit-title:yes,graph,refs,overflow=no
+set main-view	= line-number:no,interval=5 id:no date:relative-compact date:custom,format="%F %R" author:full commit-title:yes,graph,refs,overflow=no
 set refs-view	= line-number:no id:no date:default author:full ref commit-title
 set stash-view	= line-number:no,interval=5 id:no date:default author:full commit-title
 set status-view	= line-number:no,interval=5 status:short file-name
@@ -379,8 +379,8 @@ color file			default	default
 color grep.file			blue	default
 color file-size			default	default
 color line-number		cyan	default
-color title-blur		white	blue
-color title-focus		white	blue	bold
+color title-blur		black	white
+color title-focus		black	blue	normal
 color main-commit		default	default
 color main-tag			magenta	default	bold
 color main-local-tag		magenta	default
