@@ -1,7 +1,7 @@
 # Initializes Oh My Zsh
 
 # add a function path
-fpath=($ZSH/functions $ZSH/completions $fpath)
+#fpath=($ZSH/functions $ZSH/completions $fpath)
 
 # Load all stock functions (from $fpath files) called below.
 autoload -U compinit # liqiang <>
@@ -16,15 +16,14 @@ fi
 # TIP: Add files you don't want in git to .gitignore
 for config_file ($ZSH/lib/*.zsh); do
   custom_config_file="${ZSH_CUSTOM}/lib/${config_file:t}"
-  [ -f "${custom_config_file}" ] && config_file=${custom_config_file}
+  [[ -f "${custom_config_file}" ]] && config_file=${custom_config_file}
   source $config_file
 done
 
 is_plugin() {
   local base_dir=$1
   local name=$2
-  test -f $base_dir/plugins/$name/$name.plugin.zsh \
-    || test -f $base_dir/plugins/$name/_$name
+  [[ -f $base_dir/plugins/$name/$name.plugin.zsh || -f $base_dir/plugins/$name/_$name ]]
 }
 # Add all defined plugins to fpath. This must be done
 # before running compinit.
@@ -50,9 +49,9 @@ fi
 
 # Load all of the plugins that were defined in ~/.zshrc
 for plugin ($plugins); do
-  if [ -f $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh ]; then
+  if [[ -f $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh ]]; then
     source $ZSH_CUSTOM/plugins/$plugin/$plugin.plugin.zsh
-  elif [ -f $ZSH/plugins/$plugin/$plugin.plugin.zsh ]; then
+  elif [[ -f $ZSH/plugins/$plugin/$plugin.plugin.zsh ]]; then
     source $ZSH/plugins/$plugin/$plugin.plugin.zsh
   fi
 done
@@ -64,10 +63,10 @@ done
 unset config_file
 
 # Load the theme
-if [ ! "$ZSH_THEME" = ""  ]; then
-  if [ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]; then
+if [[ ! "$ZSH_THEME" = ""  ]]; then
+  if [[ -f "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme" ]]; then
     source "$ZSH_CUSTOM/$ZSH_THEME.zsh-theme"
-  elif [ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]; then
+  elif [[ -f "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme" ]]; then
     source "$ZSH_CUSTOM/themes/$ZSH_THEME.zsh-theme"
   else
     source "$ZSH/themes/$ZSH_THEME.zsh-theme"
