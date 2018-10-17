@@ -75,7 +75,10 @@ alias weather="curl wttr.in"
 alias www="python -m SimpleHTTPServer 8000"
 
 # check zsh startup time
-alias zsh_startup_time="zsh -i -xv -c exit 2>&1 | ts -i "%.s" > zsh_startup.log"
+alias zsh-startup-time="zsh -i -xv -c exit 2>&1 | ts -i "%.s" > zsh_startup.log"
+
+# remove all empty directorys
+alias rm-all-empty-dirs="find . -type d -empty -delete"
 
 #####################################
 #             Function              #
