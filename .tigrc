@@ -67,13 +67,13 @@
 #    - commit-title-overflow (boolint)	: Highlight overflow in log and diff view?
 #
 
-set blame-view	= id:yes,color file-name:auto author:full date:default line-number:yes,interval=1 text
+set blame-view	= id:yes,color file-name:auto author:full date:custom,format="%F %R" line-number:yes,interval=1 text
 set grep-view	= file-name:no line-number:yes,interval=1 text
 set main-view	= line-number:no,interval=5 id:no date:relative-compact date:custom,format="%F %R" author:full commit-title:yes,graph,refs,overflow=no
-set refs-view	= line-number:no id:no date:default author:full ref commit-title
-set stash-view	= line-number:no,interval=5 id:no date:default author:full commit-title
+set refs-view	= line-number:no id:no date:custom,format="%F %R" author:full ref commit-title
+set stash-view	= line-number:no,interval=5 id:no date:custom,format="%F %R" author:full commit-title
 set status-view	= line-number:no,interval=5 status:short file-name
-set tree-view	= line-number:no,interval=5 mode author:full file-size date:default id:no file-name
+set tree-view	= line-number:no,interval=5 mode author:full file-size date:custom,format="%F %R" id:no file-name
 
 # Pager based views
 set pager-view	= line-number:no,interval=5 text
