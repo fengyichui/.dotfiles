@@ -43,9 +43,9 @@ user_dir=$(cygpath ~)       # /home/username
 root_dir=$(cygpath -w / | sed 's#\\#/#g')    # /D:\cygwin64
 
 # change
-result=$(echo "$input" | sed "s#${user_dir}#${root_dir}${user_dir}#g; \
-                              s#/cygdrive/\\([a-z]\\)#\\1:#g; \
-                              s#~/#${root_dir}${user_dir}/#g;")
+result=$(echo "$input" | sed "s#\\(^\\|\\s\\)/cygdrive/\\([a-z]\\)/#\\1\\2:/#g; \
+                              s#\\(^\\|\\s\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g; \
+                              s#\\(^\\|\\s\\)~/#\\1${root_dir}${user_dir}/#g")
 
 if [[ -n "$slash" ]]; then
     result=${result//\//\\\\} # $(echo "$result" | sed "s#/#\\\\\\\\#g")
