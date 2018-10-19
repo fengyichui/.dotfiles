@@ -93,8 +93,8 @@
     ca  = commit -a
     d   = diff --relative --patch-with-raw --shortstat
     dw  = diff --relative --patch-with-raw --shortstat --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
-    diff-bcomp = difftool --tool=bcomp
-    diff-vimdiff = difftool --tool=vimdiff
+    d-bcomp = difftool --tool=bcomp
+    d-vimdiff = difftool --tool=vimdiff
     s   = status --short --untracked-files=no
     st  = status --short
     st2 = status --porcelain=2 --untracked-files=no
