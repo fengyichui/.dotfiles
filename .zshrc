@@ -12,9 +12,9 @@ export EDITOR='vim'
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" =~ "linux" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux:$PATH
 elif [[ "$OSTYPE" =~ "cygwin" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$PATH
 fi
 
 # Auto startup tmux
@@ -29,7 +29,7 @@ else
 fi
 
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+export ZSH=$HOME/.dotfiles/.oh-my-zsh
 
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
@@ -72,7 +72,7 @@ COMPLETION_WAITING_DOTS="true"
 # HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=$HOME/.oh-lq-zsh
+ZSH_CUSTOM=$HOME/.dotfiles/.oh-lq-zsh
 
 # zsh-completions
 source $ZSH_CUSTOM/plugins/zsh-completions/zsh-completions.plugin.zsh
@@ -128,7 +128,7 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
 fi
 
 # General shell config
-source ~/.gshrc
+source ~/.dotfiles/.gshrc
 
 # prof finish
 #zprof

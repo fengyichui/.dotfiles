@@ -3,11 +3,11 @@
 #
 
 define hs662x
-source ~/.gdb/hs662x.gdb.py
+source ~/.dotfiles/.gdb/hs662x.gdb.py
 end
 
 define xx
-source ~/.gdb/dashboard.gdb
+source ~/.dotfiles/.gdb/dashboard.gdb
 end
 
 define connect2local

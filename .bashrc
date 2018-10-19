@@ -31,9 +31,9 @@
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" =~ "linux" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/linux:$PATH
+    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux:$PATH
 elif [[ "$OSTYPE" =~ "cygwin" ]]; then
-    export PATH=$HOME/.bin:$HOME/.bin/windows:$PATH
+    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$PATH
 fi
 
 # Shell Options
@@ -197,5 +197,5 @@ cd_func ()
 }
 
 # general shell config
-source ~/.gshrc
+source ~/.dotfiles/.gshrc
 

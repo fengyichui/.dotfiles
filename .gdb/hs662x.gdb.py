@@ -59,8 +59,8 @@ def flash_prepare_and_show():
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
-    gdb.execute('file ~/.gdb/HS662X.GDB.FLM', to_string=True)
-    gdb.execute('restore ~/.gdb/HS662X.GDB.FLM', to_string=True)
+    gdb.execute('file ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
+    gdb.execute('restore ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
     gdb.execute('set $sp=&FlashDevice.sectors[1024]')
     gdb.execute('set $res=Init(0, 6000000, 3)')
 

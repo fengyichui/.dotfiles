@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # dir
-SRCDIR="$(cd "$(dirname "$0")/../" && pwd)"
-DSTDIR="$(cd ~ && pwd)"
+HOMEDIR="$(cd ~ && pwd)"
+SRCDIR="$HOMEDIR/.dotfiles"
+DSTDIR="$HOMEDIR"
 
 if [[ "$SRCDIR" == "$DSTDIR" ]]; then
     echo "Please run me at .git directory!"
@@ -10,12 +11,11 @@ if [[ "$SRCDIR" == "$DSTDIR" ]]; then
 fi
 
 # create soft link
-ln -v -snf "$SRCDIR/.bin" "$DSTDIR/.bin"
+#ln -v -snf "$SRCDIR/.bin" "$DSTDIR/.bin"
 ln -v -snf "$SRCDIR/.config" "$DSTDIR/.config"
-ln -v -snf "$SRCDIR/.gdb" "$DSTDIR/.gdb"
-ln -v -snf "$SRCDIR/.gitignores" "$DSTDIR/.gitignores"
-ln -v -snf "$SRCDIR/.oh-lq-zsh" "$DSTDIR/.oh-lq-zsh"
-ln -v -snf "$SRCDIR/.oh-my-zsh" "$DSTDIR/.oh-my-zsh"
+#ln -v -snf "$SRCDIR/.gdb" "$DSTDIR/.gdb"
+#ln -v -snf "$SRCDIR/.oh-lq-zsh" "$DSTDIR/.oh-lq-zsh"
+#ln -v -snf "$SRCDIR/.oh-my-zsh" "$DSTDIR/.oh-my-zsh"
 ln -v -snf "$SRCDIR/.ssh" "$DSTDIR/.ssh"
 ln -v -snf "$SRCDIR/.subversion" "$DSTDIR/.subversion"
 ln -v -snf "$SRCDIR/.tmuxinator" "$DSTDIR/.tmuxinator"
@@ -25,12 +25,13 @@ ln -v -snf "$SRCDIR/.bash_profile" "$DSTDIR/.bash_profile"
 ln -v -snf "$SRCDIR/.bashrc" "$DSTDIR/.bashrc"
 ln -v -snf "$SRCDIR/.ctags" "$DSTDIR/.ctags"
 ln -v -snf "$SRCDIR/.gdbinit" "$DSTDIR/.gdbinit"
-ln -v -snf "$SRCDIR/.gdbinit.local" "$DSTDIR/.gdbinit.local"
-ln -v -snf "$SRCDIR/.gdbinit.py" "$DSTDIR/.gdbinit.py"
+#ln -v -snf "$SRCDIR/.gdbinit.local" "$DSTDIR/.gdbinit.local"
+#ln -v -snf "$SRCDIR/.gdbinit.py" "$DSTDIR/.gdbinit.py"
 ln -v -snf "$SRCDIR/.gitconfig" "$DSTDIR/.gitconfig"
 ln -v -snf "$SRCDIR/.gitignore" "$DSTDIR/.gitignore"
+#ln -v -snf "$SRCDIR/.gitignores" "$DSTDIR/.gitignores"
 ln -v -snf "$SRCDIR/.gnuplot" "$DSTDIR/.gnuplot"
-ln -v -snf "$SRCDIR/.gshrc" "$DSTDIR/.gshrc"
+#ln -v -snf "$SRCDIR/.gshrc" "$DSTDIR/.gshrc"
 ln -v -snf "$SRCDIR/.inputrc" "$DSTDIR/.inputrc"
 ln -v -snf "$SRCDIR/.minttyrc" "$DSTDIR/.minttyrc"
 ln -v -snf "$SRCDIR/.tigrc" "$DSTDIR/.tigrc"
