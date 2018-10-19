@@ -52,6 +52,10 @@
     # Not prompt before each invocation of the diff tool.
     prompt = false
 
+[difftool "bcomp"]
+    # Specify the command to invoke the specified diff tool.
+    cmd = "bcomp \"$LOCAL\" \"$REMOTE\""
+
 [merge]
     # Controls which merge tool is used by git-mergetool.
     tool = vimdiff #vim-merge3way
@@ -66,14 +70,18 @@
     # Not prompt before each invocation of the merge resolution program.
     prompt = false
 
-[mergetool "vim-merge3way"]
-    # Specify the command to invoke the specified merge tool.
-    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
-
     #  If this is not set to true then the merge target file timestamp is checked and the merge
     #  assumed to have been successful if the file has been updated, otherwise the user is
     #  prompted to indicate the success of the merge.
-    trustExitCode = true
+    trustExitCode = false
+
+[mergetool "bcomp"]
+    # Specify the command to invoke the specified merge tool.
+    cmd = "bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\""
+
+[mergetool "vim-merge3way"]
+    # Specify the command to invoke the specified merge tool.
+    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
 
 [tar "tar.xz"]
     command = xz -c
@@ -85,6 +93,8 @@
     ca  = commit -a
     d   = diff --relative --patch-with-raw --shortstat
     dw  = diff --relative --patch-with-raw --shortstat --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
+    diff-bcomp = difftool --tool=bcomp
+    diff-vimdiff = difftool --tool=vimdiff
     s   = status --short --untracked-files=no
     st  = status --short
     st2 = status --porcelain=2 --untracked-files=no
