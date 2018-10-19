@@ -46,7 +46,7 @@ root_dir=$(cygpath -m /)    # D:/cygwin64
 result=$(echo "$input" | sed "s#${user_dir}/#${root_dir}${user_dir}/#g; \
                               s#/cygdrive/\\([a-z]\\)/#\\1:/#g; \
                               s#~/#${root_dir}${user_dir}/#g; \
-                              s#\\(^\\|\\s\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g")
+                              s#\\(^\\|\\s\\|\"\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g")
 
 if [[ -n "$slash" ]]; then
     result=${result//\//\\\\} # $(echo "$result" | sed "s#/#\\\\\\\\#g")
