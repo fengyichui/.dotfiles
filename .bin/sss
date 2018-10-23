@@ -55,12 +55,12 @@ res=( \
     '\"img/qr/sgc-[^\"]+\"' \
     $x \
     \
-    'id=\"jp01\" href=\"[^\"]+\"' \
-    'id=\"jp02\" href=\"[^\"]+\"' \
-    'id=\"jp03\" href=\"[^\"]+\"' \
-    'id=\"us01\" href=\"[^\"]+\"' \
-    'id=\"us02\" href=\"[^\"]+\"' \
-    'id=\"us03\" href=\"[^\"]+\"' \
+    'id=\"usa\" href=\"[^\"]+\"' \
+    'id=\"usb\" href=\"[^\"]+\"' \
+    'id=\"usc\" href=\"[^\"]+\"' \
+    'id=\"usd\" href=\"[^\"]+\"' \
+    'id=\"use\" href=\"[^\"]+\"' \
+    'id=\"usf\" href=\"[^\"]+\"' \
     $x $x $x $x \
     \
     ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png $x $x $x $x $x $x $x \
@@ -185,7 +185,7 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
     elif [[ $parse_mode -eq 1 ]]; then
         echo "curl '${net}' ..."
         qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
-             awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+38, RLENGTH-39);}")
+             awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+37, RLENGTH-38);}")
         if [[ -z $qr ]]; then
             echo -e "\e[31msss: can't curl valid QR image!\e[0m"
             exit 1
