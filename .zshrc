@@ -83,7 +83,6 @@ source $ZSH_CUSTOM/plugins/zsh-completions-lq/zsh-completions-lq.plugin.zsh
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    safe-paste
     vi-mode
     extract
     dircycle
