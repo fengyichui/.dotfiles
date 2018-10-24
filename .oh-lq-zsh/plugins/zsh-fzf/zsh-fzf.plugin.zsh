@@ -8,11 +8,9 @@ __fzfcmd() {
 
 # CTRL-T - Paste the selected file path(s) into the command line
 __fsel() {
-  local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
-    -o -type f -print \
-    -o -type d -print \
-    -o -type l -print 2> /dev/null | sed 1d | cut -b3-"}"
-  eval "$cmd" | TERM=screen-256color $(__fzfcmd) -m | while read item; do
+    (git ls-files 2>/dev/null || \
+     find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune -o -type f -print -o -type d -print -o -type l -print 2>/dev/null | sed 1d | cut -b3-) \
+        | TERM=screen-256color $(__fzfcmd) -m | while read item; do
     echo -n "${(q)item} "
   done
   echo
