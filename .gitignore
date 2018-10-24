@@ -30,3 +30,6 @@ __pycache__/
 .subversion/README.txt
 .subversion/auth/
 .subversion/servers
+
+# ycm
+YouCompleteMe/
