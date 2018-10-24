@@ -3,7 +3,8 @@
 if [[ $- == *i* ]]; then
 
 __fzfcmd() {
-  echo "fzf-tmux +2 -e -d${FZF_TMUX_HEIGHT:-40%}"
+#  echo "fzf-tmux +2 -e -d${FZF_TMUX_HEIGHT:-40%}"
+  echo "fzf +2 -e"
 }
 
 # CTRL-T - Paste the selected file path(s) into the command line
