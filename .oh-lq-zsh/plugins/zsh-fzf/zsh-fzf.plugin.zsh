@@ -2,20 +2,20 @@
 # ------------
 if [[ $- == *i* ]]; then
 
+__fzfcmd() {
+  echo "fzf-tmux +2 -e -d${FZF_TMUX_HEIGHT:-40%}"
+}
+
 # CTRL-T - Paste the selected file path(s) into the command line
 __fsel() {
   local cmd="${FZF_CTRL_T_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
     -o -type f -print \
     -o -type d -print \
     -o -type l -print 2> /dev/null | sed 1d | cut -b3-"}"
-  eval "$cmd" | $(__fzfcmd) -e -m | while read item; do
+  eval "$cmd" | TERM=screen-256color $(__fzfcmd) -m | while read item; do
     echo -n "${(q)item} "
   done
   echo
-}
-
-__fzfcmd() {
-  [ ${FZF_TMUX:-1} -eq 1 ] && echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
 }
 
 fzf-file-widget() {
@@ -25,11 +25,26 @@ fzf-file-widget() {
 zle     -N   fzf-file-widget
 bindkey '^T' fzf-file-widget
 
+# CTRL-G - Paste the selected git status file path(s) into the command line
+__gsel() {
+  (git status --short 2>/dev/null || echo "M NOT-A-GIT-REPOSITORY") | awk '{print $2}' | TERM=screen-256color $(__fzfcmd) -m | while read item; do
+    echo -n "${(q)item} "
+  done
+  echo
+}
+
+fzf-git-widget() {
+  LBUFFER="${LBUFFER}$(__gsel)"
+  zle redisplay
+}
+zle     -N   fzf-git-widget
+bindkey '^G' fzf-git-widget
+
 # ALT-C - cd into the selected directory
 fzf-cd-widget() {
   local cmd="${FZF_ALT_C_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
     -o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
-  cd "${$(eval "$cmd" | $(__fzfcmd) +m):-.}"
+  cd "${$(eval "$cmd" | TERM=screen-256color $(__fzfcmd) +m):-.}"
   zle reset-prompt
 }
 zle     -N    fzf-cd-widget
@@ -38,7 +53,7 @@ bindkey '\ec' fzf-cd-widget
 # CTRL-R - Paste the selected command from history into the command line
 fzf-history-widget() {
   local selected num
-  selected=( $(fc -l 1 | $(__fzfcmd) -e +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r ${=FZF_CTRL_R_OPTS} -q "${LBUFFER//$/\\$}") )
+  selected=( $(fc -l 1 | TERM=screen-256color $(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r ${=FZF_CTRL_R_OPTS} -q "${LBUFFER//$/\\$}") )
   if [ -n "$selected" ]; then
     num=$selected[1]
     if [ -n "$num" ]; then
