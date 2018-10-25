@@ -36,8 +36,8 @@
 x='x'
 ss8='ss8.pm'
 isx='isx.yt' # dwz.pm/x
-freess='f55.fun'
-fvs='jn9.org/img/'
+freess='f55.fun' # 55r.run
+freess2='ssx.re'
 res=( \
     '\"images/server03-[^\"]+\"' \
     '\"images/server02-[^\"]+\"' \
@@ -63,7 +63,10 @@ res=( \
     'id=\"usf\" href=\"[^\"]+\"' \
     $x $x $x $x \
     \
-    ${fvs}qr01.png ${fvs}qr02.png ${fvs}qr03.png $x $x $x $x $x $x $x \
+    '\"img/portfolio/ss1_[^\"]+\"' \
+    '\"img/portfolio/ss2_[^\"]+\"' \
+    '\"img/portfolio/ss3_[^\"]+\"' \
+    $x $x $x $x $x $x $x \
     )
 
 # const
@@ -144,6 +147,11 @@ do
     esac
 done
 
+finalurl ()
+{
+    curl --insecure --progress-bar -A foxfire -w %{url_effective} -I -L "$1" -o /dev/null
+}
+
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
     if [[ "$inside_qr_index" -ge "${#res[*]}" ]]; then
@@ -161,12 +169,18 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
     if [[ $inside_qr_index -lt 10 ]]; then
         net=$ss8
         parse_mode=0
+        url_effective=0
     elif [[ $inside_qr_index -lt 20 ]]; then
         net=$isx
         parse_mode=0
+        url_effective=0
     elif [[ $inside_qr_index -lt 30 ]]; then
         net=$freess
         parse_mode=1
+    elif [[ $inside_qr_index -lt 40 ]]; then
+        net=$freess2
+        parse_mode=0
+        url_effective=1
     fi
 
     # ss8 and isx
@@ -177,6 +191,9 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
         if [[ -z $qr ]]; then
             echo -e "\e[31msss: can't curl valid QR image!\e[0m"
             exit 1
+        fi
+        if [[ $url_effective -eq 1 ]]; then
+            net=$(finalurl "$net")
         fi
         qr_net_path="$net/$qr"
         echo ""
