@@ -32,17 +32,21 @@
 # @{
 ######################################################################
 
+#
 # inside proxy table
-x='x'
-ss8='ss8.pm'
-isx='isx.yt' # dwz.pm/x
-freess='f55.fun' # 55r.run
-freess2='ssx.re'
-res=( \
+#
+# iShadow: isx.yt == dwz.pm/x
+# freess:  f55.fun == 55r.run
+#
+# name   ss8      iShadow   freess    freess
+# index  0-2      10-18     20-25     30-32
+urls=(  'ss8.pm' 'isx.yt'  'f55.fun' 'ssx.re')
+pmodes=( 0        0         1         0)
+qrimgs=( \
     '\"images/server03-[^\"]+\"' \
     '\"images/server02-[^\"]+\"' \
     '\"images/server01-[^\"]+\"' \
-    $x $x $x $x $x $x $x \
+    'x' 'x' 'x' 'x' 'x' 'x' 'x' \
     \
     '\"img/qr/usa-[^\"]+\"' \
     '\"img/qr/usb-[^\"]+\"' \
@@ -53,7 +57,7 @@ res=( \
     '\"img/qr/sga-[^\"]+\"' \
     '\"img/qr/sgb-[^\"]+\"' \
     '\"img/qr/sgc-[^\"]+\"' \
-    $x \
+    'x' \
     \
     'id=\"usa\" href=\"[^\"]+\"' \
     'id=\"usb\" href=\"[^\"]+\"' \
@@ -61,12 +65,12 @@ res=( \
     'id=\"usd\" href=\"[^\"]+\"' \
     'id=\"use\" href=\"[^\"]+\"' \
     'id=\"usf\" href=\"[^\"]+\"' \
-    $x $x $x $x \
+    'x' 'x' 'x' 'x' \
     \
     '\"img/portfolio/ss1_[^\"]+\"' \
     '\"img/portfolio/ss2_[^\"]+\"' \
     '\"img/portfolio/ss3_[^\"]+\"' \
-    $x $x $x $x $x $x $x \
+    'x' 'x' 'x' 'x' 'x' 'x' 'x' \
     )
 
 # const
@@ -154,31 +158,21 @@ finalurl ()
 
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
-    if [[ "$inside_qr_index" -ge "${#res[*]}" ]]; then
+    if [[ "$inside_qr_index" -ge "${#qrimgs[*]}" ]]; then
         echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
-    qr_net_path=${res[$inside_qr_index]}
+    qr_net_path=${qrimgs[$inside_qr_index]}
 
-    if [[ $qr_net_path == $x ]]; then
+    if [[ $qr_net_path == 'x' ]]; then
         echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
-    if [[ $inside_qr_index -lt 10 ]]; then
-        net=$ss8
-        parse_mode=0
-    elif [[ $inside_qr_index -lt 20 ]]; then
-        net=$isx
-        parse_mode=0
-    elif [[ $inside_qr_index -lt 30 ]]; then
-        net=$freess
-        parse_mode=1
-    elif [[ $inside_qr_index -lt 40 ]]; then
-        net=$freess2
-        parse_mode=0
-    fi
+    inside_url_index=$(($inside_qr_index/10))
+    net=${urls[$inside_url_index]}
+    parse_mode=${pmodes[$inside_url_index]}
 
     # ss8 and isx
     if [[ $parse_mode -eq 0 ]]; then
