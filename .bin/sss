@@ -169,33 +169,28 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
     if [[ $inside_qr_index -lt 10 ]]; then
         net=$ss8
         parse_mode=0
-        url_effective=0
     elif [[ $inside_qr_index -lt 20 ]]; then
         net=$isx
         parse_mode=0
-        url_effective=0
     elif [[ $inside_qr_index -lt 30 ]]; then
         net=$freess
         parse_mode=1
     elif [[ $inside_qr_index -lt 40 ]]; then
         net=$freess2
         parse_mode=0
-        url_effective=1
     fi
 
     # ss8 and isx
     if [[ $parse_mode -eq 0 ]]; then
         echo "curl '${net}' ..."
+        net=$(finalurl "$net")
         qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
              awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+1, RLENGTH-2);}")
         if [[ -z $qr ]]; then
             echo -e "\e[31msss: can't curl valid QR image!\e[0m"
             exit 1
         fi
-        if [[ $url_effective -eq 1 ]]; then
-            net=$(finalurl "$net")
-        fi
-        qr_net_path="$net/$qr"
+        qr_net_path="$net$qr"
         echo ""
 
     # freess
