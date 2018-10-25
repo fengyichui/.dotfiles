@@ -38,11 +38,11 @@
 # iShadow: isx.yt == dwz.pm/x
 # freess:  f55.fun == 55r.run
 #
-# name   ss8      iShadow   freess    freess
-# index  0-2      10-18     20-25     30-32
-urls=(  'ss8.pm' 'isx.yt'  'f55.fun' 'ssx.re')
-pmodes=( 0        0         1         0)
-qrimgs=( \
+# name      ss8      iShadow  freess   freess
+# index     0-2      10-18    20-22    30-35
+urls=(     'ss8.pm' 'isx.yt' 'ssx.re' 'f55.fun')
+addrmodes=('re_img' 're_img' 're_img' 're_base64_img')
+address=( \
     '\"images/server03-[^\"]+\"' \
     '\"images/server02-[^\"]+\"' \
     '\"images/server01-[^\"]+\"' \
@@ -59,6 +59,11 @@ qrimgs=( \
     '\"img/qr/sgc-[^\"]+\"' \
     'x' \
     \
+    '\"img/portfolio/ss1_[^\"]+\"' \
+    '\"img/portfolio/ss2_[^\"]+\"' \
+    '\"img/portfolio/ss3_[^\"]+\"' \
+    'x' 'x' 'x' 'x' 'x' 'x' 'x' \
+    \
     'id=\"usa\" href=\"[^\"]+\"' \
     'id=\"usb\" href=\"[^\"]+\"' \
     'id=\"usc\" href=\"[^\"]+\"' \
@@ -66,11 +71,6 @@ qrimgs=( \
     'id=\"use\" href=\"[^\"]+\"' \
     'id=\"usf\" href=\"[^\"]+\"' \
     'x' 'x' 'x' 'x' \
-    \
-    '\"img/portfolio/ss1_[^\"]+\"' \
-    '\"img/portfolio/ss2_[^\"]+\"' \
-    '\"img/portfolio/ss3_[^\"]+\"' \
-    'x' 'x' 'x' 'x' 'x' 'x' 'x' \
     )
 
 # const
@@ -158,37 +158,25 @@ finalurl ()
 
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
-    if [[ "$inside_qr_index" -ge "${#qrimgs[*]}" ]]; then
+    if [[ "$inside_qr_index" -ge "${#address[*]}" ]]; then
         echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
-    qr_net_path=${qrimgs[$inside_qr_index]}
+    qr_net_path=${address[$inside_qr_index]}
 
     if [[ $qr_net_path == 'x' ]]; then
         echo -e "\e[31msss: invalid index!\e[0m"
         exit 1
     fi
 
+    # net and mode
     inside_url_index=$(($inside_qr_index/10))
     net=${urls[$inside_url_index]}
-    parse_mode=${pmodes[$inside_url_index]}
-
-    # ss8 and isx
-    if [[ $parse_mode -eq 0 ]]; then
-        echo "curl '${net}' ..."
-        net=$(finalurl "$net")
-        qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
-             awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+1, RLENGTH-2);}")
-        if [[ -z $qr ]]; then
-            echo -e "\e[31msss: can't curl valid QR image!\e[0m"
-            exit 1
-        fi
-        qr_net_path="$net$qr"
-        echo ""
+    parse_mode=${addrmodes[$inside_url_index]}
 
     # freess
-    elif [[ $parse_mode -eq 1 ]]; then
+    if [[ "$parse_mode" == "re_base64_img" ]]; then
         echo "curl '${net}' ..."
         qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
              awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+37, RLENGTH-38);}")
@@ -198,6 +186,19 @@ if [[ $mode -eq $mode_inside_qr_net_path ]]; then
         fi
         echo $qr | base64 -d >$qr_local_path
         mode=$mode_usr_qr_local_path
+        echo ""
+
+    # ss8 and isx
+    else
+        echo "curl '${net}' ..."
+        net=$(finalurl "$net")
+        qr=$(curl --insecure --progress-bar -A foxfire -L ${net} |
+             awk "{if(match(\$0, \"$qr_net_path\"))print substr(\$0, RSTART+1, RLENGTH-2);}")
+        if [[ -z $qr ]]; then
+            echo -e "\e[31msss: can't curl valid QR image!\e[0m"
+            exit 1
+        fi
+        qr_net_path="$net$qr"
         echo ""
     fi
 fi
