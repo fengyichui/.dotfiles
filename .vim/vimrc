@@ -252,7 +252,7 @@ set autoread                    " Set to auto read when a file is changed from t
 set scrolloff=0                 " Minimal number of screen lines to keep above and below the cursor
 set wildmenu                    " Turn on the WiLd menu
 set wildmode=list:longest       " Completion mode
-set wildignore=*.o,*.d,*~,*.pyc,*/obj/* " Ignore compiled files
+set wildignore=*.o,*.d,*~,*.pyc,*/__pycache__,*/obj " Ignore compiled files
 let &path='.,,,'.getcwd().'/**' " add pwd and all sub dir to path for: find, gf ...
 set hidden                      " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent  " Configure backspace so it acts as it should act
