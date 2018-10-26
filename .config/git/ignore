@@ -1,0 +1,13 @@
+
+# tags
+tags
+*.taghl
+
+# c temp files
+*.o
+*.d
+
+# python compiled files
+*.py[cod]
+__pycache__/
+
