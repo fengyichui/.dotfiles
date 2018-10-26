@@ -26,7 +26,7 @@ bindkey '^T' fzf-file-widget
 
 # CTRL-G - Paste the selected git status file path(s) into the command line
 __gsel() {
-  (git status --short 2>/dev/null || echo "M NOT-A-GIT-REPOSITORY") | awk '{print $2}' | TERM=screen-256color $(__fzfcmd) -m | while read item; do
+  (git status --short ./ 2>/dev/null || echo "M NOT-A-GIT-REPOSITORY") | awk '{print $2}' | TERM=screen-256color $(__fzfcmd) -m | while read item; do
     echo -n "${(q)item} "
   done
   echo
