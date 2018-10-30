@@ -34,6 +34,14 @@
     status = auto
     ui = auto
 
+[color "diff"]
+    meta = yellow bold
+    frag = magenta
+    commit = yellow
+    old = red
+    new = green
+    whitespace = red reverse
+
 [push]
     default = simple
 
