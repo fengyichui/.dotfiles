@@ -27,6 +27,12 @@
     # considered "unusual" any more.
     quotepath = false
 
+[pager]
+    # diff-highlight: https://github.com/git/git/tree/master/contrib/diff-highlight
+    log = diff-highlight | less
+    show = diff-highlight | less
+    diff = diff-highlight | less
+
 [color]
     branch = auto
     diff = auto
@@ -41,6 +47,14 @@
     old = red
     new = green
     whitespace = red reverse
+
+[color "diff-highlight"]
+    oldHighlight = ul
+    oldReset = noul
+    #oldNormal = red
+    #oldHighlight = red 52
+    #newNormal = green
+    #newHighlight = green 22
 
 [push]
     default = simple
