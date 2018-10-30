@@ -16,6 +16,7 @@ fi
 os=$(uname -o)
 if [ "$os" == "Cygwin" ]; then
     path=$(cygpath --absolute --windows "$file")
+    export HOME="$(cygpath -m --mydocs)/../"
     explorer "$path"
     exit 0
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export HOME=$(cygpath -m --mydocs)/../
+export HOME="$(cygpath -m --mydocs)/../"
 
 cyg2win -e -i "gvim.exe $* &"
 
