@@ -42,7 +42,7 @@ function title {
 }
 
 ZSH_THEME_TERM_TAB_TITLE_IDLE="%16<..<%~%<<" #15 char left truncated PWD
-ZSH_THEME_TERM_TITLE_IDLE=" (%n@%m: %~)" # qli<>
+ZSH_THEME_TERM_TITLE_IDLE="(%n@%m: %~)" # qli<>
 # Avoid duplication of directory in terminals with independent dir display
 if [[ "$TERM_PROGRAM" == Apple_Terminal ]]; then
   ZSH_THEME_TERM_TITLE_IDLE="%n@%m"
@@ -72,7 +72,7 @@ function omz_termsupport_preexec {
   local CMD=${1[(wr)^(*=*|sudo|ssh|mosh|rake|-*)]:gs/%/%%}
   local LINE="${2:gs/%/%%}"
 
-  title "[$CMD] $ZSH_THEME_TERM_TAB_TITLE_IDLE$ZSH_THEME_TERM_TITLE_IDLE [%100>...>$LINE%<<]" #qli<>
+  title "[$CMD] $ZSH_THEME_TERM_TAB_TITLE_IDLE $ZSH_THEME_TERM_TITLE_IDLE [%100>...>$LINE%<<]" #qli<>
 }
 
 precmd_functions+=(omz_termsupport_precmd)
