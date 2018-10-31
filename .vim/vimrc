@@ -297,7 +297,7 @@ set fileformats=unix,dos,mac    " This gives the end-of-line (<EOL>) formats tha
 set laststatus=2                " Always show the status line
 set ruler                       " Show the line and column number of the cursor position
 set tags=tags,./tags,./../tags,./../../tags,./../../../tags,./../../../../tags,./../../../../../tags,./../../../../../../tags
-set title titlestring=%{has('gui_running')?'':'[Vim]\ '}%{split(getcwd(),\'/\\\|\\\\')[-1]}\ \|\ %t%r%m%w%h\ %<(%{getcwd()})
+set title titlestring=%{has('gui_running')?'':'[Vim]\ '}%{split(getcwd(),\'/\\\|\\\\')[-1]}\ ·\ %t%r%m%w%h\ %<(%{getcwd()})
 set statusline=%1*%{&modified?\"[+]\":\"\"}
 set statusline+=%0*%h%r%w%{&modifiable?\"\":\"[-]\"}\ %f
 set statusline+=\ %{&binary?\"[binary]\":\"\"}
