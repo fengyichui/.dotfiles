@@ -43,6 +43,7 @@
 [color "diff"]
     meta = yellow bold
     frag = magenta
+    func = cyan
     commit = yellow
     old = red
     new = green
