@@ -115,8 +115,12 @@ setopt NO_SHARE_HISTORY          # Not share history with other window
 #export REPORTTIME=4
 export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es $fg[cyan](cpu=%P user=%U kernel=%S)$reset_color"
 
+## pager
+export PAGER='less'
+export LESS='-R -x4 -j.3'
+
 # default open with $EDITER
-for s in c cc cpp h hpp asm s java bin hex map dis sct symdefs mk mak ini log md xml txt; do alias -s $s=$EDITOR; done
+alias -s {c,cc,cpp,h,hpp,asm,s,java,bin,hex,map,dis,sct,symdefs,mk,mak,ini,log,md,xml,txt}=$EDITOR
 
 # fix git files completion slowly in windows file system
 if [[ "$OSTYPE" == "cygwin" ]]; then
