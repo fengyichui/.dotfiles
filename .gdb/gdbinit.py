@@ -17,6 +17,7 @@
 import gdb
 import os
 import time
+import re
 
 ######################################################################
 # VARIABLES
@@ -27,6 +28,55 @@ import time
 # FUNCTIONS
 ######################################################################
 
+def parse_dump_data(file_path, parse_reg=False, parse_mem=False):
+
+    cmds = []
+    ignore = False
+
+    f = open(file_path, 'r')
+    for line in f.readlines():
+
+        # comment
+        match = re.match(r'^\s*#', line)
+        if match:
+            continue
+
+        # if 0
+        match = re.match(r'^if 0', line, flags=re.I)
+        if match:
+            ignore = True
+
+        # endif
+        match = re.match(r'^endif', line, flags=re.I)
+        if match:
+            ignore = False
+
+        # ignore
+        if ignore:
+            continue
+
+        # restore reg
+        if parse_reg:
+            match = re.match(r'^(\w+)  +(0x[0-9a-f]+)\t', line, flags=re.I)
+            if match:
+                cmds += ["set ${}={}".format(match.group(1), match.group(2))]
+
+        # restore memery
+        if parse_mem:
+            match = re.match(r'^(0x[0-9a-f]+):\t(0x[0-9a-f]+)(?:\t(0x[0-9a-f]+))?(?:\t(0x[0-9a-f]+))?(?:\t(0x[0-9a-f]+))?', line, flags=re.I)
+            if match:
+                address = int(match.group(1), 0)
+                cmds += ["set *0x{:08x}={}".format(address, match.group(2))]
+                if match.group(3):
+                    cmds += ["set *0x{:08x}={}".format(address+4, match.group(3))]
+                if match.group(4):
+                    cmds += ["set *0x{:08x}={}".format(address+8, match.group(4))]
+                if match.group(5):
+                    cmds += ["set *0x{:08x}={}".format(address+12, match.group(5))]
+
+    f.close()
+
+    return cmds
 
 ######################################################################
 # CLASS
@@ -88,6 +138,48 @@ class loop_memery_change_register(gdb.Command):
         except Exception as e:
             print(e)
 
+# restore reg
+class restore_dump_reg_register(gdb.Command):
+
+    """restore dump reg
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("restore_dump_reg", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Get file name
+        if args == '':
+            raise gdb.GdbError('missing restore file!')
+
+        cmds = parse_dump_data(args, parse_reg=True)
+
+        for cmd in cmds:
+            print(cmd)
+            gdb.execute(cmd)
+
+# restore dump memery
+class restore_dump_memery_register(gdb.Command):
+
+    """restore dump memery
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("restore_dump_mem", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Get file name
+        if args == '':
+            raise gdb.GdbError('missing restore file!')
+
+        cmds = parse_dump_data(args, parse_mem=True)
+
+        for cmd in cmds:
+            print(cmd)
+            gdb.execute(cmd)
+
 ######################################################################
 # CLASS
 ######################################################################
@@ -95,6 +187,8 @@ class loop_memery_change_register(gdb.Command):
 # register
 loop_command_register()
 loop_memery_change_register()
+restore_dump_reg_register()
+restore_dump_memery_register()
 
 # @} #
 
