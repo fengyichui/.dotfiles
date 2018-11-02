@@ -23,8 +23,14 @@ if [[ -f "/tmp/.notmux.tmp" ]]; then
     rm -f /tmp/.notmux.tmp
 else
     if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
-        # try to reattach sessions
-        tmux ls 2>/dev/null | grep -vq attached && exec tmux attach-session -d || exec tmux
+        tmux_ls=$(tmux ls 2>/dev/null)
+        # FIXME: workaround cygwin tmux
+        if [[ "$tmux_ls" && "$OSTYPE" =~ "cygwin" && "$(echo $tmux_ls | wc -l)" == "6" ]]; then
+            echo "Warning: tmux can only open up to 6 sessions in cygwin"
+        else
+            # try to reattach sessions
+            (echo -n $tmux_ls | grep -vq attached) && exec tmux attach-session -d || exec tmux
+        fi
     fi
 fi
 
