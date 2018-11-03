@@ -13,8 +13,8 @@ alias l='ls -l --time-style=long-iso'                # long list file
 alias ll='l -A'                                      # long list all file
 
 # grep file
-alias grep='grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
-alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -ni"
+alias grep='grep -nir -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
+alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -nir -I --color=auto"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -128,12 +128,6 @@ latest ()
 ff ()
 {
     find -iname "*$@*"
-}
-
-# find file
-gg ()
-{
-    grep --color -nir "$@"
 }
 
 # create a daemon process
