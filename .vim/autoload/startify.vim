@@ -10,7 +10,6 @@ endif
 let g:autoloaded_startify = 1
 
 " Init: values {{{1
-let s:nowait         = v:version >= 704 || (v:version == 703 && has('patch1261')) ? '<nowait>' : ''
 let s:numfiles       = get(g:, 'startify_files_number', 10)
 let s:show_special   = get(g:, 'startify_enable_special', 1)
 let s:relative_path  = get(g:, 'startify_relative_path') ? ':~:.' : ':p:~'
@@ -43,7 +42,14 @@ endfunction
 
 " Function: #insane_in_the_membrane {{{1
 function! startify#insane_in_the_membrane() abort
+  " Handle vim -y, vim -M.
   if &insertmode
+        \ || (!&modifiable && &buftype != 'terminal' && &filetype != 'startify')
+    return
+  endif
+
+  if !&hidden && &modified
+    call s:warn('Save your changes first.')
     return
   endif
 
@@ -53,6 +59,10 @@ function! startify#insane_in_the_membrane() abort
         return
       endif
     endfor
+  endif
+
+  if line2byte('$') != -1
+    noautocmd enew
   endif
 
   silent! setlocal
@@ -72,21 +82,15 @@ function! startify#insane_in_the_membrane() abort
   endif
 
   " Must be global so that it can be read by syntax/startify.vim.
-  if exists('g:startify_custom_header')
-    if type(g:startify_custom_header) == type([])
-      let g:startify_header = copy(g:startify_custom_header)
-    else
-      let g:startify_header = eval(g:startify_custom_header)
-    endif
-  else
-    let g:startify_header = startify#fortune#cowsay()
-  endif
+  let g:startify_header = exists('g:startify_custom_header')
+        \ ? s:set_custom_section(g:startify_custom_header)
+        \ : startify#fortune#cowsay()
   if !empty(g:startify_header)
     let g:startify_header += ['']  " add blank line
   endif
   call append('$', g:startify_header)
 
-  let b:startify = { 'tick': 0, 'entries': {} }
+  let b:startify = { 'tick': 0, 'entries': {}, 'indices': [] }
 
   if s:show_special
     call append('$', [s:padding_left .'[e]  <empty buffer>', ''])
@@ -103,26 +107,13 @@ function! startify#insane_in_the_membrane() abort
   endif
 
   if empty(v:oldfiles)
-    call s:warn("startify: Can't read viminfo file. Read :help startify-faq-02")
+    call s:warn("Can't read viminfo file. Read :help startify-faq-02")
   endif
 
   let b:startify.section_header_lines = []
-  let s:lists = get(g:, 'startify_list_order', [
-        \ [s:padding_left .'MRU'],            'files',
-        \ [s:padding_left .'MRU '. getcwd()], 'dir',
-        \ [s:padding_left .'Sessions'],       'sessions',
-        \ [s:padding_left .'Bookmarks'],      'bookmarks',
-        \ [s:padding_left .'Commands'],       'commands',
-        \ ])
 
-  for item in s:lists
-    if type(item) == 1
-      call s:show_{item}()
-    else
-      let s:last_message = item
-    endif
-    unlet item
-  endfor
+  let lists = s:get_lists()
+  call s:show_lists(lists)
 
   silent $delete _
 
@@ -138,15 +129,19 @@ function! startify#insane_in_the_membrane() abort
   let b:startify.firstline = 2
   let b:startify.firstline += len(g:startify_header)
   " no special, no local Session.vim, but a section header
-  if !s:show_special && !exists('l:show_session') && type(s:lists[0]) == type([])
-    let b:startify.firstline += len(s:lists[0]) + 1
+  if !s:show_special && !exists('l:show_session') && has_key(lists[0], 'header')
+    let b:startify.firstline += len(lists[0].header) + 1
   endif
 
   let b:startify.lastline = line('$')
 
-  if exists('g:startify_custom_footer')
-    call append('$', g:startify_custom_footer)
+  let footer = exists('g:startify_custom_footer')
+        \ ? s:set_custom_section(g:startify_custom_footer)
+        \ : []
+  if !empty(footer)
+    let footer = [''] + footer
   endif
+  call append('$', footer)
 
   setlocal nomodifiable nomodified
 
@@ -154,14 +149,18 @@ function! startify#insane_in_the_membrane() abort
   call cursor(b:startify.firstline, 5)
   autocmd startify CursorMoved <buffer> call s:set_cursor()
 
-  silent! file Startify
-  set filetype=startify readonly
+  silent! %foldopen!
+  silent! file Startify "liqiang+
+  set filetype=startify
+
+  if exists('##DirChanged')
+    autocmd startify DirChanged <buffer> Startify
+  endif
   if exists('#User#Startified')
-    if v:version > 703 || v:version == 703 && has('patch442')
-      doautocmd <nomodeline> User Startified
-    else
-      doautocmd User Startified
-    endif
+    doautocmd <nomodeline> User Startified
+  endif
+  if exists('#User#StartifyReady')
+    doautocmd <nomodeline> User StartifyReady
   endif
 endfunction
 
@@ -364,22 +363,9 @@ endfunction
 
 " Function: #session_delete_buffers {{{1
 function! startify#session_delete_buffers()
-  if !get(g:, 'startify_session_delete_buffers', 1)
-    return
+  if get(g:, 'startify_session_delete_buffers', 1)
+    silent! %bdelete
   endif
-  let n = 1
-  while n <= bufnr('$')
-    if buflisted(n)
-      try
-        silent execute 'bdelete' n
-      catch
-        echohl ErrorMsg
-        echomsg v:exception
-        echohl NONE
-      endtry
-    endif
-    let n += 1
-  endwhile
 endfunction
 
 " Function: #session_list {{{1
@@ -425,6 +411,88 @@ function! startify#open_buffers(...) abort
   endfor
 
   wincmd =
+
+  if exists('#User#StartifyAllBuffersOpened')
+    autocmd <nomodeline> User StartifyAllBuffersOpened
+  endif
+endfunction
+
+" Function: s:get_lists {{{1
+function! s:get_lists() abort
+  if exists('g:startify_lists')
+    return g:startify_lists
+  elseif exists('g:startify_list_order')
+    " Convert old g:startify_list_order format to newer g:startify_lists format.
+    let lists = []
+    for item in g:startify_list_order
+      if type(item) == type([])
+        let header = item
+      else
+        if exists('header')
+          let lists += [{ 'type': item, 'header': header }]
+          unlet header
+        else
+          let lists += [{ 'type': item }]
+        endif
+      endif
+      unlet item
+    endfor
+    return lists
+  else
+    return [
+          \ { 'header': [s:padding_left .'MRU'],            'type': 'files' },
+          \ { 'header': [s:padding_left .'MRU '. getcwd()], 'type': 'dir' },
+          \ { 'header': [s:padding_left .'Sessions'],       'type': 'sessions' },
+          \ { 'header': [s:padding_left .'Bookmarks'],      'type': 'bookmarks' },
+          \ { 'header': [s:padding_left .'Commands'],       'type': 'commands' },
+          \ ]
+  endif
+endfunction
+
+" Function: s:show_lists {{{1
+function! s:show_lists(lists) abort
+  for list in a:lists
+    if !has_key(list, 'type')
+      continue
+    endif
+
+    let b:startify.indices = copy(get(list, 'indices', []))
+
+    if type(list.type) == type('')
+      if has_key(list, 'header')
+        let s:last_message = list.header
+      endif
+      call s:show_{list.type}()
+    elseif type(list.type) == type(function('tr'))
+      try
+        let entries = list.type()
+      catch
+        call s:warn(v:exception)
+        continue
+      endtry
+      if empty(entries)
+        unlet! s:last_message
+        continue
+      endif
+
+      if has_key(list, 'header')
+        let s:last_message = list.header
+        call s:print_section_header()
+      endif
+
+      for entry in entries
+        let cmd  = get(entry, 'cmd', 'edit')
+        let path = get(entry, 'path', '')
+        let type = get(entry, 'type', empty(path) ? 'special' : 'file')
+        let index = s:get_index_as_string()
+        call append('$', s:padding_left .'['. index .']'. repeat(' ', (3 - strlen(index))) . entry.line)
+        call s:register(line('$'), index, type, cmd, path)
+      endfor
+      call append('$', '')
+    else
+      call s:warn('Wrong format for g:startify_lists: '. string(list))
+    endif
+  endfor
 endfunction
 
 " Function: s:open_buffer {{{1
@@ -444,6 +512,19 @@ function! s:open_buffer(entry)
     endif
     call s:check_user_options(a:entry.path)
   endif
+  if exists('#User#StartifyBufferOpened')
+    autocmd <nomodeline> User StartifyBufferOpened
+  endif
+endfunction
+
+" Function: s:set_custom_section {{{1
+function! s:set_custom_section(section) abort
+  if type(a:section) == type([])
+    return copy(a:section)
+  elseif type(a:section) == type('')
+    return empty(a:section) ? [] : eval(a:section)
+  endif
+  return []
 endfunction
 
 " Function: s:display_by_path {{{1
@@ -451,12 +532,11 @@ function! s:display_by_path(path_prefix, path_format, use_env) abort
   let oldfiles = call(get(g:, 'startify_enable_unsafe') ? 's:filter_oldfiles_unsafe' : 's:filter_oldfiles',
         \ [a:path_prefix, a:path_format, a:use_env])
 
-  let entry_format = "s:padding_left .'['. index .']'. repeat(' ', (3 - strlen(index)))"
-  if exists('*WebDevIconsGetFileTypeSymbol') && get(g:, 'webdevicons_enable')
-    " support for vim-devicons
-    let entry_format .= ". WebDevIconsGetFileTypeSymbol(entry_path) .' '.  entry_path"
+  let entry_format = "s:padding_left .'['. index .']'. repeat(' ', (3 - strlen(index))) ."
+  if exists('*StartifyEntryFormat')
+    let entry_format .= StartifyEntryFormat()
   else
-    let entry_format .= '. entry_path'
+    let entry_format .= 'entry_path'
   endif
 
   if !empty(oldfiles)
@@ -465,13 +545,12 @@ function! s:display_by_path(path_prefix, path_format, use_env) abort
     endif
 
     for [absolute_path, entry_path] in oldfiles
-      let index = s:get_index_as_string(b:startify.entry_number)
+      let index = s:get_index_as_string()
       call append('$', eval(entry_format))
       if has('win32')
         let absolute_path = substitute(absolute_path, '\[', '\[[]', 'g')
       endif
       call s:register(line('$'), index, 'file', 'edit', absolute_path)
-      let b:startify.entry_number += 1
     endfor
 
     call append('$', '')
@@ -538,29 +617,25 @@ function! s:filter_oldfiles_unsafe(path_prefix, path_format, use_env) abort
   let entries     = {}
   let oldfiles    = []
   let is_dir      = escape(s:sep, '\') . '$'
-  let is_nerdtree = 'NERD_tree_1$'
-  let is_tagbar   = '__Tagbar__\.1$'
 
   for fname in v:oldfiles
     if counter <= 0
       break
     endif
 
-    let absolute_path = fname
+    let absolute_path = fname "liqiang<>
     if empty(absolute_path)
           \ || has_key(entries, absolute_path)
           \ || (absolute_path =~ is_dir)
-          \ || (absolute_path =~ is_nerdtree)
-          \ || (absolute_path =~ is_tagbar)
           \ || match(absolute_path, path_prefix)
           \ || s:is_in_skiplist(absolute_path)
       continue
     endif
 
-    let entry_path              = absolute_path
+    let entry_path              = absolute_path "liqiang<>
     let entries[absolute_path]  = 1
     let counter                -= 1
-    let oldfiles               += [[absolute_path, entry_path]]
+    let oldfiles               += [[absolute_path, entry_path]] "liqiang<>
   endfor
 
   return oldfiles
@@ -608,14 +683,13 @@ function! s:show_sessions() abort
   endif
 
   for i in range(len(sfiles))
-    let index = s:get_index_as_string(b:startify.entry_number)
+    let index = s:get_index_as_string()
     let fname = fnamemodify(sfiles[i], ':t')
     call append('$', s:padding_left .'['. index .']'. repeat(' ', (3 - strlen(index))) . fname)
     if has('win32')
       let fname = substitute(fname, '\[', '\[[]', 'g')
     endif
     call s:register(line('$'), index, 'session', 'SLoad', fname)
-    let b:startify.entry_number += 1
     if i == limit
       break
     endif
@@ -638,8 +712,7 @@ function! s:show_bookmarks() abort
     if type(bookmark) == type({})
       let [index, path] = items(bookmark)[0]
     else  " string
-      let [index, path] = [s:get_index_as_string(b:startify.entry_number), bookmark]
-      let b:startify.entry_number += 1
+      let [index, path] = [s:get_index_as_string(), bookmark]
     endif
 
     let entry_path = ''
@@ -677,8 +750,7 @@ function! s:show_commands() abort
       let [index, command] = items(entry)[0]
     else
       let command = entry
-      let index = s:get_index_as_string(b:startify.entry_number)
-      let b:startify.entry_number += 1
+      let index = s:get_index_as_string()
     endif
     " If no list is given, the description is the command itself.
     let [desc, cmd] = type(command) == type([]) ? command : [command, command]
@@ -700,7 +772,7 @@ function! s:is_in_skiplist(arg) abort
         return 1
       endif
     catch
-      call s:warn('startify: Pattern '. string(regexp) .' threw an exception. Read :help g:startify_skiplist')
+      call s:warn('Pattern '. string(regexp) .' threw an exception. Read :help g:startify_skiplist')
     endtry
   endfor
 endfunction
@@ -736,15 +808,15 @@ endfunction
 
 " Function: s:set_mappings {{{1
 function! s:set_mappings() abort
-  execute "nnoremap <buffer>". s:nowait ."<silent> i             :enew <bar> startinsert<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> <insert>      :enew <bar> startinsert<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> b             :call <sid>set_mark('B')<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> s             :call <sid>set_mark('S')<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> t             :call <sid>set_mark('T')<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> v             :call <sid>set_mark('V')<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> <cr>          :call startify#open_buffers()<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> <2-LeftMouse> :call startify#open_buffers()<cr>"
-  execute "nnoremap <buffer>". s:nowait ."<silent> <MiddleMouse> :enew <bar> execute 'normal! \"'.(v:register=='\"'?'*':v:register).'gp'<cr>"
+  nnoremap <buffer><nowait><silent> i             :enew <bar> startinsert<cr>
+  nnoremap <buffer><nowait><silent> <insert>      :enew <bar> startinsert<cr>
+  nnoremap <buffer><nowait><silent> b             :call <sid>set_mark('B')<cr>
+  nnoremap <buffer><nowait><silent> s             :call <sid>set_mark('S')<cr>
+  nnoremap <buffer><nowait><silent> t             :call <sid>set_mark('T')<cr>
+  nnoremap <buffer><nowait><silent> v             :call <sid>set_mark('V')<cr>
+  nnoremap <buffer><nowait><silent> <cr>          :call startify#open_buffers()<cr>
+  nnoremap <buffer><nowait><silent> <2-LeftMouse> :call startify#open_buffers()<cr>
+  nnoremap <buffer><nowait><silent> <MiddleMouse> :enew <bar> execute 'normal! "'.(v:register=='"'?'*':v:register).'gp'<cr>
 
   " Without these mappings n/N wouldn't work properly, since autocmds always
   " force the cursor back on the index.
@@ -756,7 +828,7 @@ function! s:set_mappings() abort
   endfunction
 
   for entry in sort(values(b:startify.entries), 's:compare_by_index')
-    execute 'nnoremap <buffer><silent>'. s:nowait entry.index
+    execute 'nnoremap <buffer><silent><nowait>' entry.index
           \ ':call startify#open_buffers('. string(entry.line) .')<cr>'
   endfor
 endfunction
@@ -778,7 +850,7 @@ function! s:set_mark(type, ...) abort
         \ 'T': 'tabnew',
         \ }
 
-  setlocal noreadonly modifiable
+  setlocal modifiable
 
   if entry.marked && index[0] == a:type
     let entry.cmd = 'edit'
@@ -795,7 +867,7 @@ function! s:set_mark(type, ...) abort
   " Reset cursor to fixed column, which is important for s:set_cursor().
   call cursor(line('.'), s:fixed_column)
 
-  setlocal readonly nomodifiable nomodified
+  setlocal nomodifiable nomodified
 endfunction
 
 " Function: s:sort_by_tick {{{1
@@ -853,15 +925,24 @@ function! s:close() abort
 endfunction
 
 " Function: s:get_index_as_string {{{1
-function! s:get_index_as_string(idx) abort
-  if exists('g:startify_custom_indices')
+function! s:get_index_as_string() abort
+  if !empty(b:startify.indices)
+    return remove(b:startify.indices, 0)
+  elseif exists('g:startify_custom_indices')
     let listlen = len(g:startify_custom_indices)
-    return (a:idx < listlen) ? g:startify_custom_indices[a:idx] : string(a:idx - listlen)
+    if b:startify.entry_number < listlen
+      let idx = g:startify_custom_indices[b:startify.entry_number]
+    else
+      let idx = string(b:startify.entry_number - listlen)
+    endif
   else
-    return string(a:idx)
+    let idx = string(b:startify.entry_number)
   endif
-endfunction
 
+  let b:startify.entry_number += 1
+
+  return idx
+endfunction
 
 " Function: s:print_section_header {{{1
 function! s:print_section_header() abort
@@ -896,7 +977,7 @@ function! s:create_last_session_link(spath)
           \ shellescape(s:session_dir .'/__LAST__'))
     call system(cmd)
     if v:shell_error
-      echomsg "startify: Can't create 'last used session' symlink."
+      call s:warn("Can't create 'last used session' symlink.")
     endif
   endif
 endfunction
@@ -953,6 +1034,6 @@ endfunction
 " Function: s:warn {{{1
 function! s:warn(msg) abort
   echohl WarningMsg
-  echomsg a:msg
+  echomsg 'startify: '. a:msg
   echohl NONE
 endfunction
