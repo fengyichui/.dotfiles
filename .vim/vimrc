@@ -816,6 +816,8 @@ let g:startify_fortune_use_unicode = 1
 let g:startify_bookmarks = [
             \ {'v': $MYVIMRC},
             \ {'l': expand(g:learn_path)},
+            \ {'g': expand('~/.gitconfig')},
+            \ {'z': expand('~/.zshrc')},
             \ ]
 
 " Colorizer
