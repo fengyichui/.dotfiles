@@ -111,7 +111,7 @@ set ignore-space		= no		# Enum: no, all, some, at-eol (diff)
 set show-notes			= yes		# When non-bool passed as `--show-notes=...` (diff)
 #set diff-context		= 3		# Number of lines to show around diff changes (diff)
 #set diff-options		= -C		# User-defined options for `tig show` (git-diff)
-#set diff-highlight		= true		# String (or bool): Path to diff-highlight script,
+set diff-highlight		= true		# String (or bool): Path to diff-highlight script,
 						#                   defaults to `diff-highlight`.
 #set blame-options		= -C -C -C	# User-defined options for `tig blame` (git-blame)
 #set log-options		= --pretty=raw	# User-defined options for `tig log` (git-log)
@@ -431,8 +431,8 @@ set git-colors = \
 	diff.old=diff-del \
 	diff.new=diff-add \
 	\
-	diff-highlight.oldHighlight=diff-del-highlight \
-	diff-highlight.newHighlight=diff-add-highlight \
+	diff-highlight.oldHighlight=ul \
+	diff-highlight.oldReset=noul \
 	\
 	grep.filename=grep.file \
 	grep.linenumber=grep.line-number \
