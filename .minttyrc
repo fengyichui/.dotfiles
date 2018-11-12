@@ -28,6 +28,9 @@ PgUpDnScroll=yes
 Language=en
 ScrollbackLines=1000000
 
+# Workaround cursor not blink in Tmux [https://github.com/mintty/mintty/issues/818]
+SuppressDEC=12
+
 # Solarized colorscheme
 #ForegroundColour=131,148,150
 #BackgroundColour=0,43,54
