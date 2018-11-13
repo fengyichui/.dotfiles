@@ -810,9 +810,10 @@ let g:maximizer_set_mapping_with_bang = 1
 " Startify
 let g:startify_enable_unsafe = 1
 let g:startify_fortune_use_unicode = 1
-    let g:startify_skiplist = [
+let g:startify_skiplist = [
             \ 'COMMIT_EDITMSG', 'MERGE_MSG',
             \ 'NERD_tree_*', '__Tagbar__*', 'undotree_*', 'diffpanel_*',
+            \ 'Temp/*', '^/tmp/*',
             \ ]
 let g:startify_bookmarks = [
             \ {'v': $MYVIMRC},
