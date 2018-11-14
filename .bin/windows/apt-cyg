@@ -69,6 +69,7 @@ function usage()
   echo "  find <patterns>                   find packages matching patterns"
   echo "  desc <patterns>                   describe packages matching patterns"
   echo "  outdate <patterns>                check outdated packages"
+  echo "  unpack <package tar files>        unpack packages tar files"
   echo "  packageof <commands or files>     locate parent packages"
   echo "  pathof <mode>                     show path mode:<cache|mirror|mirrordir|cache/mirrordir|setup.ini>"
 #  echo "  key-add <files> ...               add keys contained in <files>"
@@ -1786,6 +1787,27 @@ function apt-cyg-install ()
   done
 }
 
+function apt-cyg-unpack ()
+{
+  local script
+
+  for file do
+    # uppack
+    verbose 0 "Unpacking $file ..."
+    tar > "/etc/setup/$file.lst" xvf "$file" -C /
+    gzip -f "/etc/setup/$file.lst"
+
+    # run all postinstall scripts
+    local pis="$(ls /etc/postinstall/*.sh 2>/dev/null | wc -l)"
+    if [ $pis -gt 0 -a $noscripts -ne 1 ]; then
+      for script in /etc/postinstall/*.sh; do
+        verbose 0 "  Running postinstall scripts $script ..."
+        $script
+        mv $script $script.done
+      done
+    fi
+  done
+}
 
 function apt-cyg-remove()
 {

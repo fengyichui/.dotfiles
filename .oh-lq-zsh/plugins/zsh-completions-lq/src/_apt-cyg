@@ -11,6 +11,7 @@ commands=(
   "find: find packages matching patterns"
   "desc: describe packages matching patterns"
   "outdate: check outdated packages"
+  "unpack: unpack packages tar files"
   "packageof: locate parent packages"
   "pathof: show path mode:<cache|mirror|mirrordir|cache/mirrordir|setup.ini>"
   "upgrade-self: upgrade apt-cyg"
