@@ -592,16 +592,6 @@ function! lq#SumNumbers(...) range
     endif
 endfunction
 
-" Do IDE
-function! lq#DoIDE()
-    :GdbTS
-    :BashV
-    :TagbarToggle
-    :NERDTreeToggle
-    " jump to the first window
-    sil exe '5 wincmd w'
-endfunction
-
 " Run It
 function! lq#RunIt()
     if &filetype == 'python'

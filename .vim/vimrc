@@ -187,9 +187,6 @@
 " Custom {{{1
 
 let g:sys_path = 'C:/Python35;C:/cygwin64/bin;'
-let g:cygwin_path = 'C:/cygwin64/cygwin.bat'
-let g:jlink_path = 'D:/Keil_v520/ARM/Segger/Jlink.exe'
-let g:gdb_path = 'arm-none-eabi-gdb'
 let g:learn_path = fnamemodify('~/github/harvest/learn.txt', ":p")
 
 
@@ -705,30 +702,6 @@ command! -nargs=0 Endif  call lq#SmartPreProcCommenter()
 " Sum
 command! -nargs=? -range -register Sum  call lq#SumNumbers("<reg>")
 
-" Bash
-if has('win32')
-exe 'command! -nargs=0 Bash   ConqueTermSplit ' . g:cygwin_path
-exe 'command! -nargs=0 BashV  ConqueTermVSplit ' . g:cygwin_path
-exe 'command! -nargs=0 BashS  ConqueTermSplit ' . g:cygwin_path
-command! -nargs=0 Cmd    ConqueTermSplit cmd
-else
-command! -nargs=0 Bash   ConqueTermSplit bash
-command! -nargs=0 BashV  ConqueTermVSplit bash
-command! -nargs=0 BashS  ConqueTermSplit bash
-endif
-
-" Commands to open conque gdb
-command! -complete=file -nargs=* Gdb    call conque_gdb#open(<q-args>, ['belowright split'])
-command! -complete=file -nargs=* GdbS   call conque_gdb#open(<q-args>, ['belowright split'])
-command! -complete=file -nargs=* GdbV   call conque_gdb#open(<q-args>, ['belowright vsplit'])
-command! -complete=file -nargs=* GdbTS  call conque_gdb#open(<q-args>, ['topleft split'])
-
-" Jlink
-exe 'command! -nargs=0 Jlink  ConqueTermSplit ' . g:jlink_path
-
-" start to show IDE
-command! -nargs=0 IDE  call lq#DoIDE()
-
 " cd and redo the path dir, Only "CD" will change the PWD to current file dir
 command! -complete=file -nargs=* CD  if "<args>"=="" | cd %:h | else | cd <args> | endif | let &path='.,,,'.getcwd().'/**'
 
@@ -861,26 +834,6 @@ let g:ctrlp_lazy_update = 1
 let g:ctrlp_by_filename = 1
 let g:ctrlp_max_height = 100
 
-" conque_term
-let g:ConqueTerm_FastMode = 0
-let g:ConqueTerm_Color = 2
-let g:ConqueTerm_ColorMode = 'conceal'
-let g:ConqueTerm_PyVersion = 3
-let g:ConqueTerm_CloseOnEnd = 1
-let g:ConqueTerm_InsertOnEnter = 0
-let g:ConqueTerm_ReadUnfocused = 0
-let g:ConqueTerm_PyExe = 'python'
-"let g:ConqueTerm_ToggleKey = ''
-let g:ConqueTerm_SendVisKey = '<A-F1>'
-"let g:ConqueTerm_SendFileKey = ''
-"let g:ConqueTerm_ExecFileKey = ''
-
-" conque_gdb
-let g:ConqueGdb_GdbExe = g:gdb_path
-let g:ConqueGdb_Leader = ';'
-let g:ConqueGdb_SaveHistory = 1
-let g:ConqueGdb_SrcSplit = 'right'
-
 " DirDiff
 let g:DirDiffExcludes = ".git,.svn,*.o,*.a,*.lib,tags,*.taghl"
 
@@ -908,7 +861,7 @@ let g:rainbow_conf = {
             \ 'guifgs': ['Orchid', 'Yellow', 'LightSkyBlue', 'Green'],
             \ 'ctermfgs': [207, 226, 75, 46],
             \ 'separately': {
-            \     'text':0, 'tagbar':0, 'nerdtree':0, 'conque_term':0, 'xxd':0, 'help':0, 'qf':0,
+            \     'text':0, 'tagbar':0, 'nerdtree':0, 'xxd':0, 'help':0, 'qf':0,
             \     'c': {'parentheses': g:rainbow_c_parentheses},
             \     'cpp': {'parentheses': g:rainbow_c_parentheses},
             \     'java': {'parentheses': g:rainbow_c_parentheses},
