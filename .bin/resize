@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Workaround resize not work with TMUX
+if [[ "$1" == "-s" ]]; then
+    if [[ -z "$2" || -z "$3" ]]; then
+        echo "Usage: resize [-v] [-u] [-c] [-s [rows cols]]"
+        exit 1
+    fi
+    rows="$2"
+    cols="$3"
+    if [[ "$rows" == "=" ]]; then rows=''; fi
+    if [[ "$cols" == "=" ]]; then cols=''; fi
+    if [ -z "$TMUX" ]; then
+        printf "\\e[8;%s;%st" "$rows" "$cols"
+    else
+        printf "\\ePtmux;\\e\\e[8;%s;%st\\e\\" "$rows" "$cols"
+    fi
+else
+    /usr/bin/resize "$@"
+fi
+
