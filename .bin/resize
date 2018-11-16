@@ -11,9 +11,9 @@ if [[ "$1" == "-s" ]]; then
     if [[ "$rows" == "=" ]]; then rows=''; fi
     if [[ "$cols" == "=" ]]; then cols=''; fi
     if [ -z "$TMUX" ]; then
-        printf "\\e[8;%s;%st" "$rows" "$cols"
+        printf "\\e[8;%s;%st" "$rows" "$cols" 1>&2
     else
-        printf "\\ePtmux;\\e\\e[8;%s;%st\\e\\" "$rows" "$cols"
+        printf "\\ePtmux;\\e\\e[8;%s;%st\\e\\" "$rows" "$cols" 1>&2
     fi
 else
     /usr/bin/resize "$@"
