@@ -6,6 +6,27 @@
 # Only for cygwin
 #
 
+window=''
+
+# parse params
+case "$1" in
+    -n)
+        shift
+        export NOTMUX=1
+        ;;
+    -m)
+        shift
+        window='--window max'
+        ;;
+    -nm)
+        shift
+        export NOTMUX=1
+        window='--window max'
+        ;;
+    *)
+        ;;
+esac
+
 # $TMUX env may lead some strange thing
 unset TMUX
 unset TMUX_PANE
@@ -17,7 +38,7 @@ export CHERE_INVOKING=1
 echo "$@" > /tmp/.init.tmp
 
 # Start new window
-cygstart -w --action=open mintty --exec "$SHELL" --login -i
+cygstart -w --action=open mintty $window --exec "$SHELL" --login -i
 #cmd /C start /I /B "$(cygpath -w -a /bin/mintty)" -
 
 

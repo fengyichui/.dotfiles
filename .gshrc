@@ -54,9 +54,9 @@ alias cpp="webx 'http://www.cplusplus.com/search.do?q='"
 alias rfc="webx 'http://www.ietf.org/rfc/rfc'"
 
 # arm gdb with tmux,gdb.dashboard
-alias armgdb="new-tmuxinator start armgdb"
-alias armgdb2="new-tmuxinator start armgdb -n armgdb2"
-alias armgdb3="new-tmuxinator start armgdb -n armgdb3"
+alias armgdb="new -nm exec tmuxinator start armgdb"
+alias armgdb2="new -nm exec tmuxinator start armgdb -n armgdb2"
+alias armgdb3="new -nm exec tmuxinator start armgdb -n armgdb3"
 
 # gdb for hs662x
 alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.dotfiles/.gdb/hs662x.gdb.py"'
