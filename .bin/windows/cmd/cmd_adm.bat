@@ -4,7 +4,7 @@
 @echo off
 
 set tmp="%TEMP%\cmd_adm.tmp"
-set hstart="%~dp0\hstart.exe"
+set hstart="%~dp0\..\hstart.exe"
 
 if exist %tmp% goto CMD else goto HSTART
 
