@@ -1,28 +1,61 @@
 #!/bin/bash
 
-privoxy_config='/etc/privoxy/config'
+privoxy_config_dir='/etc/privoxy'
+privoxy_config=$privoxy_config_dir'/config'
 gfwlist_action='gfwlist.action'
-socks_proxy='127.0.0.1:1080'
-http_proxy='127.0.0.1:8118'
 
 gen_pac=0
-pac=0
-global=0
+pac_proxy=0
+global_proxy=0
+redo_http_listen=0
+redo_socks_forward=0
+pre_pac_enable=0
+
+get_address ()
+{
+    http_listen=$(awk '/^listen-address/{print $2}' $privoxy_config)
+    socks_forward=$(awk '/^forward-socks5 \//{print $3}' $privoxy_config)
+
+    if [[ -z $socks_forward ]]; then
+        if [[ -f "$privoxy_config_dir/$gfwlist_action" ]]; then
+            socks_forward=$(awk '/{\+forward-override{forward-socks5/{print $2}' $privoxy_config_dir/$gfwlist_action)
+            if [[ ! -z $socks_forward ]]; then
+                pre_pac_enable=1
+            fi
+        fi
+    fi
+
+    if [[ -z $socks_forward ]]; then
+        socks_proxy='127.0.0.1:1080'
+    fi
+}
+
+get_address
 
 # Parse argument
 for i in "$@"
 do
     case $i in
+        -l=*|--listen-http=*)
+            http_listen="${i#*=}"
+            redo_http_listen=1
+            shift
+            ;;
+        -f=*|--forward-socks=*)
+            socks_forward="${i#*=}"
+            redo_socks_forward=1
+            shift
+            ;;
         -x|--gen-pac)
             gen_pac=1
             shift
             ;;
         -p|--pac)
-            pac=1
+            pac_proxy=1
             shift
             ;;
         -g|--global)
-            global=1
+            global_proxy=1
             shift
             ;;
         -h|--help)
@@ -35,25 +68,51 @@ do
     esac
 done
 
+if [[ "$redo_socks_forward" == "1" ]]; then
+    if [[ "$pac_proxy" == "1" ]]; then
+        gen_pac=1
+    fi
+    if [[ "$pac_proxy" != "1" && "$global_proxy" != "1" ]]; then
+        if [[ "$pre_pac_enable" == "1" ]]; then
+            pac_proxy=1
+            gen_pac=1
+        else
+            global_proxy=1
+        fi
+    fi
+fi
+
 # generate PAC
 if [[ "$gen_pac" == "1" ]]; then
     echo "Generate privoxy.action from gfwlist.txt ..."
-    gfwlist2privoxy $socks_proxy >/dev/null
-    mv -f $gfwlist_action /etc/privoxy
+    gfwlist2privoxy $socks_forward >/dev/null
+    if [[ "$?" == "0" ]]; then
+        mv -f $gfwlist_action $privoxy_config_dir
+    else
+        exit 1
+    fi
 fi
 
-if [[ "$pac" == "1" ]]; then
-    \grep "^actionsfile $gfwlist_action" $privoxy_config >/dev/null || echo "actionsfile $gfwlist_action" >>$privoxy_config
-    sed -i "/^forward-socks5 \/ $socks_proxy ./d" $privoxy_config >/dev/null
+if [[ "$pac_proxy" == "1" ]]; then
+    sed -i "/^forward-socks5 \//d" $privoxy_config
+    sed -i "/^actionsfile $gfwlist_action/d" $privoxy_config
+    echo "actionsfile $gfwlist_action" >>$privoxy_config
 fi
 
-if [[ "$global" == "1" ]]; then
-    \grep "^forward-socks5 / $socks_proxy ." $privoxy_config >/dev/null || echo "forward-socks5 / $socks_proxy ." >>$privoxy_config
-    sed -i "/^actionsfile $gfwlist_action/d" $privoxy_config >/dev/null
+if [[ "$global_proxy" == "1" ]]; then
+    sed -i "/^forward-socks5 \//d" $privoxy_config
+    sed -i "/^actionsfile $gfwlist_action/d" $privoxy_config
+    echo "forward-socks5 / $socks_forward ." >>$privoxy_config
 fi
 
-echo "HTTP: $http_proxy"
-echo "SOCKS: $socks_proxy"
+if [[ "$redo_http_listen" == "1" ]]; then
+    sed -i "/^listen-address /d" $privoxy_config
+    echo "listen-address $http_listen" >>$privoxy_config
+fi
+
+get_address
+echo "HTTP: $http_listen"
+echo "SOCKS: $socks_forward"
 
 # privoxy
 privoxy --no-daemon $privoxy_config
