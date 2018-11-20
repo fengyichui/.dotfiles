@@ -51,7 +51,8 @@ apt-cyg install ncdu # NCurses Disk Usage, like du: file system statistics (http
 # Python packages
 pip3 install qrcode # QR encode
 pip3 install html2text # html to text
-pip3 install you-get # Download media contents (videos, audios, images) from the Web
+#pip3 install you-get # Download media contents (videos, audios, images) from the Web
+pip3 install streamlink # CLI for extracting streams from various websites to a video player of your choosing
 pip3 install pudb # Python debuger
 pip3 install bpython # good python shell
 
