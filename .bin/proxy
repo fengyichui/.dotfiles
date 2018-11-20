@@ -1,8 +1,22 @@
 #!/bin/bash
+######################################################################
+# @file proxy
+# @date 2018/11/19 22:57:47
+# @author liqiang
+#
+# Easy to use privoxy
+#   1. HTTP to SOCKS
+#   2. System PAC/GLOBAL proxy
+#   3. Generate PAC file from gfwlist
+#
+# privoxy: http://www.privoxy.org/
+#
+######################################################################
 
 privoxy_config_dir='/etc/privoxy'
 privoxy_config=$privoxy_config_dir'/config'
 gfwlist_action='gfwlist.action'
+gfwlist_config=$privoxy_config_dir/$gfwlist_action
 
 gen_pac=0
 pac_proxy=0
@@ -11,18 +25,24 @@ redo_http_listen=0
 redo_socks_forward=0
 pre_pac_enable=0
 
+# Get socks and http address
 get_address ()
 {
+    pre_pac_enable=0
     http_listen=$(awk '/^listen-address/{print $2}' $privoxy_config)
     socks_forward=$(awk '/^forward-socks5 \//{print $3}' $privoxy_config)
 
     if [[ -z $socks_forward ]]; then
-        if [[ -f "$privoxy_config_dir/$gfwlist_action" ]]; then
-            socks_forward=$(awk '/{\+forward-override{forward-socks5/{print $2}' $privoxy_config_dir/$gfwlist_action)
+        if [[ -f "$gfwlist_config" ]]; then
+            socks_forward=$(awk '/{\+forward-override{forward-socks5/{print $2}' $gfwlist_config)
             if [[ ! -z $socks_forward ]]; then
                 pre_pac_enable=1
             fi
         fi
+    fi
+
+    if [[ -z $http_listen ]]; then
+        http_listen='127.0.0.1:8118'
     fi
 
     if [[ -z $socks_forward ]]; then
@@ -30,6 +50,7 @@ get_address ()
     fi
 }
 
+# Get address
 get_address
 
 # Parse argument
@@ -59,6 +80,14 @@ do
             shift
             ;;
         -h|--help)
+            echo "Easy to use proxy"
+            echo "Usage:"
+            echo "  -l|--listen-http   Set listen HTTP address (127.0.0.1:8118)"
+            echo "  -f|--forward-socks Set forward SOCKS address (127.0.0.1:1080)"
+            echo "  -x|--gen-pac       Generate PAC"
+            echo "  -p|--pac           PAC proxy mode"
+            echo "  -g|--global        Global proxy mode"
+            echo "  -h|--help          Show this help"
             echo "by liqiang"
             exit 0
             ;;
@@ -67,20 +96,6 @@ do
         ;;
     esac
 done
-
-if [[ "$redo_socks_forward" == "1" ]]; then
-    if [[ "$pac_proxy" == "1" ]]; then
-        gen_pac=1
-    fi
-    if [[ "$pac_proxy" != "1" && "$global_proxy" != "1" ]]; then
-        if [[ "$pre_pac_enable" == "1" ]]; then
-            pac_proxy=1
-            gen_pac=1
-        else
-            global_proxy=1
-        fi
-    fi
-fi
 
 # generate PAC
 if [[ "$gen_pac" == "1" ]]; then
@@ -93,26 +108,43 @@ if [[ "$gen_pac" == "1" ]]; then
     fi
 fi
 
+# Use PAC
 if [[ "$pac_proxy" == "1" ]]; then
     sed -i "/^forward-socks5 \//d" $privoxy_config
     sed -i "/^actionsfile $gfwlist_action/d" $privoxy_config
     echo "actionsfile $gfwlist_action" >>$privoxy_config
 fi
 
+# Use global
 if [[ "$global_proxy" == "1" ]]; then
     sed -i "/^forward-socks5 \//d" $privoxy_config
     sed -i "/^actionsfile $gfwlist_action/d" $privoxy_config
     echo "forward-socks5 / $socks_forward ." >>$privoxy_config
 fi
 
+# reset http listen address
 if [[ "$redo_http_listen" == "1" ]]; then
     sed -i "/^listen-address /d" $privoxy_config
     echo "listen-address $http_listen" >>$privoxy_config
 fi
 
+# reset socks socks address
+if [[ "$redo_socks_forward" == "1" ]]; then
+    sed -i "s/^forward-socks5 \/ .\+$/forward-socks5 \/ $socks_forward ./" $privoxy_config
+    if [[ -f "$gfwlist_config" ]]; then
+        sed -i "s/^{+forward-override{forward-socks5 .\+$/{+forward-override{forward-socks5 $socks_forward .}}/" $gfwlist_config
+    fi
+fi
+
+# show
 get_address
-echo "HTTP: $http_listen"
-echo "SOCKS: $socks_forward"
+if [[ "$pre_pac_enable" == "1" ]]; then
+    echo -e "\e[32mPAC Mode\e[0m"
+else
+    echo -e "\e[32mGLOBAL Mode\e[0m"
+fi
+echo -e "\e[32mListen HTTP: $http_listen\e[0m"
+echo -e "\e[32mForward SOCKS5: $socks_forward\e[0m"
 
 # privoxy
 privoxy --no-daemon $privoxy_config
