@@ -24,6 +24,8 @@ global_proxy=0
 redo_http_listen=0
 redo_socks_forward=0
 pre_pac_enable=0
+system_proxy=0
+daemon_mode=0
 
 # Get socks and http address
 get_address ()
@@ -79,6 +81,20 @@ do
             global_proxy=1
             shift
             ;;
+        -s|--sys)
+            system_proxy=1
+            shift
+            ;;
+        -d|--daemon)
+            daemon_mode=1
+            shift
+            ;;
+        -k|--kill)
+            killall privoxy
+            sysproxy off
+            exit 0
+            shift
+            ;;
         -h|--help)
             echo "Easy to use proxy"
             echo "Usage:"
@@ -87,6 +103,9 @@ do
             echo "  -x|--gen-pac       Generate PAC"
             echo "  -p|--pac           PAC proxy mode"
             echo "  -g|--global        Global proxy mode"
+            echo "  -s|--sys           system proxy"
+            echo "  -d|--daemon        run as daemon"
+            echo "  -k|--kill          kill the daemon process and clear"
             echo "  -h|--help          Show this help"
             echo "by liqiang"
             exit 0
@@ -146,8 +165,28 @@ fi
 echo -e "\e[32mListen HTTP: $http_listen\e[0m"
 echo -e "\e[32mForward SOCKS5: $socks_forward\e[0m"
 
-# privoxy
-privoxy --no-daemon $privoxy_config
+# open system proxy
+if [[ "$system_proxy" == "1" ]]; then
+    echo -e "\e[32mSystem proxy running\e[0m"
+    sysproxy global $http_listen
+fi
+
+if [[ "$daemon_mode" == "1" ]]; then
+    # privoxy
+    privoxy $privoxy_config
+else
+    # catch interrupt
+    trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
+
+    # privoxy
+    privoxy --no-daemon $privoxy_config
+
+    # close system proxy
+    if [[ "$system_proxy" == "1" ]]; then
+        # close system proxy
+        sysproxy off
+    fi
+fi
 
 ## privoxy listen 8118 port
 #proxy="http://127.0.0.1:8118"
