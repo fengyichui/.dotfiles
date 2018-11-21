@@ -9,7 +9,11 @@
 
 # ls
 alias ls='ls --color=auto --group-directories-first' # classify files in colour
+if [[ "$OSTYPE" == "linux-android" ]]; then
+alias l='ls -l'                                      # long list file (termux not support --time-style=long-iso)
+else
 alias l='ls -l --time-style=long-iso'                # long list file
+fi
 alias ll='l -A'                                      # long list all file
 
 # grep file
