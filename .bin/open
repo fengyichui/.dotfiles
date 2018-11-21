@@ -21,6 +21,7 @@ if [ "$os" == "Cygwin" ]; then
     exit 0
 else
     xdg-open "$file"
+    exit 0
 fi
 
 echo "open: unsupport os type: $os"
