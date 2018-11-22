@@ -8,7 +8,7 @@ commands=(
   "remove: remove packages"
   "update: update setup.ini"
   "show: show installed packages"
-  "find: find packages matching patterns"
+  "search: search packages matching patterns"
   "desc: describe packages matching patterns"
   "outdate: check outdated packages"
   "unpack: unpack packages tar files"
