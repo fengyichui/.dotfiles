@@ -558,6 +558,7 @@ nnoremap <A-down>   <c-w>+
 
 " Like Ctrl-P, Use Alt-P to open buffer explorer
 nnoremap <A-p> :CtrlPBuffer<cr>
+nnoremap <A-S-p> :CtrlPTag<cr>
 
 " search next quickfix item
 nnoremap <A-n> :cnext<cr>zvzz
@@ -833,6 +834,7 @@ let g:ctrlp_follow_symlinks = 1
 let g:ctrlp_lazy_update = 1
 let g:ctrlp_by_filename = 1
 let g:ctrlp_max_height = 100
+let g:ctrlp_extensions = ['tag']
 
 " DirDiff
 let g:DirDiffExcludes = ".git,.svn,*.o,*.a,*.lib,tags,*.taghl"
