@@ -9,7 +9,7 @@
 
 # ls
 alias ls='ls --color=auto --group-directories-first' # classify files in colour
-alias l='ls -l --time-style=long-iso'                # long list file
+alias l='ls -l --time-style=long-iso'                # long list file (--time-style=long-iso in GNU-coreutils)
 alias ll='l -A'                                      # long list all file
 
 # grep file
