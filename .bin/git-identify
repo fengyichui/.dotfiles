@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [[ -z "$1" || -z "$2" ]]; then
+    echo "Identify git reversion from specified file"
+    echo "Usage: git identify [check-file-path/hash-object] [this-file-in-repository-path]"
+    exit 1
+fi
+
+# USAGE: identify_filehash file hash
+identify_filehash ()
+{
+    local file=${1?}
+    local hash=${2?}
+    git log --date=short --format="%h %cd %s" $file | while read commit date msg; do
+        if [ $(git rev-parse $commit:$file) = "$hash" ]; then
+            echo "$commit $date - $msg"
+            oldest_tag=$(git tag --contains $commit | head -n 1)
+            if [[ ! -z "$oldest_tag" ]]; then
+                echo "oldest tag including this commit: $oldest_tag"
+            fi
+            break
+        fi
+    done
+}
+
+check_file=$1
+rep_file=$2
+
+obj_hash=$(git hash-object "$check_file" 2>/dev/null || echo "$check_file")
+
+prefix=$(git rev-parse --show-prefix)
+
+cd "$(git rev-parse --show-toplevel)"
+
+identify_filehash "$prefix$rep_file" "$obj_hash"
+
