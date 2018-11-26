@@ -516,16 +516,21 @@ imap <C-F12> <C-o>:tnext<cr>
 " Shortcut: Ctrl {{{2
 
 " Windows
-inoremap <C-v> <C-r><C-o>+
-cnoremap <C-v> <C-r><C-o>+
-vnoremap <C-v> "_c<C-r><C-o>+<esc>
-vnoremap <C-c> "+y
-cnoremap <C-c> <C-f>^v$"+y<C-c><C-e>
-vnoremap <C-x> "+x
-cnoremap <C-x> <C-f>^v$"+y<C-c><C-e><C-u>
-inoremap <C-s> <C-o>:update<cr>
-inoremap <C-z> <C-o>u
-inoremap <C-a> <C-o>gg<C-o>gH<C-o>G
+if has('unnamedplus')
+let sysclipreg='+'
+else
+let sysclipreg='*'
+endif
+execute 'inoremap <C-v> <C-r><C-o>'.sysclipreg
+execute 'cnoremap <C-v> <C-r><C-o>'.sysclipreg
+execute 'vnoremap <C-v> "_c<C-r><C-o>'.sysclipreg.'<esc>'
+execute 'vnoremap <C-c> "'.sysclipreg.'y'
+execute 'cnoremap <C-c> <C-f>^v$"'.sysclipreg.'y<C-c><C-e>'
+execute 'vnoremap <C-x> "'.sysclipreg.'x'
+execute 'cnoremap <C-x> <C-f>^v$"'.sysclipreg.'y<C-c><C-e><C-u>'
+execute 'inoremap <C-s> <C-o>:update<cr>'
+execute 'inoremap <C-z> <C-o>u'
+execute 'inoremap <C-a> <C-o>gg<C-o>gH<C-o>G'
 
 " Smart way to move between windows
 noremap <C-j> <C-W>j
