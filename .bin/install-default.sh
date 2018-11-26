@@ -18,7 +18,7 @@ apt-cyg install git-svn # git svn clone ...
 apt-cyg install git-gui gitk # git gui
 apt-cyg install tig # git graph mode
 apt-cyg install subversion # svn
-apt-cyg install the_silver_searcher # ag search
+apt-cyg install the_silver_searcher # ag search (termux: silversearcher-ag)
 apt-cyg install vim
 apt-cyg install wget
 apt-cyg install curl
