@@ -83,7 +83,11 @@ mode_usr_server_password=3 #like: rc4-md5:52918214@138.68.61.42:23456 (encrypt_m
 global_proxy=0
 inside_qr_index=0
 qr_net_path=''
-qr_local_path='/tmp/ssqr.png'
+if [[ -z "$TMPDIR" ]]; then
+    qr_local_path='/tmp/ssqr.png'
+else
+    qr_local_path="$TMPDIR/ssqr.png"
+fi
 server_info='rc4-md5:52918214@138.68.61.42:23456'
 mode=$mode_inside_qr_net_path
 proxy_mode='' # HTTP or SOCKS5
@@ -246,7 +250,15 @@ echo ""
 trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
 # ss
-shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
+if command -v shadowsocks-libqss > /dev/null 2>&1; then
+    shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
+elif command -v shadowsocks-libev > /dev/null 2>&1; then
+    shadowsocks-libev -t 600 $proxy_mode $localparam $serverparam
+elif command -v sslocal > /dev/null 2>&1; then
+    sslocal -t 600 $proxy_mode $localparam $serverparam
+else
+    echo -e "\e[31mRequest Shadowsocks: shadowsocks-libqss or shadowsocks-libev or sslocal\e[0m"
+fi
 
 # sslocal only support socks5
 # request:
