@@ -516,7 +516,9 @@ imap <C-F12> <C-o>:tnext<cr>
 " Shortcut: Ctrl {{{2
 
 " Windows
-if has('unnamedplus')
+if !has('clipboard')
+let sysclipreg='"'
+elseif has('unnamedplus')
 let sysclipreg='+'
 else
 let sysclipreg='*'
