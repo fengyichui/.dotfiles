@@ -68,7 +68,11 @@ function! s:key_fix()
     " ALT "
     """""""
     " leaving out problematic characters: 'O', double quote, pipe and '['
-    let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(80, 90) + range(94, 123) + [125, 126]
+    let ascii_nums = [33] + range(35, 61) + range(63, 78) + range(81, 90) + range(94, 123) + [125, 126]
+    " FIXME: termux can't cover this when 'map <A-S-p>'
+    if expand("$OSTYPE") != "linux-android"
+        let ascii_nums += [80] " P
+    endif
     let printable_characters = map(ascii_nums, 'nr2char(v:val)')
     for char in printable_characters
         call Fixkey_setKey("<M-".char.">", "\e".char)
