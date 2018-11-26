@@ -13,7 +13,7 @@ alias l='ls -l --time-style=long-iso'                # long list file (--time-st
 alias ll='l -A'                                      # long list all file
 
 # grep file
-alias grep='grep -nir -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
+alias grep='grep -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
 alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -nir -I --color=auto"
 
 # dumpbin with windows
