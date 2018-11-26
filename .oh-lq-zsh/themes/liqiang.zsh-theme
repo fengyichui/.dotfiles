@@ -4,19 +4,14 @@
 
 # For root flag
 local root_status="%(!.#.$)"
-local ret_status="%(?:%{$fg[green]%}»:%{$fg[red]%}»)"
-
+if [[ -n "$SSH_CLIENT" ]]; then
+    local ret_status="%(?:%{$fg[green]%}«:%{$fg[red]%}«)"
+else
+    local ret_status="%(?:%{$fg[green]%}»:%{$fg[red]%}»)"
+fi
 setopt PROMPT_SUBST
 
 PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
-
-rprompt_ssh_context () {
-    echo -n "%{$fg[magenta]%}[%n@%m]%{$reset_color%}"
-}
-
-if [[ -n "$SSH_CLIENT" ]]; then
-    RPROMPT='$(rprompt_ssh_context)'
-fi
 
 function prompt_update () {
     # for root flag
