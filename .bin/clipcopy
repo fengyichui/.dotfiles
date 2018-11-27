@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# clipcopy - Copy data to clipboard
+#
+# Usage:
+#
+#  <command> | clipcopy    - copies stdin to clipboard
+#
+#  clipcopy <file>         - copies a file's contents to clipboard
+#
+
+file=$1
+
+if [[ $OSTYPE == darwin* ]]; then
+    if [[ -z "$file" ]]; then
+        pbcopy
+    else
+        pbcopy < "$file"
+    fi
+
+elif [[ $OSTYPE == cygwin* ]]; then
+    if [[ -z "$file" ]]; then
+        cat > /dev/clipboard
+    else
+        cat "$file" > /dev/clipboard
+    fi
+
+elif [[ $OSTYPE == linux-android ]]; then
+    if [[ -z "$file" ]]; then
+        termux-clipboard-set
+    else
+        termux-clipboard-set < "$file"
+    fi
+
+else
+    if command -v xclip > /dev/null 2>&1; then
+        if [[ -z "$file" ]]; then
+            xclip -in -selection clipboard
+        else
+            xclip -in -selection clipboard "$file"
+        fi
+
+    elif command -v xsel > /dev/null 2>&1; then
+        if [[ -z "$file" ]]; then
+            xsel --clipboard --input
+        else
+            xsel --clipboard --input < "$file"
+        fi
+
+    elif command -v clip.exe > /dev/null 2>&1; then
+        if [[ -z "$file" ]]; then
+            clip.exe
+        else
+            clip.exe < "$file"
+        fi
+
+    else
+        print "clipcopy: Platform $OSTYPE not supported or xclip/xsel not installed" >&2
+        exit 1
+    fi
+fi
+

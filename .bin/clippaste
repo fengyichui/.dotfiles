@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# clippaste - "Paste" data from clipboard to stdout
+#
+# Usage:
+#
+#   clippaste   - writes clipboard's contents to stdout
+#
+#   clippaste | <command>    - pastes contents and pipes it to another process
+#
+#   clippaste > <file>      - paste contents to a file
+#
+
+if [[ $OSTYPE == darwin* ]]; then
+    pbpaste
+
+elif [[ $OSTYPE == cygwin* ]]; then
+    cat /dev/clipboard
+
+elif [[ $OSTYPE == linux-android ]]; then
+    termux-clipboard-get
+
+else
+    if command -v xclip > /dev/null 2>&1; then
+        xclip -out -selection clipboard
+
+    elif command -v xsel > /dev/null 2>&1; then
+        xsel --clipboard --output
+
+    elif command -v clip.exe > /dev/null 2>&1; then
+        clip.exe -o
+
+    else
+        print "clipcopy: Platform $OSTYPE not supported or xclip/xsel not installed" >&2
+        exit 1
+    fi
+fi
+
