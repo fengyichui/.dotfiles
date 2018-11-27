@@ -298,7 +298,7 @@ set title titlestring=%{has('gui_running')?'':'[Vim]\ '}%{split(getcwd(),\'/\\\|
 set statusline=%1*%{&modified?\"[+]\":\"\"}
 set statusline+=%0*%h%r%w%{&modifiable?\"\":\"[-]\"}\ %f
 set statusline+=%{&binary?\"\ [binary]\":\"\"}
-set statusline+=%{$SSH_CLIENT?\"\ [ssh]\":\"\"}
+set statusline+=%{$SSH_CONNECTION?\"\ [ssh]\":\"\"}
 set statusline+=\ %<%=
 set statusline+=%Bh
 set statusline+=\ %{&fenc==\"\"?&enc:&fenc}%{&bomb?\",bom\":\"\"}

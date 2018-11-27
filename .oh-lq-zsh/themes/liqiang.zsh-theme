@@ -4,7 +4,7 @@
 
 # For root flag
 local root_status="%(!.#.$)"
-if [[ -n "$SSH_CLIENT" ]]; then
+if [[ -n "$SSH_CONNECTION" ]]; then
     local ret_status="%(?:%{$fg[green]%}«:%{$fg[red]%}«)"
 else
     local ret_status="%(?:%{$fg[green]%}»:%{$fg[red]%}»)"
