@@ -827,6 +827,7 @@ let g:NERDTreeDirArrowCollapsible = '▾'
 let g:TagHighlightSettings = {}
 let g:TagHighlightSettings['DisableStandardLibraries'] = 1
 let g:TagHighlightSettings['SkipPatterns'] = ['\b__anon']
+"let g:TagHighlightSettings['CtagsExtraArguments'] = ['--input-encoding=utf-8', '--output-encoding=utf-8']
 if has('win32')
 let g:TagHighlightSettings['PythonVariantPriority'] = 'compiled'
 elseif has('win32unix') " cygwin
