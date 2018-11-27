@@ -28,7 +28,7 @@ else
         xsel --clipboard --output
 
     elif command -v clip.exe > /dev/null 2>&1; then
-        clip.exe -o
+        powershell.exe -Command Get-Clipboard
 
     else
         print "clipcopy: Platform $OSTYPE not supported or xclip/xsel not installed" >&2
