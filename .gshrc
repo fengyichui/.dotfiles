@@ -130,6 +130,12 @@ ff ()
     find -iname "*$@*"
 }
 
+# grep pattern
+gg ()
+{
+    grep -nir "$@"
+}
+
 # create a daemon process
 daemon ()
 {
