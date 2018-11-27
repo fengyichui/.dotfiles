@@ -80,6 +80,7 @@ mode_usr_qr_local_path=2
 mode_usr_server_password=3 #like: rc4-md5:52918214@138.68.61.42:23456 (encrypt_method:password@ip_address:port)
 
 # variable
+copy_info=0
 global_proxy=0
 inside_qr_index=0
 qr_net_path=''
@@ -129,6 +130,10 @@ do
             proxy_mode='--http-proxy'
             shift # past argument with no value
             ;;
+        -c|--copy)
+            copy_info=1
+            shift
+            ;;
         -h|--help)
             echo "Automatic proxy with shadowsocks."
             echo "Usage:"
@@ -139,6 +144,7 @@ do
             echo "  -g|--global        use global proxy"
             echo "  -5|--socks5        use socks5 proxy mode"
             echo "  -0|--http          use http proxy mode"
+            echo "  -c|--copy          copy ss raw info to clipboard"
             echo "  -h|--help          show this help"
             echo "Example:"
             echo "  -i=1"
@@ -220,7 +226,8 @@ fi
 # Parse server info
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path || $mode -eq $mode_usr_qr_local_path ]]; then
     # like: rc4-md5:52918214@138.68.61.42:23456
-    server_info=$(zbarimg -q --raw $qr_local_path | sed 's#^ss://##' | base64 -d)
+    server_info_raw=$(zbarimg -q --raw $qr_local_path)
+    server_info=$(echo "$server_info_raw" | sed 's#^ss://##' | base64 -d)
 fi
 
 # Check server params
@@ -237,8 +244,14 @@ localparam='-b 127.0.0.1 -l 1080'
 echo -e "\e[32mServer: $server_info\e[0m"
 echo -e "\e[32mProxy: 127.0.0.1:1080\e[0m"
 
+# copy to clipboard
+if [[ $copy_info -eq 1 ]]; then
+    echo "$server_info_raw" | clipcopy
+    exit 0
+fi
+
+# open system proxy
 if [ $global_proxy -eq 1 ]; then
-    # open system proxy
     echo -e "\e[32mSystem proxy running\e[0m"
     sysproxy global 127.0.0.1:1080
 fi
@@ -266,8 +279,8 @@ fi
 #   $ apt-cyg install openssl-devel
 #sslocal -v -t 600 $localparam $serverparam
 
+# close system proxy
 if [ $global_proxy -eq 1 ]; then
-    # close system proxy
     sysproxy off
 fi
 

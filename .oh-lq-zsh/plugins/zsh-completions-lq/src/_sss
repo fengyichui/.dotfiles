@@ -7,6 +7,8 @@ _arguments -C \
   '(--server -s)'{--server=,-s=}'[encrypt_method: password@ip_addr:port]' \
   '(--global -g)'{--global,-g}'[use global proxy]' \
   '(--socks5 -5)'{--socks5,-5}'[use socks5 proxy mode]' \
+  '(--http -0)'{--http,-0}'[use http proxy mode]' \
+  '(--copy -c)'{--copy,-c}'[copy ss raw info to clipboard]' \
   '(--help -h)'{--help,-h}'[show this help]'
 
 # Local Variables:
