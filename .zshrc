@@ -25,7 +25,7 @@ fi
 if [[ -f "/tmp/.notmux.tmp" ]]; then
     rm -f /tmp/.notmux.tmp
 else
-    if [[ -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
+    if [[ -z "$SSH_CONNECTION" && -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
         tmux_ls=$(tmux ls 2>/dev/null)
         # FIXME: workaround cygwin tmux
         if [[ "$tmux_ls" && "$OSTYPE" =~ "cygwin" && "$(echo $tmux_ls | wc -l)" == "6" ]]; then
