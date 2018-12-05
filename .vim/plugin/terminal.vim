@@ -112,36 +112,30 @@ endif
 
 " tmux key fix
 function! s:tmux_key_fix()
-    """"""""
-    " CTRL "
-    """"""""
-    " for CTRL-F12 (only for TERM=tmux_256color)
-"    exe 'set <F36>=[24;5~'
-"    map <F36> <C-F12>
-"    map! <F36> <C-F12>
-
-    """""""""
-    " SHIFT "
-    """""""""
-    " for SHIFT-F12 (only for TERM=tmux_256color)
-"    exe 'set <S-F12>=[24;2~'
-
-    """""""
-    " ALT "
-    """""""
-    " ALT-[F1-F12] (RVCT, TMUX)
-"    call Fixkey_setNewKey("<M-F1>",  "\e\e[11~")
-"    call Fixkey_setNewKey("<M-F2>",  "\e\e[12~")
-"    call Fixkey_setNewKey("<M-F3>",  "\e\e[13~")
-"    call Fixkey_setNewKey("<M-F4>",  "\e\e[14~")
-"    call Fixkey_setNewKey("<M-F5>",  "\e\e[15~")
-"    call Fixkey_setNewKey("<M-F6>",  "\e\e[17~")
-"    call Fixkey_setNewKey("<M-F7>",  "\e\e[18~")
-"    call Fixkey_setNewKey("<M-F8>",  "\e\e[19~")
-"    call Fixkey_setNewKey("<M-F9>",  "\e\e[20~")
-"    call Fixkey_setNewKey("<M-F10>", "\e\e[21~")
-    call Fixkey_setNewKey("<M-F11>", "\e\e[23~")
-    call Fixkey_setNewKey("<M-F12>", "\e\e[24~")
+    if $TERM =~ 'tmux' " tmux-256color
+        " F11
+        call Fixkey_setNewKey("<C-F11>", "\e[23;5~")
+        call Fixkey_setNewKey("<S-F11>", "\e[23;2~")
+        call Fixkey_setNewKey("<M-F11>", "\e[23;3~")
+        " F12
+        call Fixkey_setNewKey("<C-F12>", "\e[24;5~")
+        call Fixkey_setNewKey("<S-F12>", "\e[24;2~")
+        call Fixkey_setNewKey("<M-F12>", "\e[24;3~")
+    else
+        " ALT-[F1-F12] (RVCT, TMUX)
+"       call Fixkey_setNewKey("<M-F1>",  "\e\e[11~")
+"       call Fixkey_setNewKey("<M-F2>",  "\e\e[12~")
+"       call Fixkey_setNewKey("<M-F3>",  "\e\e[13~")
+"       call Fixkey_setNewKey("<M-F4>",  "\e\e[14~")
+"       call Fixkey_setNewKey("<M-F5>",  "\e\e[15~")
+"       call Fixkey_setNewKey("<M-F6>",  "\e\e[17~")
+"       call Fixkey_setNewKey("<M-F7>",  "\e\e[18~")
+"       call Fixkey_setNewKey("<M-F8>",  "\e\e[19~")
+"       call Fixkey_setNewKey("<M-F9>",  "\e\e[20~")
+"       call Fixkey_setNewKey("<M-F10>", "\e\e[21~")
+        call Fixkey_setNewKey("<M-F11>", "\e\e[23~")
+        call Fixkey_setNewKey("<M-F12>", "\e\e[24~")
+    endif
 endfunction
 
 " fix key
