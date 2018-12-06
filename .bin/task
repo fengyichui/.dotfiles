@@ -60,11 +60,15 @@ finish() {
     if [[ -n $line ]]; then
         while IFS= read -r task; do
             echo "$(date +'%F %R') $task" >> ~/tasks.log
+            echo "[FINISH] $task"
         done <<< "$line"
     fi
 }
 
 case "$1" in
+    -h|--help)
+        echo "Usage: task [-e] [-f] task_desc"
+        ;;
     -e)
         $EDITOR ~/tasks
         ;;
