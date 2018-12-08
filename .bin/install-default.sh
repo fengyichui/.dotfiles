@@ -47,6 +47,7 @@ apt-cyg install fzf
 #apt-cyg install multitail # better than tail
 apt-cyg install moreutils # more utils for parallel,ts and so on
 apt-cyg install ncdu # NCurses Disk Usage, like du: file system statistics (https://dev.yorhel.nl/ncdu)
+apt-cyg install rlwrap # readline wrapper for unsupport readline command
 
 # Python packages
 pip3 install qrcode # QR encode
