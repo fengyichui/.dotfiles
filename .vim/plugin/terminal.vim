@@ -112,7 +112,7 @@ endif
 
 " tmux key fix
 function! s:tmux_key_fix()
-    if $TERM =~ 'tmux' " tmux-256color
+    if &term =~ 'tmux' " tmux-256color
         " F11
         call Fixkey_setNewKey("<C-F11>", "\e[23;5~")
         call Fixkey_setNewKey("<S-F11>", "\e[23;2~")
