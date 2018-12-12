@@ -64,9 +64,9 @@ function! lq#GrepAuto(pattern, path, ignorecase)
                 let l:files = '(?i:.*\.' . ext . '$)'
             endif
         endif
-        call lq#CmdLine('grep ' . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"', 1)
+        call lq#CmdLine("grep " . l:opt . " -G '" . l:files . "' '" . a:pattern . "'", 1)
     else
-        call lq#CmdLine('grep ' . l:opt . ' "' . a:pattern . '" ' . a:path, strlen(a:path)+2)
+        call lq#CmdLine("grep " . l:opt . " '" . a:pattern . "' " . a:path, strlen(a:path)+2)
     endif
 endfunction
 
@@ -95,7 +95,11 @@ endfunction
 
 " Visual Select
 function! lq#VisualSelect(mode) range
-    let l:pattern = substitute(escape(lq#GetVisualSelectText(), '\\/.*$^~[]'), "\n$", "", "")
+    if a:mode =~ 'grep'
+        let l:pattern = substitute(escape(lq#GetVisualSelectText(), "\\/.*$^~[]#%()'"), "\n$", "", "")
+    else
+        let l:pattern = substitute(escape(lq#GetVisualSelectText(), "\\/.*$^~[]"), "\n$", "", "")
+    endif
     if a:mode == 'search'
         let @/ = l:pattern
     elseif a:mode == 'grep'
