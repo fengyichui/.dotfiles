@@ -45,26 +45,29 @@ function! lq#CmdLine(cmd, cursor_left_num)
 endfunction
 
 " grep automatically, use 'ag'
-function! lq#GrepAuto(pattern, ...)
-    if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'asm'
-        let l:files = '(?i:.*\.([ch](pp)?\|cc\|s)$)'
-    elseif &filetype == 'make'
-        let l:files = '(?i:makefile\|.*\.ma?k$)'
+function! lq#GrepAuto(pattern, path, ignorecase)
+    if a:ignorecase
+        let l:opt = '-i'
     else
-        let ext = expand("%:e")
-        if ext == ''
-            let l:files = ''
+        let l:opt = '-s'
+    endif
+    if a:path == ''
+        if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'asm'
+            let l:files = '(?i:.*\.([ch](pp)?\|cc\|s)$)'
+        elseif &filetype == 'make'
+            let l:files = '(?i:makefile\|.*\.ma?k$)'
         else
-            let l:files = '(?i:.*\.' . ext . '$)'
+            let ext = expand("%:e")
+            if ext == ''
+                let l:files = ''
+            else
+                let l:files = '(?i:.*\.' . ext . '$)'
+            endif
         endif
-    endif
-    if a:0 == 1
-        let l:opt = a:1
+        call lq#CmdLine('grep ' . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"', 1)
     else
-        let l:opt = '-i' "Ignore cases
+        call lq#CmdLine('grep ' . l:opt . ' "' . a:pattern . '" ' . a:path, strlen(a:path)+2)
     endif
-    " grep it
-    call lq#CmdLine('grep ' . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"', 1)
 endfunction
 
 " Replace all automatically, use 'args','argdo','%s'
@@ -96,7 +99,9 @@ function! lq#VisualSelect(mode) range
     if a:mode == 'search'
         let @/ = l:pattern
     elseif a:mode == 'grep'
-        call lq#GrepAuto(l:pattern)
+        call lq#GrepAuto(l:pattern, "", 1)
+    elseif a:mode == 'grep-file'
+        call lq#GrepAuto(l:pattern, "%", 1)
     elseif a:mode == 'replace'
         call lq#CmdLine("%s" . '/'. l:pattern . '//gc', 3)
     elseif a:mode == 'replace-all'

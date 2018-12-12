@@ -604,14 +604,13 @@ nmap <leader>pz vi]<C-v>
 nnoremap <leader><tab> :bn<cr>
 
 " Open grep and put the cursor in the right position, <C-R><C-W><cr>
-nnoremap <silent> <leader>g :call lq#GrepAuto("")<cr>
-
-" Vimgreps in the current file
-nnoremap <leader><space> :vimgrep //j %<left><left><left><left>
+nnoremap <silent> <leader>g :call lq#GrepAuto("","", 1)<cr>
 
 " When you press gv you grep after the selected text
 vnoremap <silent> <leader>v :call lq#VisualSelect('grep')<cr>
-nnoremap <silent> <leader>v :call lq#GrepAuto("\\b<C-R>=expand('<cword>')<cr>\\b","-s")<cr>
+nnoremap <silent> <leader>v :call lq#GrepAuto("\\b<C-R>=expand('<cword>')<cr>\\b","",0)<cr>
+vnoremap <silent> <leader>V :call lq#VisualSelect('grep-file')<cr>
+nnoremap <silent> <leader>V :call lq#GrepAuto("\\b<C-R>=expand('<cword>')<cr>\\b","%",0)<cr>
 
 " When you press <leader>r you can search and replace the selected text
 vnoremap <silent> <leader>r :call lq#VisualSelect('replace')<cr>
