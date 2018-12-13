@@ -768,6 +768,11 @@ command! -bang -nargs=0 Xdir        call lq#OpenDir(<bang>0)
 
 " Plugin {{{1
 
+" Alternate File
+let g:alternateSearchPath = 'sfr:../source,sfr:../src,sfr:../include,sfr:../inc,sfr:../api,sfr:..,wdr:include,wdr:inc,wdr:api'
+let g:alternateNoDefaultAlternate = 1
+let g:alternateRelativeFiles = 1
+
 " Markdown
 let g:vim_markdown_folding_disabled = 1
 
