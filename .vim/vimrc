@@ -184,10 +184,6 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " }}}1
 
-" Custom {{{1
-
-let g:sys_path = 'C:/Python35;C:/cygwin64/bin;'
-
 
 " Option {{{1
 
@@ -204,7 +200,7 @@ if has('win32')
     "set renderoptions=type:directx  " Use Directx to render
     set shellpipe=\|\ tee           " shell pipe to tee
     set noshelltemp                 " Use pipe to instead temp file and avoid the console window flash
-    let $PATH=$HOME.'/vimfiles/res/windows;' . $PATH . ';' . g:sys_path
+    let $PATH=$HOME."\\vimfiles\\res\\windows;" . $PATH . ';' . $VIMEXTPATH   " VIMEXTPATH is windows env
     if !exists("g:load_vimrc")
     set lines=46 columns=85         " Startup window size
     endif
