@@ -187,7 +187,6 @@
 " Custom {{{1
 
 let g:sys_path = 'C:/Python35;C:/cygwin64/bin;'
-let g:learn_path = fnamemodify('~/github/harvest/learn.txt', ":p")
 
 
 " Option {{{1
@@ -802,10 +801,11 @@ let g:startify_skiplist = [
             \ 'Temp/*', '^/tmp/*',
             \ ]
 let g:startify_bookmarks = [
-            \ {'v': $MYVIMRC},
-            \ {'l': expand(g:learn_path)},
-            \ {'g': expand('~/.gitconfig')},
-            \ {'z': expand('~/.zshrc')},
+            \ {'v': fnamemodify(expand($MYVIMRC), ':p:~')},
+            \ {'l': fnamemodify(expand('~/github/harvest/learn.txt'), ':p:~')},
+            \ {'g': fnamemodify(expand('~/.gitconfig'), ':p:~')},
+            \ {'z': fnamemodify(expand('~/.zshrc'), ':p:~')},
+            \ {'n': fnamemodify(expand('~/note'), ':p:~')},
             \ ]
 
 " Colorizer
