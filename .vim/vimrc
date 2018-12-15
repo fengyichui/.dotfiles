@@ -635,9 +635,14 @@ nnoremap <silent> - :call lq#OpComment('del', 'n')<cr>
 vnoremap <silent> <A-=> :call lq#OpComment('add', 'v')<cr>
 vnoremap <silent> <A--> :call lq#OpComment('del', 'v')<cr>
 
-" Search
-nnoremap <expr> n     'Nn'[v:searchforward].'zvzz'
-nnoremap <expr> N     'nN'[v:searchforward].'zvzz'
+" Search (*/# remap by mark.vim)
+nnoremap n :ZZWrap normal! nzv<cr>
+nnoremap N :ZZWrap normal! Nzv<cr>
+nnoremap * :ZZWrap normal! *zv<cr>
+nnoremap # :ZZWrap normal! #zv<cr>
+" Visual mode pressing * or # searches for the current selection
+vnoremap <silent> * :call lq#VisualSelect('search')<cr>//<cr>zvzz
+vnoremap <silent> # :call lq#VisualSelect('search')<cr>??<cr>zvzz
 
 " No highlight search
 nnoremap <space><space> :<C-u>nohlsearch<cr>
@@ -645,11 +650,6 @@ nnoremap <space><space> :<C-u>nohlsearch<cr>
 " Treat long lines as break lines (useful when moving around in them)
 noremap j gj
 noremap k gk
-
-" Visual mode pressing * or # searches for the current selection
-" Super useful! From an idea by Michael Naumann
-vnoremap <silent> * :call lq#VisualSelect('search')<cr>//<cr>
-vnoremap <silent> # :call lq#VisualSelect('search')<cr>??<cr>
 
 " Now you can use >>>>> on your visual selection without any problems
 xnoremap <  <gv
@@ -679,6 +679,9 @@ vmap E <C-c>
 
 
 " Command {{{1
+
+" Wrap zz
+command! -nargs=* -complete=command ZZWrap let &scrolloff=999 | exec <q-args> | let &so=0
 
 " Generate doxgen comment
 command! -nargs=0 Dox   call lq#MakeDoxygenComment()
