@@ -48,7 +48,7 @@ get_address ()
     fi
 
     if [[ -z $socks_forward ]]; then
-        socks_proxy='127.0.0.1:1080'
+        socks_forward='127.0.0.1:1080'
     fi
 }
 
