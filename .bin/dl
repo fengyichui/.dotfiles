@@ -1,0 +1,92 @@
+#!/bin/bash
+
+dir="$HOME/downloads"
+session="aria2.session"
+configsys="$HOME/.config/aria2/aria2.conf"
+configtracker="$HOME/.aria2tracker.conf"
+uilocal="$HOME/github/AriaNg/index.html"
+uiurl="http://ariang.mayswind.net/latest"
+trackerurl="https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt"
+config=""
+url=""
+
+# Parse argument
+for i in "$@"
+do
+    case $i in
+        -u)
+            ui=1
+            shift
+            ;;
+        -t)
+            tracker_update=1
+            shift
+            ;;
+        -d=*)
+            dir="${i#*=}"
+            shift
+            ;;
+        -h|--help)
+            echo "Faster downloader (aria2)"
+            echo "Usage: dl [option] [url]"
+            echo "Options:"
+            echo "  -u          show ui"
+            echo "  -t          BT tracker update"
+            echo "  -d <dir>    set download directory"
+            echo "  -h          show this help and exit"
+            echo "by liqiang (2018/12/20)"
+            exit 0
+            ;;
+        *)
+            url="$*"
+            break
+        ;;
+    esac
+done
+
+if [[ -v ui ]]; then
+    if [[ -f "$uilocal" ]]; then
+        open "$uilocal"
+    else
+        open "$uiurl"
+    fi
+    exit
+fi
+
+if [[ -v tracker_update ]]; then
+    list=$(wget -O- "$trackerurl" | awk NF | sed ":a;N;s/\\n/,/g;ta")
+    cp -f "$configsys" "$configtracker"
+    echo "bt-tracker=$list" >>"$configtracker"
+    echo "$configtracker: bt-tracker=$list"
+    exit
+fi
+
+if [[ ! -d $dir ]]; then
+    mkdir -p "$dir"
+fi
+
+if [[ -f $configtracker ]]; then
+    config="--conf-path='$configtracker'"
+fi
+
+save_session="$dir/$session"
+if [[ -s $save_session && ! -z "$url" ]]; then
+    read -r -p "There are unfinished tasks, ignore those? [yN] " answer
+    if [[ "$answer" != "y" ]]; then
+        echo -e "\e[32mPlease use UI to add this task: $url\e[0m"
+        echo -e "\e[32mNow resume unfinished tasks!\e[0m"
+        url=""
+    fi
+fi
+
+if [[ -z "$url" ]]; then
+    cmd="aria2c --dir='$dir' --save-session='$save_session' --input-file='$save_session' $config"
+else
+    cmd="aria2c --dir='$dir' --save-session='$save_session' $config $url"
+fi
+
+echo "####################"
+echo "$cmd" | sed 's/ \+/\n/g'
+echo "####################"
+eval "$cmd"
+

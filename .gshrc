@@ -61,12 +61,6 @@ alias armgdb3="new -nm exec tmuxinator start armgdb -n armgdb3"
 # gdb for hs662x
 alias arm-none-eabi-gdb-hs662x='arm-none-eabi-gdb -ex "source ~/.dotfiles/.gdb/hs662x.gdb.py"'
 
-# faster download files (aria2 tool)
-alias dl="aria2c --dir=$HOME/downloads --save-session=$HOME/downloads/aria2.session"
-alias dl-resume="aria2c --dir=$HOME/downloads --save-session=$HOME/downloads/aria2.session --input-file=$HOME/downloads/aria2.session"
-alias dl-ui="open ~/github/AriaNg/index.html"
-alias dl-tracker-update='list=$(wget -O- https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt | awk NF | sed ":a;N;s/\n/,/g;ta"); sed -i "s@bt-tracker.*@bt-tracker=$list@g" ~/.config/aria2/aria2.conf'
-
 # curl
 alias whereami="curl https://freegeoip.app/xml/"
 alias weather="curl wttr.in"
