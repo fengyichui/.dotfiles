@@ -1,4 +1,10 @@
 #!/bin/bash
+######################################################################
+# @file dl
+# @brief 
+# @date Thu, Dec 20, 2018  5:34:20 PM
+# @author liqiang
+######################################################################
 
 dir="$HOME/downloads"
 session="aria2.session"
@@ -7,13 +13,18 @@ configtracker="$HOME/.aria2tracker.conf"
 uilocal="$HOME/github/AriaNg/index.html"
 uiurl="http://ariang.mayswind.net/latest"
 trackerurl="https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt"
-config=""
-url=""
+config_cfg=""
+inputfile_cfg=""
+dlthing=""
 
 # Parse argument
 for i in "$@"
 do
     case $i in
+        -i)
+            ignore_unfinished=1
+            shift
+            ;;
         -u)
             ui=1
             shift
@@ -28,23 +39,25 @@ do
             ;;
         -h|--help)
             echo "Faster downloader (aria2)"
-            echo "Usage: dl [option] [url]"
+            echo "Usage: dl [option] [url/file]"
             echo "Options:"
+            echo "  -i          ignore unfinished tasks"
             echo "  -u          show ui"
             echo "  -t          BT tracker update"
-            echo "  -d <dir>    set download directory"
+            echo "  -d=<dir>    set download directory"
             echo "  -h          show this help and exit"
             echo "by liqiang (2018/12/20)"
             exit 0
             ;;
         *)
-            url="$*"
+            dlthing="$*"
             break
         ;;
     esac
 done
 
-if [[ -v ui ]]; then
+# ui
+if [[ ! -z "$ui" ]]; then
     if [[ -f "$uilocal" ]]; then
         open "$uilocal"
     else
@@ -53,7 +66,8 @@ if [[ -v ui ]]; then
     exit
 fi
 
-if [[ -v tracker_update ]]; then
+# tracker
+if [[ ! -z "$tracker_update" ]]; then
     list=$(wget -O- "$trackerurl" | awk NF | sed ":a;N;s/\\n/,/g;ta")
     cp -f "$configsys" "$configtracker"
     echo "bt-tracker=$list" >>"$configtracker"
@@ -61,32 +75,53 @@ if [[ -v tracker_update ]]; then
     exit
 fi
 
+# dir
 if [[ ! -d $dir ]]; then
     mkdir -p "$dir"
 fi
 
+# config
 if [[ -f $configtracker ]]; then
-    config="--conf-path='$configtracker'"
+    config_cfg="--conf-path='$configtracker'"
 fi
 
+# resume ?
 save_session="$dir/$session"
-if [[ -s $save_session && ! -z "$url" ]]; then
+if [[ -s $save_session && ! -z "$dlthing" ]]; then
+    echo "$save_session:"
+    echo "===================="
+    cat "$save_session"
+    echo "===================="
+    echo ""
     read -r -p "There are unfinished tasks, ignore those? [yN] " answer
     if [[ "$answer" != "y" ]]; then
-        echo -e "\e[32mPlease use UI to add this task: $url\e[0m"
+        echo -e "\e[32mPlease use UI to add this task: $dlthing\e[0m"
         echo -e "\e[32mNow resume unfinished tasks!\e[0m"
-        url=""
+        dlthing=""
     fi
 fi
 
-if [[ -z "$url" ]]; then
-    cmd="aria2c --dir='$dir' --save-session='$save_session' --input-file='$save_session' $config"
-else
-    cmd="aria2c --dir='$dir' --save-session='$save_session' $config $url"
+# input file
+if [[ -z "$dlthing" ]]; then
+    if [[ -s $save_session && -z "$ignore_unfinished" ]]; then
+        inputfile_cfg="--input-file='$save_session'"
+    fi
+elif [[ -f $dlthing ]]; then
+    inputfile_cfg="--input-file='$dlthing'"
+    dlthing=""
 fi
 
+# create command
+cmd="aria2c --dir='$dir' --save-session='$save_session' $config_cfg"
+if [[ -z "$dlthing" ]]; then
+    cmd="$cmd $inputfile_cfg"
+else
+    cmd="$cmd $dlthing"
+fi
+
+# execute
 echo "####################"
-echo "$cmd" | sed 's/ \+/\n/g'
+echo "$cmd" | sed -e 's/ $//g' -e 's/ \+/\n/g'
 echo "####################"
 eval "$cmd"
 
