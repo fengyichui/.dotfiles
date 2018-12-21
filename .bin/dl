@@ -15,6 +15,7 @@ uiurl="http://ariang.mayswind.net/latest"
 trackerurl="https://raw.githubusercontent.com/ngosang/trackerslist/master/trackers_best_ip.txt"
 config_cfg=""
 inputfile_cfg=""
+max_con_per_server_cfg=""
 dlthing=""
 
 # Parse argument
@@ -41,18 +42,24 @@ do
             echo "Faster downloader (aria2)"
             echo "Usage: dl [option] [url/file]"
             echo "Options:"
-            echo "  -i          ignore unfinished tasks"
-            echo "  -u          show ui"
+            echo "  -i          Ignore unfinished tasks"
+            echo "  -u          Show ui"
             echo "  -t          BT tracker update"
-            echo "  -d=<dir>    set download directory"
-            echo "  -h          show this help and exit"
+            echo "  -d=<dir>    Set download directory"
+            echo "  -NUM        Set number of max connection per server. default 16 in aria2.conf"
+            echo "  -h          Show this help and exit"
             echo "by liqiang (2018/12/20)"
             exit 0
             ;;
         *)
-            dlthing="$*"
-            break
-        ;;
+            if [[ "$(echo $i | awk '/^-[0-9]+$/')" == "$i" ]]; then
+                max_con_per_server_cfg="--max-connection-per-server=${i#*-}"
+                shift
+            else
+                dlthing="$*"
+                break
+            fi
+            ;;
     esac
 done
 
@@ -112,7 +119,7 @@ elif [[ -f $dlthing ]]; then
 fi
 
 # create command
-cmd="aria2c --dir='$dir' --save-session='$save_session' $config_cfg"
+cmd="aria2c --dir='$dir' --save-session='$save_session' $config_cfg $max_con_per_server_cfg"
 if [[ -z "$dlthing" ]]; then
     cmd="$cmd $inputfile_cfg"
 else
@@ -121,7 +128,7 @@ fi
 
 # execute
 echo "####################"
-echo "$cmd" | sed -e 's/ $//g' -e 's/ \+/\n/g'
+echo "$cmd" | sed -e 's/ \+$//g' -e 's/ \+/\n/g'
 echo "####################"
 eval "$cmd"
 
