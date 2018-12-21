@@ -123,7 +123,7 @@ cmd="aria2c --dir='$dir' --save-session='$save_session' $config_cfg $max_con_per
 if [[ -z "$dlthing" ]]; then
     cmd="$cmd $inputfile_cfg"
 else
-    cmd="$cmd $dlthing"
+    cmd="$cmd '$dlthing'"
 fi
 
 # execute
