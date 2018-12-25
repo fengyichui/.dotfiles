@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+    echo "Switch branch and auto stash push/pop all modified and untracked files"
+    echo "Usage: git sbs [branch]"
+    exit 1
+fi
+
+branch=$1
+message="SWITCH-BRANCH-AUTO-WIP"
+
+# Check branch whether is valid
+if ! git branch | grep -q "^\\s*$branch"; then
+    echo "No such branch or on this branch!"
+    exit 1
+fi
+
+# Stash files
+git stash push --all -m "$message"
+
+# Switch branch
+git checkout "$branch"
+
+# Pop the stashed files
+stash=$(git stash list | awk -F: "/On $branch: $message/{print \$1}")
+if [[ ! -z "$stash" ]]; then
+    git stash pop "$stash"
+fi
+
