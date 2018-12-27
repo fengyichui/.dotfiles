@@ -2,8 +2,6 @@
 
 # For root flag
 local root_status="%(!.#.$)"
-# predir
-local predir="$HOME"
 # rprompt
 local rprompt=''
 # async procs
@@ -77,16 +75,11 @@ function precmd() {
         kill -s USR1 $$
     }
 
-    if [[ "$PWD" != "$predir" ]]; then
-        # save predir
-        predir=$PWD
+#    [[ "$PWD" == "$HOME" ]] && return
 
-        # start background computation
-        async $async_procs &!
-        async_procs="$async_procs $!"
-    else
-        async_procs=''
-    fi
+    # start background computation
+    async $async_procs &!
+    async_procs="$async_procs $!"
 }
 
 # Hook Functions: trigger by `kill -s USR1 $$`
