@@ -114,6 +114,7 @@
     coh = checkout HEAD
     cm  = commit
     ca  = commit -a
+    b   = branch
     d   = diff --relative --patch-with-raw --stat
     dw  = diff --relative --patch-with-raw --stat --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
     d-bcomp = difftool --tool=bcomp
