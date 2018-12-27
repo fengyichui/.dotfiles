@@ -681,7 +681,7 @@ vmap E <C-c>
 " Command {{{1
 
 " Wrap zz
-command! -nargs=* -complete=command ZZWrap let &scrolloff=999 | exec <q-args> | let &so=0
+command! -nargs=* -complete=command ZZWrap  let &scrolloff=999 | try | exec <q-args> | catch | echohl ErrorMsg | echo substitute(v:exception, '^Vim\%((\a\+)\)\=:', '', '') | echohl None | finally | let &scrolloff=0 | endtry
 
 " Generate doxgen comment
 command! -nargs=0 Dox   call lq#MakeDoxygenComment()
