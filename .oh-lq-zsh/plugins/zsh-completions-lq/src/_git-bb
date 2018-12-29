@@ -1,0 +1,13 @@
+#compdef git-bb
+
+_arguments -C \
+  ': :__git_branch_names' \
+  '-d[delete branch and its stash]'
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et
