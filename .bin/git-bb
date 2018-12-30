@@ -1,13 +1,18 @@
 #!/bin/bash
 
-if [[ "$1" == "-d" ]]; then
-    delete_branch=1
+stash_push_opt='--include-untracked'
+
+if [[ "$1" == "-d" || "$1" == "-D" ]]; then
+    delete_branch="$1"
+    shift
+elif [[ "$1" == "-a" ]]; then
+    stash_push_opt="--all"
     shift
 fi
 
 if [[ -z "$1" || ! -z "$2" ]]; then
     echo "Switch branch and auto stash push/pop all modified and untracked files"
-    echo "Usage: git bb [-d] [branch]"
+    echo "Usage: git bb [-d][-D][-a] [branch]"
     echo "Branchs: $(git branch --color=always | tr -d '\n' | sed 's/\*/  */g')"
     exit 1
 fi
@@ -24,7 +29,7 @@ fi
 
 # delete branch and its stash
 if [[ ! -z "$delete_branch" ]]; then
-    if git branch -d "$branch"; then
+    if git branch "$delete_branch" "$branch"; then
         # delete the stashed files
         stash=$(git stash list | awk -F: "/On $branch: $message/{print \$1}")
         if [[ ! -z "$stash" ]]; then
@@ -35,7 +40,7 @@ if [[ ! -z "$delete_branch" ]]; then
 fi
 
 # Stash files
-git stash push --all -m "$message"
+git stash push "$stash_push_opt" -m "$message"
 
 # Switch branch
 git checkout "$branch"
