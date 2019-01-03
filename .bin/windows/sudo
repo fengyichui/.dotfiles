@@ -32,6 +32,13 @@ echo "$@" >> /tmp/.init.tmp
 # Start SUDO window
 cygstart -w --action=runas mintty --exec "$SHELL" --login -i
 
-# Kill parent window
-kill -9 $PPID
+# Check result
+if [[ "$?" == "0" ]]; then
+    # Kill parent window
+    kill -9 $PPID
+else
+    rm -f /tmp/.notmux.tmp
+    rm -f /tmp/.init.tmp
+fi
+
 
