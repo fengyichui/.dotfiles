@@ -75,6 +75,15 @@ make install
 cd ..
 rm -rf rename
 
+# install git-extras
+git clone https://github.com/tj/git-extras.git
+cd git-extras
+git checkout $(git describe --tags $(git rev-list --tags --max-count=1))
+make install
+cp etc/git-extras-completion.zsh /etc
+cd ..
+rm -rf git-extras
+
 # link cygwin to windows (mklink must be sudo)
 cmd /c mklink /D "$(cygpath -w $(cygpath -O)/../vimfiles)" "$(cygpath -w ~/.dotfiles/.vim)"  # .vim->vimfiles
 cmd /c mklink "$(cygpath -w $(cygpath -O)/../.gitconfig)" "$(cygpath -w ~/.dotfiles/.gitconfig)"  # .gitconfig
