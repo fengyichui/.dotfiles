@@ -149,6 +149,28 @@ count ()
     grep -o "$@" | wc -l
 }
 
+# loop command times
+loop ()
+{
+    num=0
+    if [[ "$1" == -* ]]; then
+        num=${1#-}
+        shift
+    fi
+
+    if [[ "$num" == "0" ]]; then
+        while true; do
+            eval "$@"
+        done
+    else
+        for ((i=0;i<$num;i++)); do
+            eval "$@"
+        done
+    fi
+
+    unset $num
+}
+
 # proxy enable/disable
 proxy_enable ()
 {
