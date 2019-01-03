@@ -132,7 +132,7 @@
 
     # authors
     rank    = shortlog -sn --no-merges
-    authors = "!f() { git log --no-merges --pretty='format:%<(26)%an <%ae>' --author \"$*\" | sort | uniq; }; f"
+    #authors = "!f() { git log --no-merges --pretty='format:%<(26)%an <%ae>' --author \"$*\" | sort | uniq; }; f"
 
     # commits not pushed to $1, master by default
     unpushed = cherry -v
@@ -273,7 +273,7 @@
     # buggyclasses = "!f() { git log -M -C -p  | pcregrep -o  \"@@.*@@\\sclass\\s(.*)\\(.*\\)\"  | cut -f5 -d\'@\' | sort | uniq -c | sort -n;}; f"
 
     # ignore local changes to a  file
-    ignore = update-index --assume-unchanged
+    #ignore = update-index --assume-unchanged
 
     # http://sandofsky.com/blog/git-workflow.html
     # merge code but not history to manually recommit
@@ -309,7 +309,7 @@
     rebase-recent = !git rebase -i $(git remote-ref)
 
     # from http://blog.blindgaenger.net/advanced_git_aliases.html
-    alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\ = \\2/' | sort
+    #alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\ = \\2/' | sort
 
     # from https://gist.github.com/awood/11189030
     oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
