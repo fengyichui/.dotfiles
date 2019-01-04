@@ -77,8 +77,8 @@ alias rm-all-empty-dirs="find . -type d -empty -delete"
 # file system scan
 alias fscan='ncdu'
 
-# remove repeat line (not sort)
-alias rm-repeat-line="awk '!x[$0]++'"
+# remove repeat line (not sort) (awk '!x[$0]++' filename)
+alias rm-repeat-line="awk '!x[\$0]++'"
 
 #####################################
 #             Function              #
