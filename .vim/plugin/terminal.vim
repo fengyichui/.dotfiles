@@ -234,7 +234,8 @@ function! s:tmux_focus_gained()
                 echoerr "Force to delete 'tmux_vim_focus_losting_lock' file!"
             endif
             " force cursor to normal mode
-            silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
+"            silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
+            silent! normal! r
         endif
     endif
     let s:tmux_is_running = 1
