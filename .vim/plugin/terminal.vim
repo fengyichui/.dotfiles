@@ -121,6 +121,11 @@ function! s:tmux_key_fix()
         call Fixkey_setNewKey("<C-F12>", "\e[24;5~")
         call Fixkey_setNewKey("<S-F12>", "\e[24;2~")
         call Fixkey_setNewKey("<M-F12>", "\e[24;3~")
+        " ALT-cursor
+        call Fixkey_setNewKey("<M-up>",    "\e[1;3A")
+        call Fixkey_setNewKey("<M-down>",  "\e[1;3B")
+        call Fixkey_setNewKey("<M-right>", "\e[1;3C")
+        call Fixkey_setNewKey("<M-left>",  "\e[1;3D")
     else
         " ALT-[F1-F12] (RVCT, TMUX)
 "       call Fixkey_setNewKey("<M-F1>",  "\e\e[11~")
