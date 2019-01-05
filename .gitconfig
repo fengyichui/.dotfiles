@@ -81,7 +81,7 @@
 
 [merge]
     # Controls which merge tool is used by git-mergetool.
-    tool = vimdiff #vim-merge3way
+    tool = vimdiff
 
     # Specify the style in which conflicted hunks are written out to working tree files upon merge.
     # The default is "merge", which shows a <<<<<<< conflict marker, changes made by one side,
@@ -91,7 +91,7 @@
 
 [mergetool]
     # Not prompt before each invocation of the merge resolution program.
-    prompt = false
+    prompt = true
 
     #  If this is not set to true then the merge target file timestamp is checked and the merge
     #  assumed to have been successful if the file has been updated, otherwise the user is
@@ -101,10 +101,6 @@
 [mergetool "bcomp"]
     # Specify the command to invoke the specified merge tool.
     cmd = "bcomp \"$LOCAL\" \"$REMOTE\" \"$BASE\" \"$MERGED\""
-
-[mergetool "vim-merge3way"]
-    # Specify the command to invoke the specified merge tool.
-    cmd = "vim -c \"call mergeutil#threeway()\" \"$BASE\" \"$REMOTE\" \"$LOCAL\" \"$MERGED\""
 
 [tar "tar.xz"]
     command = xz -c
@@ -130,21 +126,11 @@
     lsr = ls-remote
     clone1 = clone --depth=1
 
-    # authors
-    rank    = shortlog -sn --no-merges
-    #authors = "!f() { git log --no-merges --pretty='format:%<(26)%an <%ae>' --author \"$*\" | sort | uniq; }; f"
-
-    # commits not pushed to $1, master by default
-    unpushed = cherry -v
-
     # various pretty loggers from various places
     lg = log --graph --pretty=format:'%C(red)%h%Creset -%C(auto)%d%Creset %s %C(blue)(%an) %C(dim)%C(white)%cr, %cd%Creset' --abbrev-commit --date=short
     lgb = !git lg --branches
     lc = !git lg ORIG_HEAD.. --name-status
     lf = !git lg --name-status
-
-    # show a list of tags sorted by when they were tagged
-    tagage = !sh -c 'git for-each-ref --sort=taggerdate refs/tags --format=\"%(refname:short)\"'
 
     # https://github.com/prabirshrestha/ProfilesAndSettings/blob/master/.gitconfig
     # show tags and any tag annotation (tito adds tag annotations for example)
@@ -153,133 +139,11 @@
     # for ansible, with its submodules
     pullall = "!f() { git pull; git submodule update --recursive; } ; f"
 
-    # from https://git.wiki.kernel.org/index.php/Aliases
-    whois = !sh -c 'git log -i -1 --pretty=\"format:%an <%ae>\n\" --author=\"$1\"' -
-    whatis = show -s --pretty='tformat:%h (%s, %ad)' --date=short
-
-    # what tag contains the sha
-    whatrelease = name-rev --name-only
-
-    # from http://serverfault.com/questions/175052/how-to-tell-which-local-branch-is-tracking-which-remote-branch-in-git
-    upstream = rev-parse --symbolic-full-name --abbrev-ref HEAD@{upstream}
-
-    # also from http://serverfault.com/questions/175052/how-to-tell-which-local-branch-is-tracking-which-remote-branch-in-git
-    tbranch = branch -vv
-
-    # what got pushed to master in the last hour
-    #  based on http://stackoverflow.com/questions/3357219/expose-the-date-a-commit-was-pushed-to-a-repository
-    justpushed = log origin/master@{\"1 hour ago\"}..origin/master --
-
-    # log everything with $1 string in the diff
-    timegrep = log -S
-
-    # like above, but show the diff
-    diffgrep = log -p -S
-
-    # search logs for a bugzilla like number
-    findbug = !sh -c 'git log --grep=^$1:' -
-
-    # search for a pattern in branch names, file names, or file contents
-    #find = "!f() { ((git branch -a ; git ls-files) | grep $1); git grep $1 }; f"
-    find = "!f() { (git branch -a ; git ls-files) | grep $1; GIT_PAGER=cat git grep $1; }; f"
-
-    # show what tag/release a bug was part of
-    # bugrelease = "!sh -c 'git name-rev --tags --name-only  $(git log --grep ^$1: --pretty=\"format:%H\"\n")' -
-
-    # from https://gist.github.com/492227
-    lost = "!git fsck | awk '/dangling commit/ {print $3}' | git show --format='SHA1: %C(yellow)%h%Creset %f' --stdin | awk '/SHA1/ {sub(\"SHA1: \", \"\"); print}'"
-
-    # show a log without the formating, occasionaly handy for c&p
-    rawlog = log --format=\"format:commit %H%nAuthor:%an%n%n%B%n\"
-
-    # show a list of branches sorted by time of last commit.
-    # This is in a seperate script now.
-    # brage = "!f() { git for-each-ref --sort=committerdate refs/heads $1  --format=\"%(refname:short)\" ; }; g() { for C in $(f $1) ; do git show -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C\" \"$C\" -- ; done; }; g "
-
-    # show remote branches as well
-    brageall = !git brage refs/remotes
-
-    # TODO: make these options of 'git-brage' script
-    tbrage = "!f() { git for-each-ref --sort=committerdate refs/heads $1  --format=\"%(refname:short)\" ; }; g() { for C in $(f $1) ; do UP=$(git rev-parse --symbolic-full-name --abbrev-ref $C@{upstream} 2> /dev/null); TRACKING=$?; UP=\"-> $UP \"; if [ $TRACKING -ne 0 ] ; then UP=\"\"; fi;  git show -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C $UP\" \"$C\" -- ; done; }; g "
-    tbrageall = !git tbrage refs/remotes
-
-    # show a list of every branch and show their latests commit, sorted by last commit
-    brlog = "!sh -c 'for C in $(git for-each-ref --sort=committerdate refs/heads --format=\"%(refname:short)\") ; do git show  -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C\" \"$C\" -- ; git show --stat -s $C ; echo; done'"
-    brlogremote = "!sh -c 'for C in $(git for-each-ref --sort=committerdate refs/remotes/origin --format=\"%(refname:short)\") ; do git show  -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C\" \"$C\" -- ; git show --stat -s $C ; echo; done'"
-
-    # show a list of last change in each branch of a given path
-    # roly poly fileheads
-    # fileheads = "!sh  -c 'for C in $(git for-each-ref --sort=committerdate refs/heads --format=\"%(refname:short)\"| tac) ; do git show -s --pretty=format:\"%Cgreen%ci %Cblue%cr%Creset  $C\" \"$C\" -- ; git --no-pager log  -p -1 $C -- $0; echo; done'"
-
-    yesterday = "!sh  -c 'for C in $(git for-each-ref --sort=committerdate refs/heads --format=\"%(refname:short)\"| tac) ; do git --no-pager log --since=yesterday -p -1 $C -- $0; done'"
-
-    thisweek = "!sh  -c 'for C in $(git for-each-ref --sort=committerdate refs/heads --format=\"%(refname:short)\"| tac) ; do git --no-pager log --since=monday -p -1 $C -- $0; done'"
     # not useful itself, but handy to remember for use in scripts
     thisbranch = rev-parse --abbrev-ref HEAD
 
-    # remove a file from index
-    unadd = git reset HEAD
-
-    # needs python-bugzilla, and git-showbugs
-    openbugs = showbugs -s NEW,ASSIGNED,NEEDINFO,FAILS_QA,REOPENED,ON_DEV
-    closedbugs = showbugs -s PASSES_QA,VERIFIED,RELEASE_PENDING,CLOSED
-
-    # show a list of files with bug fixes in them, sorted by popularity of occurance
-    #  aka, list the buggy files
-    # FIXME: should probably make all the bug regex stuff scripts so it's easier to customize
-    buggyfiles = "!git log -M -C --format=\"format:%n\" --grep=\"^[[:digit:]]\\+:\" --name-only | grep .  | sort | uniq -c | sort -n"
-
     # from https://github.com/cypher/dotfiles/blob/master/gitconfig
     ls-ignored = ls-files --exclude-standard --ignored --others
-
-    # based on "buggyfiles" above and https://github.com/cypher/dotfiles/blob/master/bin/git-churn
-    churn = !git log -M -C --name-only --format=\"format:%n\" | grep . | sort | uniq -c | sort -n
-
-    # branches that are merged locally already, note this includes master itself
-    lurkers = branch --merged master
-
-    # as per https://twitter.com/jrbowes/status/304942580133679105
-    # delete all local branches that have been merged into master
-    #
-    # note, "git branch --merged master" will helpfully include master itself
-    # as a branch that has been fully merged to master. Gee, thanks git.
-    #
-    #  So for sanity, filter out current branch and anything named master
-    #
-    # Also note -d won't delete branches that aren't merged to their tracking
-    # branch. Use -D if you dont care.
-    #
-    #  See also 'git remote prune
-    purge = !git branch -d $(git branch --merged master | grep -v -e '*' -e 'master')
-
-    # mostly from http://stackoverflow.com/questions/67699/how-do-i-clone-all-remote-branches-with-git
-    # binge = "!sh -c 'for BRANCH in $(git branch -a | sed -n \"\=/HEAD$=d; \=/master$=d;s=  remotes/==p\") ; do branch --track ${BRANCH##*/} $BRANCH ; done' "
-    # uh, don't do this. list authors by numbers of commits. probably needs a .mailmap
-    churners = shortlog -sn --
-
-    # burners: who last touched the most code according to annotate  see git-burners
-    # alias implementation just for reference
-    # burners = "!f() { for i in $(git ls-files) ; do git annotate -e $i ; done }; g() { f | awk '{print $2 }' | perl -pe 's/\\(\\<(.+@.+)\\>/\\1/' ; }; g"
-    #
-    # yeah, don't do this either. list authors by # of bug id's fixed
-    # I suppose the really mad could make "breakers" that figures out who commits code
-    # that breaks. I can save you the time, it was me. I broke it.
-    fixers = !git log -M -C --format=\"format:%aN\" --grep=\"^[[:digit:]]\\+:\" | sort | uniq -c | sort -n
-
-    # who reverts the most. Totally useless, but I like the name
-    poppers = !git log -M -C --format=\"format:%aN\" --grep \"Revert\" | sort | uniq -c | sort -n
-
-    # show which python classes have had the most commits
-    # external script now
-    # buggyclasses = "!f() { git log -M -C -p  | pcregrep -o  \"@@.*@@\\sclass\\s(.*)\\(.*\\)\"  | cut -f5 -d\'@\' | sort | uniq -c | sort -n;}; f"
-
-    # ignore local changes to a  file
-    #ignore = update-index --assume-unchanged
-
-    # http://sandofsky.com/blog/git-workflow.html
-    # merge code but not history to manually recommit
-    # for emergency use only
-    bankrupt = merge --squash
 
     # https://github.com/wadey/dotfiles/blob/master/gitconfig
     # check if a branch has been merged into the current HEAD
@@ -291,38 +155,17 @@
     # could be useful for scripts
     cdup = rev-parse --show-cdup
 
-    # https://github.com/SixArm/sixarm_git_gitconfig/blob/master/gitconfig-alias.txt
-    # Show the date of the first commit
-    log-first-date = !git log --date-order --date=iso --pretty=\"format:%ad\" --reverse | head -1
-
-    # https://github.com/SixArm/sixarm_git_gitconfig/blob/master/gitconfig-alias.txt
-    # Editing and adding conflicted files: when we get many merge conflicts
-    # and want to quickly solve them using an editor, then add the  files.
-    edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; $EDITOR `f`"
-    add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
-
-    # from https://github.com/SixArm/sixarm_git_gitconfig/blob/master/gitconfig-alias.txt
-    # Thanks to jtolds on stackoverflow
-    remote-ref = "!bash -c '       local_ref=$(git symbolic-ref HEAD);       local_name=${local_ref##refs/heads/};       remote=$(git config branch.\"#local_name\".remote || echo origin);       remote_ref=$(git config branch.\"$local_name\".merge);       remote_name=${remote_ref##refs/heads/};       echo remotes/$remote/$remote_name'"
-
     # also from https://github.com/SixArm/sixarm_git_gitconfig/blob/master/gitconfig-alias.txt
     # Thanks to jtolds on stackoverflow
     rebase-recent = !git rebase -i $(git remote-ref)
 
-    # from http://blog.blindgaenger.net/advanced_git_aliases.html
-    #alias = !git config --list | grep 'alias\\.' | sed 's/alias\\.\\([^=]*\\)=\\(.*\\)/\\1\\ = \\2/' | sort
-
     # from https://gist.github.com/awood/11189030
     oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
     branchdiff = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor $1 $head` ; git diff $ancestor..$head ; }; f"
-    visual-branchdiff = "!f() { head=${1:-HEAD} ; ancestor=`git oldest-ancestor master $head` ; git diff --name-only $ancestor..$head | xargs diffuse -s -r $ancestor ; }; f &"
 
     # find what commit a file was added
     # usage: `git whatadded --foo.c`
     whatadded = log --follow --diff-filter=A --find-renames=40%
-
-    # checkout a tag into a branch
-    checkout-tag = "!f() { tagname=${1}; branchname='${tagname}-branch'; git checkout -b '${branchname}' '${tagname}'; } ; f"
 
 [gui]
     fontui = -family \"DejaVu Sans\" -size 11 -weight normal -slant roman -underline 0 -overstrike 0
