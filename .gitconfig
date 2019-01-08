@@ -161,7 +161,7 @@
 
     # from https://gist.github.com/awood/11189030
     oldest-ancestor = !bash -c 'diff --old-line-format='' --new-line-format='' <(git rev-list --first-parent "${1:-master}") <(git rev-list --first-parent "${2:-HEAD}") | head -1' -
-    branchdiff = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor $1 $head` ; git diff $ancestor..$head ; }; f"
+    branchdiff = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor ${1:-master} $head` ; git d $ancestor..$head ; }; f"
 
     # find what commit a file was added
     # usage: `git whatadded --foo.c`
