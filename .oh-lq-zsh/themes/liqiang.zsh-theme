@@ -69,7 +69,9 @@ function precmd() {
         fi
 
         # save to temp file
-        echo "rprompt='$(prompt_git_current_branch)'" > "${HOME}/.zsh_tmp_prompt"
+        echo "GIT_CURRENT_BRANCH='$(prompt_git_current_branch)'" > "${HOME}/.zsh_tmp_prompt"
+        echo 'rprompt="$GIT_CURRENT_BRANCH"' >> "${HOME}/.zsh_tmp_prompt"
+        echo 'export GIT_CURRENT_BRANCH' >> "${HOME}/.zsh_tmp_prompt"
 
         # signal parent, trigger TRAPUSR1()
         kill -s USR1 $$
