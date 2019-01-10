@@ -23,6 +23,14 @@ PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_c
 # Set prompt (right)
 RPROMPT='%{$fg[magenta]%}${rprompt}%{$reset_color%}'
 
+# Outputs the name of the current project
+function prompt_git_current_project() {
+    local dir
+    dir=$(git rev-parse --show-toplevel 2>/dev/null)
+    [[ $? != 0 ]] && return
+    basename "$dir"
+}
+
 # Outputs the name of the current branch
 function prompt_git_current_branch() {
     local ref
@@ -33,6 +41,19 @@ function prompt_git_current_branch() {
         ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
     fi
     echo ${ref#refs/heads/}
+}
+
+# Output git current info
+function prompt_git_current_info() {
+    local project
+    project=$(prompt_git_current_project)
+    [[ -z "$project" ]] && return
+
+    local branch
+    branch=$(prompt_git_current_branch)
+    [[ -z "$branch" ]] && return
+
+    echo "${project}·${branch}"
 }
 
 # Root flag
@@ -69,9 +90,9 @@ function precmd() {
         fi
 
         # save to temp file
-        echo "GIT_CURRENT_BRANCH='$(prompt_git_current_branch)'" > "${HOME}/.zsh_tmp_prompt"
-        echo 'rprompt="$GIT_CURRENT_BRANCH"' >> "${HOME}/.zsh_tmp_prompt"
-        echo 'export GIT_CURRENT_BRANCH' >> "${HOME}/.zsh_tmp_prompt"
+        echo "GIT_CURRENT_INFO='$(prompt_git_current_info)'" > "${HOME}/.zsh_tmp_prompt"
+        echo 'rprompt="$GIT_CURRENT_INFO"' >> "${HOME}/.zsh_tmp_prompt"
+        echo 'export GIT_CURRENT_INFO' >> "${HOME}/.zsh_tmp_prompt"
 
         # signal parent, trigger TRAPUSR1()
         kill -s USR1 $$
