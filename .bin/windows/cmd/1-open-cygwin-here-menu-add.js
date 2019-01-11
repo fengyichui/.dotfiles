@@ -1,6 +1,6 @@
 var WshShell = new ActiveXObject("WScript.Shell");
 
-WshShell.CurrentDirectory = "..\\..";
+WshShell.CurrentDirectory = "..\\..\\..";
 
 WshShell.RegWrite("HKCU\\Software\\Classes\\Directory\\shell\\open-cygwin\\", "Open Cygwin Here", "REG_SZ");
 WshShell.RegWrite("HKCU\\Software\\Classes\\Directory\\shell\\open-cygwin\\Icon", WshShell.CurrentDirectory + "\\..\\..\\..\\bin\\mintty.exe", "REG_SZ");
