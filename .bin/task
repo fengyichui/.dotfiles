@@ -15,42 +15,48 @@
 #   task -f     finish all tasks
 #
 
+if [[ -z "$OneDrive" ]]; then
+    tasks_path="$HOME/tasks"
+else
+    tasks_path="$(cygpath "$OneDrive")/Note/tasks.txt"
+fi
+
 task_exists() {
-    if [[ -s ~/tasks ]]; then
+    if [[ -s $tasks_path ]]; then
         newline="$*"
         while read -r line; do
             if [[ "$line" == "$newline" ]]; then
                 return 0
             fi
-        done < ~/tasks
+        done < "$tasks_path"
     fi
     return 1
 }
 
 task() {
     if (( $# )); then
-        if [[ "$@" =~ ^[0-9]+$ ]]; then
+        if [[ "$*" =~ ^[0-9]+$ ]]; then
             finish "$@"
         elif task_exists "$@"; then
             echo "Task exists already."
         else
-            echo "$@" >> ~/tasks
+            echo "$@" >> "$tasks_path"
         fi
     else
-        if [[ -s ~/tasks ]]; then
-            nl -w2 -s'  ' ~/tasks
+        if [[ -s $tasks_path ]]; then
+            nl -w2 -s'  ' "$tasks_path"
         else
-            echo -e "\e[1mLAZY TIME\e[0m"
+            echo -e "\\e[1mLAZY TIME\\e[0m"
         fi
     fi
 }
 
 finish() {
     if (( $# == 0 )); then
-        read -p "Really? [yN] " answer
+        read -r -p "Really? [yN] " answer
         [[ "$answer" != y ]] && return
     fi
-    line="$(2>/dev/null sed -i '' -e "${1}w /dev/stdout" -e "${1}d" ~/tasks)"
+    line="$(2>/dev/null sed -i '' -e "${1}w /dev/stdout" -e "${1}d" "$tasks_path")"
     if [[ -n $line ]]; then
         while IFS= read -r task; do
             echo "$(date +'%F %R')  $task" >> ~/.tasks_finished
@@ -64,10 +70,10 @@ case "$1" in
         echo "Usage: task [-e][-E][-f] task_desc"
         ;;
     -e)
-        $EDITOR ~/tasks
+        $EDITOR "$tasks_path"
         ;;
     -E)
-        $EDITOR ~/.tasks_finished
+        $EDITOR "$HOME/.tasks_finished"
         ;;
     -f)
         shift
