@@ -35,9 +35,7 @@ task_exists() {
 
 task() {
     if (( $# )); then
-        if [[ "$*" =~ ^[0-9]+$ ]]; then
-            finish "$@"
-        elif task_exists "$@"; then
+        if task_exists "$@"; then
             echo "Task exists already."
         else
             echo "$@" >> "$tasks_path"
@@ -53,15 +51,21 @@ task() {
 
 finish() {
     if (( $# == 0 )); then
-        read -r -p "Really? [yN] " answer
+        read -r -p "Finish All Task, Really? [yN] " answer
         [[ "$answer" != y ]] && return
+    elif [[ ! "$*" =~ ^[0-9\ ]+$ ]]; then
+        echo "Invalid Finish Params! (eg: task -f 1 3 9)"
+        return
     fi
-    line="$(2>/dev/null sed -i '' -e "${1}w /dev/stdout" -e "${1}d" "$tasks_path")"
-    if [[ -n $line ]]; then
+    p="$(echo "$*" | sed 's/ /p;/g')p"
+    d="$(echo "$*" | sed 's/ /d;/g')d"
+    lines=$(sed -n "$p" "$tasks_path" 2>/dev/null)
+    sed -i "$d" "$tasks_path" 2>/dev/null
+    if [[ -n $lines ]]; then
         while IFS= read -r task; do
             echo "$(date +'%F %R')  $task" >> ~/.tasks_finished
             echo "[FINISH] $task"
-        done <<< "$line"
+        done <<< "$lines"
     fi
 }
 
