@@ -42,7 +42,7 @@ task() {
         fi
     else
         if [[ -s $tasks_path ]]; then
-            nl -w2 -s'  ' "$tasks_path"
+            nl -w2 -s'  ' -ba "$tasks_path"
         else
             echo -e "\\e[1mLAZY TIME\\e[0m"
         fi
