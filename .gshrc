@@ -15,6 +15,7 @@ alias ll='l -A'                                      # long list all file
 # grep file
 alias grep='grep -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
 alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -nir -I --color=auto"
+alias grep-chinese="grep -P '[\p{Han}]'"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
