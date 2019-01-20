@@ -113,7 +113,7 @@ if [[ -z "$dlthing" ]]; then
     if [[ -s $save_session && -z "$ignore_unfinished" ]]; then
         inputfile_cfg="--input-file='$save_session'"
     fi
-elif [[ -f $dlthing ]]; then
+elif [[ -f "$dlthing" && "$dlthing" != *.torrent ]]; then
     inputfile_cfg="--input-file='$dlthing'"
     dlthing=""
 fi
