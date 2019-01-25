@@ -6,21 +6,18 @@ if [ $# -gt 1 ]; then
     exit 1
 fi
 
-file=${1:-"."}
-
-if [ ! -e "$file" ]; then
-    echo "open: file not exist!"
-    exit 1
-fi
+path=${1:-"."}
 
 os=$(uname -o)
 if [ "$os" == "Cygwin" ]; then
-    path=$(cygpath --absolute --windows "$file")
+    if [ -e "$path" ]; then
+        path=$(cygpath --absolute --windows "$path")
+    fi
     export HOME="$(cygpath -m --mydocs)/../"
     explorer "$path"
     exit 0
 else
-    xdg-open "$file"
+    xdg-open "$path"
     exit 0
 fi
 
