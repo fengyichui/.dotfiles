@@ -15,12 +15,15 @@ if [ "$os" == "Cygwin" ]; then
     fi
     export HOME="$(cygpath -m --mydocs)/../"
     explorer "$path"
-    exit 0
 else
-    xdg-open "$path"
-    exit 0
+    if command -v explorer.exe > /dev/null 2>&1; then
+        explorer.exe "$path"
+    elif command -v xdg-open > /dev/null 2>&1; then
+        xdg-open "$path"
+    else
+        exit 1
+    fi
 fi
 
-echo "open: unsupport os type: $os"
-exit 1
+exit 0
 
