@@ -35,6 +35,7 @@ ln -v -snf "$SRCDIR/.gnuplot" "$DSTDIR/.gnuplot"
 ln -v -snf "$SRCDIR/.inputrc" "$DSTDIR/.inputrc"
 ln -v -snf "$SRCDIR/.minttyrc" "$DSTDIR/.minttyrc"
 ln -v -snf "$SRCDIR/.tigrc" "$DSTDIR/.tigrc"
+ln -v -snf "$SRCDIR/.termux" "$DSTDIR/.termux"
 ln -v -snf "$SRCDIR/.tmux.conf" "$DSTDIR/.tmux.conf"
 ln -v -snf "$SRCDIR/.zshrc" "$DSTDIR/.zshrc"
 
