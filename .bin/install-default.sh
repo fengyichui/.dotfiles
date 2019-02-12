@@ -56,6 +56,7 @@ pip3 install html2text # html to text
 pip3 install streamlink # CLI for extracting streams from various websites to a video player of your choosing
 pip3 install pudb # Python debuger
 pip3 install bpython # good python shell
+pip3 install tldr # A collection of simplified and community-driven man pages.
 
 # Command-line translator using Google Translate, Bing Translator, Yandex.Translate, etc.
 #git clone https://github.com/soimort/translate-shell
