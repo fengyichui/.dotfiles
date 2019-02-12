@@ -366,7 +366,7 @@ autocmd FileType java let &l:formatprg = 'astyle --mode=java --lineend=linux --s
 autocmd FileType python let &l:formatprg = 'yapf'
 autocmd FileType xml let &l:formatprg = 'tidy -quiet -xml -indent --indent-spaces 4 --newline LF'
 autocmd FileType sh let &l:formatprg = 'shfmt -i 4 -ci'
-autocmd FileType text let &l:formatprg = 'fold -w 80 -s'
+autocmd FileType text let &l:formatprg = 'fmt -w 75 -u -s' " -s : Split lines only. Do not join short lines to form longer ones.
 
 " Custom Make
 autocmd BufReadPost *.uvproj setlocal makeprg=makekeil    | compiler keil
