@@ -35,6 +35,7 @@ alias vim-='vim -c "silent file stdin | set nomodified" -'
 
 # diff
 alias diff='diff --color=auto'
+alias gdiff='git diff --no-index'
 
 # Stopwatch
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
