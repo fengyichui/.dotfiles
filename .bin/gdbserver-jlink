@@ -12,6 +12,7 @@ do
             echo "  gdbserver-jlink:           device=$device, speed=${speed}kHz"
             echo "  gdbserver-jlink Cortex-M4: device=Cortex-M4, speed=${speed}kHz"
             echo "  gdbserver-jlink 2000:      device=$device, speed=2000kHz"
+            echo "Supported Devices: https://www.segger.com/jlink_supported_devices.html"
             exit 0
             ;;
         *)
