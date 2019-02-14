@@ -1,7 +1,31 @@
 #!/bin/bash
 
-# add device Cortex-CM3, jlinkGdbServer will wait chip wakeduped, and then connect
-params='-device Cortex-M3 -speed 6000 -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout'  #-select usb=20151001
+device="Cortex-M3"
+speed="6000"
+
+# Parse argument
+for i in "$@"
+do
+    case $i in
+        -h|--help)
+            echo "gdbserver with jLink"
+            echo "  gdbserver-jlink:           device=$device, speed=${speed}kHz"
+            echo "  gdbserver-jlink Cortex-M4: device=Cortex-M4, speed=${speed}kHz"
+            echo "  gdbserver-jlink 2000:      device=$device, speed=2000kHz"
+            exit 0
+            ;;
+        *)
+            if [[ "$(echo $i | awk '/^[0-9]+$/')" == "$i" ]]; then
+                speed="$i"
+            else
+                device="$i"
+            fi
+        ;;
+    esac
+done
+
+# add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
+params="-device $device -speed $speed -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout"  #-select usb=20151001
 
 # Segger Jlink GDB Server
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
