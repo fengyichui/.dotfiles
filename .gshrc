@@ -35,7 +35,7 @@ alias vim-='vim -c "silent file stdin | set nomodified" -'
 
 # diff
 alias diff='diff --color=auto'
-alias gdiff='git diff --no-index'
+alias diffg='git diff --no-index'
 
 # Stopwatch
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
@@ -177,12 +177,12 @@ loop ()
 }
 
 # diff pach file
-diff-path ()
+diffpath ()
 {
     if [[ -d "$1" && -d "$2" ]]; then
         diff -U0 <(cd "$1" && find | sort) <(cd "$2" && find | sort)
     else
-        echo "Usage: diff-path <path1> <path2>"
+        echo "Usage: diffpath <path1> <path2>"
     fi
 }
 
