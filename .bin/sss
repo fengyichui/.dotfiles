@@ -264,7 +264,7 @@ trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
 # ss
 if command -v shadowsocks-libqss > /dev/null 2>&1; then
-    shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam
+    shadowsocks-libqss -t 600 $proxy_mode $localparam $serverparam | awk '!/INFO: TCP connection timeout./'
 elif command -v shadowsocks-libev > /dev/null 2>&1; then
     shadowsocks-libev -t 600 $proxy_mode $localparam $serverparam
 elif command -v sslocal > /dev/null 2>&1; then
