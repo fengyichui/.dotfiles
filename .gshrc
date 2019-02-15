@@ -9,8 +9,8 @@
 
 # ls
 alias ls='ls --color=auto --group-directories-first' # classify files in colour
-alias l='ls -l --time-style=long-iso'                # long list file (--time-style=long-iso in GNU-coreutils)
-alias ll='l -A'                                      # long list all file
+alias l='ls -l --time-style=long-iso -h'             # long list file (--time-style=long-iso in GNU-coreutils)
+alias ll='ls -l --time-style=long-iso -A'            # long list all file
 
 # grep file
 alias grep='grep -i -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
