@@ -82,9 +82,18 @@ alias fscan='ncdu'
 # remove repeat line (not sort) (awk '!x[$0]++' filename)
 alias rm-repeat-line="awk '!x[\$0]++'"
 
+# trans
+alias trans='translate'
+
 #####################################
 #             Function              #
 #####################################
+
+# translate
+translate ()
+{
+    \trans -hl zh :zh+en "$@" | less
+}
 
 # Dumpbin function for windows
 dumpbin_func ()

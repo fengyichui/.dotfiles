@@ -570,8 +570,8 @@ nnoremap <A-n> :cnext<cr>zvzz
 nnoremap <A-S-n> :cprevious<cr>zvzz
 
 " trans
-nnoremap <A-k> :call lq#Scratch("!trans :zh+en '".expand("<cword>")."'")<cr>:AnsiEsc!<cr>
-vnoremap <A-k> :call lq#Scratch("!trans :zh+en '".lq#GetVisualSelectText()."'")<cr>:AnsiEsc!<cr>
+nnoremap <A-k> :call lq#Scratch("!trans -hl zh :zh+en '".expand("<cword>")."'")<cr>:AnsiEsc!<cr>
+vnoremap <A-k> :call lq#Scratch("!trans -hl zh :zh+en '".lq#GetVisualSelectText()."'")<cr>:AnsiEsc!<cr>
 
 " Shortcut: Leader {{{2
 
