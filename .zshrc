@@ -26,13 +26,24 @@ if [[ -f "/tmp/.notmux.tmp" ]]; then
     rm -f /tmp/.notmux.tmp
 else
     if [[ -z "$SSH_CONNECTION" && -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
-        tmux_ls=$(tmux ls 2>/dev/null)
-        # FIXME: workaround cygwin tmux
-        if [[ "$tmux_ls" && "$OSTYPE" =~ "cygwin" && "$(echo $tmux_ls | wc -l)" == "6" ]]; then
-            echo "Warning: tmux can only open up to 6 sessions in cygwin"
+        if [[ "$OSTYPE" == "cygwin" ]]; then
+            # FIXME: workaround cygwin tmux
+            # https://www.cygwin.com/cygwin-ug-net/highlights.html#ov-hi-sockets :
+            # AF_UNIX (AF_LOCAL) sockets are not available in Winsock. They are implemented in Cygwin by using local AF_INET sockets instead.
+            if grep -m1 -q tmux /proc/[0-9]*/exename; then
+                tmux_ls=$(tmux ls 2>/dev/null)
+                if [[ "$(wc -l <<< $tmux_ls)" -ge "6" ]]; then
+                    echo "Warning: tmux can only open up to 6 sessions in cygwin"
+                else
+                    (grep -vq attached <<< $tmux_ls) && exec tmux attach-session -d || exec tmux
+                fi
+            else
+                rm -f "/tmp/tmux-$UID/default"
+                exec tmux
+            fi
         else
             # try to reattach sessions
-            (echo -n $tmux_ls | grep -vq attached) && exec tmux attach-session -d || exec tmux
+            (tmux ls 2>/dev/null | grep -vq attached) && exec tmux attach-session -d || exec tmux
         fi
     fi
 fi
