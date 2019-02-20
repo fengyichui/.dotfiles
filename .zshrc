@@ -30,7 +30,7 @@ else
             # FIXME: workaround cygwin tmux
             # https://www.cygwin.com/cygwin-ug-net/highlights.html#ov-hi-sockets :
             # AF_UNIX (AF_LOCAL) sockets are not available in Winsock. They are implemented in Cygwin by using local AF_INET sockets instead.
-            if grep -m1 -q tmux /proc/[0-9]*/exename; then
+            if grep -q tmux /proc/[0-9]*/exename; then
                 tmux_ls=$(tmux ls 2>/dev/null)
                 if [[ "$(wc -l <<< $tmux_ls)" -ge "6" ]]; then
                     echo "Warning: tmux can only open up to 6 sessions in cygwin"
