@@ -45,6 +45,7 @@ function! lq#CmdLine(cmd, cursor_left_num)
 endfunction
 
 " grep automatically, use 'ag'
+" NOTE: grep option and params must be use "" and not '', window version gvim not support ''
 function! lq#GrepAuto(pattern, path, ignorecase)
     if a:ignorecase
         let l:opt = '-i'
@@ -64,9 +65,9 @@ function! lq#GrepAuto(pattern, path, ignorecase)
                 let l:files = '(?i:.*\.' . ext . '$)'
             endif
         endif
-        call lq#CmdLine("grep " . l:opt . " -G '" . l:files . "' '" . a:pattern . "'", 1)
+        call lq#CmdLine("grep " . l:opt . ' -G "' . l:files . '" "' . a:pattern . '"', 1)
     else
-        call lq#CmdLine("grep " . l:opt . " '" . a:pattern . "' " . a:path, strlen(a:path)+2)
+        call lq#CmdLine("grep " . l:opt . ' "' . a:pattern . '" ' . a:path, strlen(a:path)+2)
     endif
 endfunction
 
