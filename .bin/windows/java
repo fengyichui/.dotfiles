@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cyg2win -e -i "java.exe $*"
