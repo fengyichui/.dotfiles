@@ -242,15 +242,15 @@ hi WildMenu         ctermfg=16              ctermbg=186
 " added line
 hi DiffAdd          guifg=#ffaa33           guibg=#3b1d1e           gui=italic
 hi DiffAdd          ctermfg=214             ctermbg=52              cterm=italic
-" changed line
-hi DiffChange       guifg=#ae81ff           guibg=#3b1d1e           gui=italic
-hi DiffChange       ctermfg=135             ctermbg=52              cterm=italic
 " deleted line
 hi DiffDelete       guifg=#ee0000           guibg=#3b1d1e           gui=italic
 hi DiffDelete       ctermfg=196             ctermbg=52              cterm=italic
-" changed text within line
-hi DiffText         guifg=#3eb8e5           guibg=#3b1d1e           gui=italic
-hi DiffText         ctermfg=38              ctermbg=52              cterm=italic
+" changed text within changed line
+hi DiffText         guifg=#ee0000           guibg=#3b1d1e           gui=italic
+hi DiffText         ctermfg=196             ctermbg=52              cterm=italic
+" unchanged text within changed line
+hi DiffChange       guifg=#3eb8e5           guibg=#3b1d1e           gui=italic
+hi DiffChange       ctermfg=38              ctermbg=52              cterm=italic
 
 " Folds
 " -----
