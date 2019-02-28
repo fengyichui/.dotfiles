@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cyg2win -e -i "bcomp.exe $* &"
+cyg2win -p -e -i "bcomp.exe $* &"
 
