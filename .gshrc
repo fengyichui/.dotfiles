@@ -136,13 +136,17 @@ latest ()
 # find file
 ff ()
 {
-    find -iname "*$@*"
+    for i; do
+        find -iname "*$i*"
+    done
 }
 
 # grep pattern
 gg ()
 {
-    grep -nir "$@"
+    for i; do
+        grep -nir "$i"
+    done
 }
 
 # create a daemon process
