@@ -451,7 +451,7 @@ class issue_reappear_register(gdb.Command):
 
     """HS662x issue reappear with simulator
     issue_reappear <ROM_DIR> <USR_DIR>
-    ROM_DIR: xxx.axf
+    ROM_DIR: xxx.axf xxx.bin
     USR_DIR: xxx.axf xxx.log xxx.bin
     """
 
