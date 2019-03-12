@@ -469,6 +469,7 @@ class issue_reappear_register(gdb.Command):
             raise gdb.GdbError('Invalid params, "help issue_reappear" for more infomation')
 
         rom_axf = None
+        rom_bin = None
         usr_axf = None
         usr_bin = None
         usr_log = None
@@ -477,8 +478,10 @@ class issue_reappear_register(gdb.Command):
         for file in os.listdir(rom_dir):
             if file.endswith(".axf"):
                 rom_axf = os.path.join(rom_dir, file)
-        if rom_axf == None:
-            raise gdb.GdbError('Can not found ROM axf file!')
+            elif file.endswith(".bin"):
+                rom_bin = os.path.join(rom_dir, file)
+        if rom_axf == None or rom_bin == None:
+            raise gdb.GdbError('Can not found ROM axf/bin file!')
 
         # Search USR files
         for file in os.listdir(usr_dir):
@@ -493,6 +496,7 @@ class issue_reappear_register(gdb.Command):
             raise gdb.GdbError('Can not found USR bin/log file!')
 
         print("rom_axf: {}".format(rom_axf))
+        print("rom_bin: {}".format(rom_bin))
         print("usr_axf: {}".format(usr_axf))
         print("usr_bin: {}".format(usr_bin))
         print("usr_log: {}".format(usr_log))
@@ -507,6 +511,7 @@ class issue_reappear_register(gdb.Command):
 
         # Add ROM and USR info
         gdb.execute('file {}'.format(rom_axf), to_string=True)
+        gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True)
         if usr_axf:
             gdb.execute('add-symbol-file {} 0'.format(usr_axf), to_string=True)
         gdb.execute('restore {} binary 0'.format(usr_bin), to_string=True)
