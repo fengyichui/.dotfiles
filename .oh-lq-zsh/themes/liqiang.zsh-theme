@@ -21,7 +21,7 @@ setopt PROMPT_SUBST
 PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
 
 # Set prompt (right)
-RPROMPT='%{$fg[magenta]%}${rprompt}%{$reset_color%}'
+RPROMPT='%F{243}${rprompt}%{$reset_color%}'
 
 # Outputs the name of the current project
 function prompt_git_current_project() {
@@ -89,10 +89,17 @@ function precmd() {
             kill -s HUP $1 >/dev/null 2>&1 || :
         fi
 
+        # generate prompt
+        git_current_info="$(prompt_git_current_info)"
+        tmp_prompt="export GIT_CURRENT_INFO='$git_current_info';"
+        if [[ -z "$git_current_info" ]]; then
+            tmp_prompt+="rprompt=''"
+        else
+            tmp_prompt+="rprompt='♪ $git_current_info'"
+        fi
+
         # save to temp file
-        echo "GIT_CURRENT_INFO='$(prompt_git_current_info)'" > "${HOME}/.zsh_tmp_prompt"
-        echo 'rprompt="$GIT_CURRENT_INFO"' >> "${HOME}/.zsh_tmp_prompt"
-        echo 'export GIT_CURRENT_INFO' >> "${HOME}/.zsh_tmp_prompt"
+        echo "$tmp_prompt" > "${HOME}/.zsh_tmp_prompt"
 
         # signal parent, trigger TRAPUSR1()
         kill -s USR1 $$

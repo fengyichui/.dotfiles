@@ -446,6 +446,116 @@ class flash_erase_register(gdb.Command):
         print("Finish")
         flash_finish()
 
+# issue reappear
+class issue_reappear_register(gdb.Command):
+
+    """HS662x issue reappear with simulator
+    issue_reappear <ROM_DIR> <USR_DIR>
+    ROM_DIR: xxx.axf xxx.bin
+    USR_DIR: xxx.axf xxx.log xxx.bin
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("issue_reappear", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # param
+        argv = gdb.string_to_argv(args)
+        if len(argv) == 2:
+            rom_dir = argv[0]
+            usr_dir = argv[1]
+        else:
+            raise gdb.GdbError('Invalid params, "help issue_reappear" for more infomation')
+
+        rom_axf = None
+        rom_bin = None
+        usr_axf = None
+        usr_bin = None
+        usr_log = None
+
+        # Search ROM files
+        for file in os.listdir(rom_dir):
+            if file.endswith(".axf"):
+                rom_axf = os.path.join(rom_dir, file)
+            elif file.endswith(".bin"):
+                rom_bin = os.path.join(rom_dir, file)
+        if rom_axf == None or rom_bin == None:
+            raise gdb.GdbError('Can not found ROM axf/bin file!')
+
+        # Search USR files
+        for file in os.listdir(usr_dir):
+            if file.endswith(".axf"):
+                usr_axf = os.path.join(usr_dir, file)
+            elif file.endswith(".bin"):
+                usr_bin = os.path.join(usr_dir, file)
+            elif file.endswith(".log"):
+                usr_log = os.path.join(usr_dir, file)
+
+        if usr_bin == None or usr_log == None:
+            raise gdb.GdbError('Can not found USR bin/log file!')
+
+        print("rom_axf: {}".format(rom_axf))
+        print("rom_bin: {}".format(rom_bin))
+        print("usr_axf: {}".format(usr_axf))
+        print("usr_bin: {}".format(usr_bin))
+        print("usr_log: {}".format(usr_log))
+
+        # Start simulate
+        gdb.execute('file', to_string=True)
+        gdb.execute('file ~/.dotfiles/.gdb/sim_cm3.axf', to_string=True)
+        gdb.execute('target sim', to_string=True)
+        gdb.execute('load', to_string=True)
+        print("\nPress 'Ctrl-C' to continue")
+        gdb.execute('run', to_string=True)
+
+        # Add ROM and USR info
+        gdb.execute('file {}'.format(rom_axf), to_string=True)
+        gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True)
+        if usr_axf:
+            gdb.execute('add-symbol-file {} 0'.format(usr_axf), to_string=True)
+        gdb.execute('restore {} binary 0'.format(usr_bin), to_string=True)
+        gdb.execute('restore {} binary 0x20000000'.format(usr_bin), to_string=True)
+        gdb.execute('restore_dump_mem {}'.format(usr_log), to_string=True)
+        gdb.execute('restore_dump_reg {}'.format(usr_log), to_string=True)
+
+        # Debug
+        print("\nDump ARM Register")
+        print(  "-----------------")
+        gdb.execute('dump_reg_armcm')
+
+        print("\nDump ARM Fault")
+        print(  "--------------")
+        gdb.execute('dump_fault_armcm')
+
+        print("\nStack")
+        print(  "-----")
+        gdb.execute('x/40wx $sp')
+
+        print("\nDisassemble")
+        print(  "-----------")
+        gdb.execute('x/16i $pc-16')
+
+        print("\nRegister")
+        print(  "--------")
+        print("r0    {}".format(gdb.parse_and_eval('(char *)$r0')))
+        print("r1    {}".format(gdb.parse_and_eval('(char *)$r1')))
+        print("r2    {}".format(gdb.parse_and_eval('(char *)$r2')))
+        print("r3    {}".format(gdb.parse_and_eval('(char *)$r3')))
+        print("r4    {}".format(gdb.parse_and_eval('(char *)$r4')))
+        print("r5    {}".format(gdb.parse_and_eval('(char *)$r5')))
+        print("r6    {}".format(gdb.parse_and_eval('(char *)$r6')))
+        print("r7    {}".format(gdb.parse_and_eval('(char *)$r7')))
+        print("r8    {}".format(gdb.parse_and_eval('(char *)$r8')))
+        print("r9    {}".format(gdb.parse_and_eval('(char *)$r9')))
+        print("r10   {}".format(gdb.parse_and_eval('(char *)$r10')))
+        print("r11   {}".format(gdb.parse_and_eval('(char *)$r11')))
+        print("r12   {}".format(gdb.parse_and_eval('(char *)$r12')))
+
+        print("\nBacktrace")
+        print(  "---------")
+        gdb.execute('bt')
+
 
 # register
 remap2ram_register()
@@ -458,7 +568,7 @@ flash_download_cfg_register()
 flash_download_patch_register()
 flash_download_image_register()
 flash_erase_register()
-
+issue_reappear_register();
 
 # @} #
 

@@ -127,7 +127,7 @@
     clone1 = clone --depth=1
 
     # various pretty loggers from various places
-    lg = log --graph --pretty=format:'%C(yellow)%cd %C(red)%h%Creset -%C(auto)%d%Creset %s %C(blue)(%an) %C(dim)%C(white)%cr%Creset' --abbrev-commit --date=short
+    lg = !LESS+=' -S' git log --graph --pretty=format:'%C(yellow)%cd %C(red)%h%Creset -%C(auto)%d%Creset %s %C(blue)(%an) %C(dim)%C(white)%cr%Creset' --abbrev-commit --date=short
     lgb = !git lg --branches
     lc = !git lg ORIG_HEAD.. --name-status
     lf = !git lg --name-status

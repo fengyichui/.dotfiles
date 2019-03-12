@@ -165,7 +165,7 @@ function findworkspace()
 {
   # default working directory, mirror and architecture
 
-  mirror=http://ftp.jaist.ac.jp/pub/cygwin
+  mirror=http://mirrors.163.com/cygwin/
   arch="$(current_cygarch)"
   cache=/setup
   
