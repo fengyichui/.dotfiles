@@ -102,19 +102,27 @@ TVs=( \
   ['旅游卫视']='http://ivi.bupt.edu.cn/hls/lytv.m3u8' \
 )
 
-record_file_option=''
-if [[ "$1" == "-r" ]]; then
-    record_file_option="--record-file=mpv_record_$(date '+%Y%m%d_%H%M%S').ts"
-    shift
-fi
-
-if [[ -n "$1" ]]; then
-    TV=${TVs[$1]}
-fi
+for i; do
+    case $i in
+        -r)
+            record="--record-file=mpv_record_$(date '+%Y%m%d_%H%M%S').ts"
+            shift
+            ;;
+        -a)
+            TV="--playlist ${TVs[@]}"
+            shift
+            ;;
+        *)
+            TV="${TVs[$i]}"
+            break
+            ;;
+    esac
+done
 
 if [[ -z "$TV" ]]; then
     echo "Options:"
     echo "-r  Record TV stream to file"
+    echo "-a  Play all TVs"
     echo ""
     echo "TVs:"
     echo "${!TVs[@]}" | sed 's/ /\n/g' | sort | fmt
@@ -122,8 +130,8 @@ if [[ -z "$TV" ]]; then
 fi
 
 if [[ $OSTYPE == cygwin* ]]; then
-    mpv $record_file_option $TV 2>&1 | stdbuf -o0 tr '\n' '\r'
+    mpv $record $TV 2>&1 | stdbuf -o0 tr '\n' '\r'
 else
-    mpv $record_file_option $TV
+    mpv $record $TV
 fi
 
