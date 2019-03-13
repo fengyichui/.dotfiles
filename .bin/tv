@@ -111,5 +111,9 @@ if [[ -z "$TV" ]]; then
     exit 1
 fi
 
-mpv $TV
+if [[ $OSTYPE == cygwin* ]]; then
+    mpv $TV 2>&1 | stdbuf -o0 tr '\n' '\r'
+else
+    mpv $TV
+fi
 
