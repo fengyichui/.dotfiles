@@ -85,21 +85,43 @@ function! lq#ReplaceAllAuto(pattern)
 endfunction
 
 " Get Visual Select Text
-function! lq#GetVisualSelectText()
-    let [lnum1, col1] = getpos("'<")[1:2]
-    let [lnum2, col2] = getpos("'>")[1:2]
-    let lines = getline(lnum1, lnum2)
-    let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
-    let lines[0] = lines[0][col1 - 1:]
-    return join(lines, "\n")
+function! lq#GetVisualSelectText(...) range
+    if a:0 == 0
+        let op = 'remove_return'
+    else
+        let op = a:1
+    endif
+    let txt = ''
+    try
+        let v_save = @v
+        normal! gv"vy
+        if op == 'remove_return'
+            let txt = substitute(@v, "\n", " ", "g")
+        elseif op == 'split_return'
+            let txt = split(@v, "\n")
+        else
+            let txt =  @v
+        endif
+    finally
+        let @v = v_save
+    endtry
+    return txt
+
+" Following way may error when Block-Virsual Mode selecting EMPTY-LINE
+"    let [lnum1, col1] = getpos("'<")[1:2]
+"    let [lnum2, col2] = getpos("'>")[1:2]
+"    let lines = getline(lnum1, lnum2)
+"    let lines[-1] = lines[-1][: col2 - (&selection == 'inclusive' ? 1 : 2)]
+"    let lines[0] = lines[0][col1 - 1:]
+"    return join(lines, "\n")
 endfunction
 
 " Visual Select
 function! lq#VisualSelect(mode) range
     if a:mode =~ 'grep'
-        let l:pattern = substitute(escape(lq#GetVisualSelectText(), "\\/.*$^~[]#%()'"), "\n$", "", "")
+        let l:pattern = escape(lq#GetVisualSelectText(), "\\/.*$^~[]#%()'")
     else
-        let l:pattern = substitute(escape(lq#GetVisualSelectText(), "\\/.*$^~[]"), "\n$", "", "")
+        let l:pattern = escape(lq#GetVisualSelectText(), "\\/.*$^~[]")
     endif
     if a:mode == 'search'
         let @/ = l:pattern
@@ -537,53 +559,21 @@ endfunc
 
 " Sum
 function! lq#SumNumbers(...) range
+    " Work
     let l:sum = str2float("0.0")
-    let l:cur = ""
-
-    let y1 = line("'<")
-    let y2 = line("'>")
-
-    if visualmode() =~ '\cv' && y1 != y2
-        while y1 <= y2
-            let l:str = getline(y1)
-            let l:pos = 0
-            while 1
-                let l:cur = matchstr(l:str, '0[xX][0-9a-fA-F]\+\|[-+]\?\d\+\(\.\d\+\)\?', l:pos)
-                let l:pos = stridx(l:str, l:cur, l:pos)
-                if l:cur == "" || l:pos == -1
-                    break
-                endif
-                let l:sum += eval(l:cur)
-                let l:pos = l:pos + strlen(l:cur)
-            endwhile
-            let y1 += 1
+    let l:txts = lq#GetVisualSelectText('split_return')
+    for l:str in l:txts
+        let l:pos = 0
+        while 1
+            let l:cur = matchstr(l:str, '0[xX][0-9a-fA-F]\+\|[-+]\?\d\+\(\.\d\+\)\?', l:pos)
+            let l:pos = stridx(l:str, l:cur, l:pos)
+            if l:cur == "" || l:pos == -1
+                break
+            endif
+            let l:sum += eval(l:cur)
+            let l:pos = l:pos + strlen(l:cur)
         endwhile
-    else "if (visualmode() =~ '\cv' && y1 == y2) || (visualmode() == "\<c-v>")
-        let x1 = col("'<")
-        let x2 = col("'>")
-        " swap the X coords when the box is drawn from the right-hand side
-        if x2 < x1
-            let x1 = x1 + x2
-            let x2 = x1 - x2
-            let x1 = x1 - x2
-        endif
-        let x1 = x1 - 1
-        let len = x2 - x1
-        while y1 <= y2
-            let l:str = strpart(getline(y1), x1, len)
-            let l:pos = 0
-            while 1
-                let l:cur = matchstr(l:str, '0[xX][0-9a-fA-F]\+\|[-+]\?\d\+\(\.\d\+\)\?', l:pos)
-                let l:pos = stridx(l:str, l:cur, l:pos)
-                if l:cur == "" || l:pos == -1
-                    break
-                endif
-                let l:sum += eval(l:cur)
-                let l:pos = l:pos + strlen(l:cur)
-            endwhile
-            let y1 += 1
-        endwhile
-    endif
+    endfor
 
     "Drop the fractional amount if it's zero
     "TODO: When scientific notation is supported, this will need to be changed
@@ -591,9 +581,11 @@ function! lq#SumNumbers(...) range
         let l:sum = float2nr(l:sum)
     endif
 
+    "Show
     redraw
     let l:sum_hex = printf("0x%X", float2nr(l:sum))
     echo "sum =" l:sum l:sum_hex
+
     "save the sum in the variable b:sum, and optionally
     "into the register specified by the user
     let b:sum = l:sum
@@ -636,7 +628,7 @@ endfunction
 
 " Open scratch buffer with command:
 " 1st:command 2nd:filetype 3rd:reentry 4th:afterexe
-function! lq#Scratch(...) abort
+function! lq#Scratch(...) abort range
     " Parse the params
     if a:0 == 0
         let l:cmd       = ''
