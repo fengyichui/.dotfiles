@@ -19,6 +19,35 @@ max_con_per_server_cfg=""
 misc_cfg=""
 dlthing=""
 
+function run_tracker_update ()
+{
+    list=$(wget -O- "$trackerurl" | awk NF | sed ":a;N;s/\\n/,/g;ta")
+    cp -f "$configsys" "$configtracker"
+    echo "bt-tracker=$list" >>"$configtracker"
+    echo "$configtracker: bt-tracker=$list"
+}
+
+function usage ()
+{
+    echo "Faster downloader (aria2)"
+    echo "Usage: dl [option] [url/file]"
+    echo "Options:"
+    echo "  -i          Ignore unfinished tasks"
+    echo "  -ui         Show ui"
+    echo "  -t          Update BT tracker"
+    echo "  -p          Priority download header"
+    echo "  -m          Just download torrent file"
+    echo "  -ls         List torrent included files"
+    echo "  -ls=1,3-9   Select torrent included files to download (List by -ls)"
+    echo "  -d=<dir>    Set download directory"
+    echo "  -NUM        Set number of max connection per server. default 16 in aria2.conf"
+    echo "  -h          Show this help and exit"
+    echo "  --help      Show aria2c help"
+    echo "  --xxx       As aria2c option"
+    echo "by liqiang (2018/12/20)"
+    exit 0
+}
+
 # Parse argument
 for i in "$@"
 do
@@ -32,26 +61,7 @@ do
         -ls=*) misc_cfg="$misc_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
         --*) misc_cfg="$misc_cfg $i"; shift ;;
-
-        -h)
-            echo "Faster downloader (aria2)"
-            echo "Usage: dl [option] [url/file]"
-            echo "Options:"
-            echo "  -i          Ignore unfinished tasks"
-            echo "  -ui         Show ui"
-            echo "  -t          Update BT tracker"
-            echo "  -p          Priority download header"
-            echo "  -m          Just download torrent file"
-            echo "  -ls         List torrent included files"
-            echo "  -ls=1,3-9   Select torrent included files to download (List by -ls)"
-            echo "  -d=<dir>    Set download directory"
-            echo "  -NUM        Set number of max connection per server. default 16 in aria2.conf"
-            echo "  -h          Show this help and exit"
-            echo "  --help      Show aria2c help"
-            echo "  --xxx       As aria2c option"
-            echo "by liqiang (2018/12/20)"
-            exit 0
-            ;;
+        -h) usage ;;
 
         *)
             if [[ "$(awk '/^-[0-9]+$/' <<< $i)" == "$i" ]]; then
@@ -77,10 +87,7 @@ fi
 
 # tracker
 if [[ ! -z "$tracker_update" ]]; then
-    list=$(wget -O- "$trackerurl" | awk NF | sed ":a;N;s/\\n/,/g;ta")
-    cp -f "$configsys" "$configtracker"
-    echo "bt-tracker=$list" >>"$configtracker"
-    echo "$configtracker: bt-tracker=$list"
+    run_tracker_update
     exit
 fi
 
@@ -90,6 +97,22 @@ if [[ ! -d $dir ]]; then
 fi
 
 # config
+if [[ -f $configtracker ]]; then
+    sys_time_s=$(date +%s) 
+    modify_time_s=$(stat -c %Y $configtracker)
+    diff_day=$(( ($sys_time_s - $modify_time_s) / 86400 ))
+    if [[ $diff_day -ge 7 ]]; then
+        read -r -p "BT tracker file is too old, update? [yN] " answer
+        if [[ "$answer" == "y" ]]; then
+            run_tracker_update
+        fi
+    fi
+else
+    read -r -p "BT tracker file is not exist, update? [yN] " answer
+    if [[ "$answer" == "y" ]]; then
+        run_tracker_update
+    fi
+fi
 if [[ -f $configtracker ]]; then
     config_cfg="--conf-path='$configtracker'"
 fi
