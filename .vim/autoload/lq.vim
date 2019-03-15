@@ -581,10 +581,21 @@ function! lq#SumNumbers(...) range
         let l:sum = float2nr(l:sum)
     endif
 
+    let l:sum_int = float2nr(l:sum)
+    let l:sum_hex = printf("0x%X", l:sum_int)
+    if l:sum_int < 1024
+        let l:sum_size = printf("%dB", l:sum_int)
+    elseif l:sum_int < 1024*1024
+        let l:sum_size = printf("%.1fKB", l:sum_int/1024.0)
+    elseif l:sum_int < 1024*1024*1024
+        let l:sum_size = printf("%.1fMB", l:sum_int/1024.0/1024.0)
+    else
+        let l:sum_size = printf("%.1fGB", l:sum_int/1024.0/1024.0/1024.0)
+    endif
+
     "Show
     redraw
-    let l:sum_hex = printf("0x%X", float2nr(l:sum))
-    echo "sum =" l:sum l:sum_hex
+    echo "sum =" l:sum l:sum_size l:sum_hex
 
     "save the sum in the variable b:sum, and optionally
     "into the register specified by the user
