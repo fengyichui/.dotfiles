@@ -138,14 +138,17 @@ if [[ -z "$dlthing" ]]; then
     if [[ -s $save_session && -z "$ignore_unfinished" ]]; then
         inputfile_cfg="--input-file='$save_session'"
     fi
-elif [[ -f "$dlthing" && "$dlthing" != *.torrent ]]; then
-    inputfile_cfg="--input-file='$dlthing'"
-    dlthing=""
+elif [[ -f "$dlthing" ]]; then
+    dlthing=$(realpath $dlthing)
+    if [[ "$dlthing" != *.torrent ]]; then
+        inputfile_cfg="--input-file='$dlthing'"
+        dlthing=""
+    fi
 fi
 
 # select torrent files
 if [[ -z "$torrent_cfg" && "$dlthing" == *.torrent ]]; then
-    dl -ls "$dlthing"
+    aria2c --show-files "$dlthing"
     read -r -p "Select files index (eg 1,3-9): " answer
     if [[ -n "$answer" ]]; then
         misc_cfg="$misc_cfg --select-file=$answer"
