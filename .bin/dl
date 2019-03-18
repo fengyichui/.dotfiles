@@ -81,7 +81,9 @@ if [[ -n "$ui" ]]; then
     else
         open "$uiurl"
     fi
-    exit
+    if [[ $(pgrep aria2c) ]] ; then
+        exit
+    fi
 fi
 
 # tracker
