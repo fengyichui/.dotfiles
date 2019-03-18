@@ -429,14 +429,8 @@ menu liqiang.switch-vcs-root<TAB>SwitchVCSRoot :call lq#SwitchVCSRoot()<cr>
 menu liqiang.hex(endian)<TAB>HexEndianToggle :call lq#HexEndianToggle()<cr>
 menu liqiang.tail<TAB>:TailToggle :TailToggle<cr>
 
-" Command line
-menu liqiang.-Sep1- :
-menu liqiang.bash<TAB>:Bash :Bash<cr>
-menu liqiang.cmd<TAB>:Cmd :Cmd<cr>
-menu liqiang.jlink<TAB>:Jlink :Jlink<cr>
-
 " Program
-menu liqiang.-Sep2- :
+menu liqiang.-Sep1- :
 menu liqiang.complete-ycm(clang)<TAB>:packadd\ YouCompleteMe :Xycm<cr>
 menu liqiang.complete-omni(ctags)<TAB>:packadd\ OmniCppComplete :Xomni<cr>
 menu liqiang.highlight<TAB>:packadd\ TagHighlight :Xhighlight<cr>
