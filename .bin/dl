@@ -56,7 +56,7 @@ do
         -t) tracker_update=1; shift ;;
         -p) misc_cfg="$misc_cfg --bt-prioritize-piece=head"; shift ;;
         -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; shift ;;
-        -ls) torrent_cfg="$torrent_cfg --show-files"; shift ;;
+        -ls) list_torrent=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
         --*) misc_cfg="$misc_cfg $i"; shift ;;
@@ -75,7 +75,7 @@ do
 done
 
 # ui
-if [[ ! -z "$ui" ]]; then
+if [[ -n "$ui" ]]; then
     if [[ -f "$uilocal" ]]; then
         open "$uilocal"
     else
@@ -85,8 +85,14 @@ if [[ ! -z "$ui" ]]; then
 fi
 
 # tracker
-if [[ ! -z "$tracker_update" ]]; then
+if [[ -n "$tracker_update" ]]; then
     run_tracker_update
+    exit
+fi
+
+# list torrent
+if [[ -n "$list_torrent" ]]; then
+    aria2c --show-files "$dlthing"
     exit
 fi
 
@@ -119,7 +125,7 @@ fi
 
 # resume ?
 save_session="$dir/$session"
-if [[ -s $save_session && ! -z "$dlthing" ]]; then
+if [[ -s $save_session && -n "$dlthing" ]]; then
     echo "$save_session:"
     echo "===================="
     cat "$save_session"
@@ -148,7 +154,7 @@ fi
 
 # select torrent files
 if [[ -z "$torrent_cfg" && "$dlthing" == *.torrent ]]; then
-    aria2c --show-files "$dlthing"
+    dl -ls "$dlthing"
     read -r -p "Select files index (eg 1,3-9): " answer
     if [[ -n "$answer" ]]; then
         misc_cfg="$misc_cfg --select-file=$answer"
