@@ -100,6 +100,7 @@ if [[ -f $configtracker ]]; then
     sys_time_s=$(date +%s) 
     modify_time_s=$(stat -c %Y $configtracker)
     diff_day=$(( ($sys_time_s - $modify_time_s) / 86400 ))
+    echo "BT tracker updated $diff_day days ago"
     if [[ $diff_day -ge 7 ]]; then
         read -r -p "BT tracker file is too old, update? [yN] " answer
         if [[ "$answer" == "y" ]]; then
