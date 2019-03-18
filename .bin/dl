@@ -26,6 +26,18 @@ function run_tracker_update ()
     echo "$configtracker: bt-tracker=$list"
 }
 
+function magnet_hash()
+{
+    hash=$(sed 's/^\s*magnet:?xt=urn:btih:\([^&]\+\).*$/\1/' <<< "$1")
+    [[ "$hash" != "$1" ]] && echo $(tr 'A-Z' 'a-z' <<< $hash)
+}
+
+function magnet_displayname()
+{
+    displayname=$(sed 's/^\s*magnet:?xt=urn:btih:.\+&dn=\([^&]\+\).*$/\1/' <<< "$1")
+    [[ "$displayname" != "$1" ]] && echo -e $(sed 's/%/\\x/g' <<< "$displayname")
+}
+
 function usage ()
 {
     echo "Faster downloader (aria2)"
@@ -55,7 +67,7 @@ do
         -ui) ui=1; shift ;;
         -t) tracker_update=1; shift ;;
         -p) misc_cfg="$misc_cfg --bt-prioritize-piece=head"; shift ;;
-        -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; shift ;;
+        -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; rename_torrent=1; shift ;;
         -ls) list_torrent=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
@@ -171,9 +183,19 @@ else
     cmd="$cmd '$dlthing'"
 fi
 
+
 # execute
 echo "####################"
 echo "$cmd" | sed -e 's/ \+$//g' -e 's/ \+/\n/g'
 echo "####################"
 eval "$cmd"
 
+# rename downlaod torrent file
+if [[ -n "$rename_torrent" ]]; then
+    mhash=$(magnet_hash $dlthing)
+    mnane=$(magnet_displayname $dlthing)
+    [[ -z "$mhash" || -z "$mnane" ]] && exit
+    [[ -f "$dir/$mhash.torrent" ]] || exit
+    cp "$dir/$mhash.torrent" "$dir/$mnane.torrent"
+    echo "Copy metadata as $dir/$mnane.torrent"
+fi
