@@ -26,16 +26,42 @@ function run_tracker_update ()
     echo "$configtracker: bt-tracker=$list"
 }
 
+# $1 = magnet_url
 function magnet_hash()
 {
     hash=$(sed 's/^\s*magnet:?xt=urn:btih:\([^&]\+\).*$/\1/' <<< "$1")
     [[ "$hash" != "$1" ]] && echo $(tr 'A-Z' 'a-z' <<< $hash)
 }
 
+# $1 = magnet_url
 function magnet_displayname()
 {
     displayname=$(sed 's/^\s*magnet:?xt=urn:btih:.\+&dn=\([^&]\+\).*$/\1/' <<< "$1")
     [[ "$displayname" != "$1" ]] && echo -e $(sed 's/%/\\x/g' <<< "$displayname")
+}
+
+# $1 = *.torrent
+function torrent_name ()
+{
+    dl -ls "$1" | awk '/^Name:/{print $2}'
+}
+
+# $1 = dir
+# $2 = magnet_url
+function humanize_torrent_file ()
+{
+    mhash=$(magnet_hash "$2")
+    [[ -z "$mhash" ]] && exit 1
+    [[ -f "$1/$mhash.torrent" ]] || exit 1
+    mname=$(magnet_displayname "$2")
+    [[ -z "$mname" ]] && mname=$(torrent_name "$1/$mhash.torrent")
+    if [[ -z "$mname" ]]; then
+        echo "$1/$mhash.torrent"
+        exit 1
+    else
+        cp "$1/$mhash.torrent" "$1/$mname.torrent"
+        echo "$1/$mname.torrent"
+    fi
 }
 
 function usage ()
@@ -183,7 +209,6 @@ else
     cmd="$cmd '$dlthing'"
 fi
 
-
 # execute
 echo "####################"
 echo "$cmd" | sed -e 's/ \+$//g' -e 's/ \+/\n/g'
@@ -192,10 +217,7 @@ eval "$cmd"
 
 # rename downlaod torrent file
 if [[ -n "$rename_torrent" ]]; then
-    mhash=$(magnet_hash $dlthing)
-    mnane=$(magnet_displayname $dlthing)
-    [[ -z "$mhash" || -z "$mnane" ]] && exit
-    [[ -f "$dir/$mhash.torrent" ]] || exit
-    cp "$dir/$mhash.torrent" "$dir/$mnane.torrent"
-    echo "Copy metadata as $dir/$mnane.torrent"
+    file=$(humanize_torrent_file "$dir" "$dlthing")
+    [[ -z "$file" ]] && exit
+    echo "Copy metadata as $file"
 fi
