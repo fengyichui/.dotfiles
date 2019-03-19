@@ -15,7 +15,13 @@ alias ll='ls -l --time-style=long-iso -A'            # long list all file
 # grep file
 alias grep='grep -i -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
 alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -nir -I --color=auto"
+
+# ff and gg
 alias gg-chinese="grep -P '[\p{Han}]'"
+alias ff-inc="ff -d /usr/include -d /usr/local/include"
+alias gg-inc="gg -d /usr/include -d /usr/local/include"
+alias ff-py3="ff -d /usr/lib/python3*"
+alias gg-py3="gg -d /usr/lib/python3*"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -136,52 +142,43 @@ latest ()
 # find file
 ff ()
 {
+    dir=""
     for i; do
-        find -iname "*$i*"
+        if [[ "$1" == "-d" ]]; then
+            if [[ -d "$2" ]]; then
+                dir="$dir $2"
+            fi
+            shift; shift
+        else
+            break
+        fi
+    done
+    for i; do
+        p=$(sed 's/\$$//g' <<< "$i")
+        if [[ "$p" == "$i" ]]; then
+            eval "find $dir -iname '*$p*'"
+        else
+            eval "find $dir -iname '$p'"
+        fi
     done
 }
 
 # grep pattern
 gg ()
 {
+    dir=""
     for i; do
-        ag -i --nogroup "$i"
+        if [[ "$1" == "-d" ]]; then
+            if [[ -d "$2" ]]; then
+                dir="$dir $2"
+            fi
+            shift; shift
+        else
+            break
+        fi
     done
-}
-
-# find file
-ff-inc ()
-{
     for i; do
-        find /usr/include -iname "*$i*"
-        find /usr/local/include -iname "*$i*"
-    done
-}
-
-# grep pattern
-gg-inc ()
-{
-    for i; do
-        ag -i --nogroup "$i" /usr/include
-        ag -i --nogroup "$i" /usr/local/include
-    done
-}
-
-# find file
-ff-py3 ()
-{
-    for i; do
-        find /usr/lib/python3* -iname "*$i*"
-        find /usr/local/lib/python3* -iname "*$i*"
-    done
-}
-
-# grep pattern
-gg-py3 ()
-{
-    for i; do
-        ag -i --nogroup "$i" /usr/lib/python3*
-        ag -i --nogroup "$i" /usr/local/lib/python3*
+        eval "ag -i '$i' $dir" #--nogroup
     done
 }
 
