@@ -29,7 +29,7 @@ alias cpx='rsync --info=progress2'
 
 # cd to git root dir
 alias cdg='git_root_dir=$(git rev-parse --show-toplevel) && [[ $git_root_dir ]] && cd $git_root_dir'
-alias cdr='cd $(PWD)'
+alias cdr='cd $(PWD);'
 
 # vim stdin
 alias vim-='vim -c "silent file stdin | set nomodified" -'
