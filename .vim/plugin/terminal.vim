@@ -172,7 +172,7 @@ let s:tmux_cursor_replace = s:tmux_wrap(s:cursor_replace)
 function s:do_autocmd(event)
     let cmd = getcmdline()
     let pos = getcmdpos()
-    exec 'silent doautocmd ' . a:event . ' %'
+    exec 'silent doautocmd ' . a:event . ' <nomodeline> %'
     call setcmdpos(pos)
     return cmd
 endfunction
@@ -196,17 +196,17 @@ function! s:tmux_fix()
     exec "set <F13>=\e[O"
     exec "set <F14>=\e[I"
 
-    nnoremap <silent> <F13> :silent doautocmd FocusLost %<CR>
-    nnoremap <silent> <F14> :silent doautocmd FocusGained %<CR>
+    nnoremap <silent> <F13> :silent doautocmd <nomodeline> FocusLost %<CR>
+    nnoremap <silent> <F14> :silent doautocmd <nomodeline> FocusGained %<CR>
 
-    onoremap <silent> <F13> <Esc>:silent doautocmd FocusLost %<CR>
-    onoremap <silent> <F14> <Esc>:silent doautocmd FocusGained %<CR>
+    onoremap <silent> <F13> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>
+    onoremap <silent> <F14> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>
 
-    vnoremap <silent> <F13> <Esc>:silent doautocmd FocusLost %<CR>gv
-    vnoremap <silent> <F14> <Esc>:silent doautocmd FocusGained %<CR>gv
+    vnoremap <silent> <F13> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>gv
+    vnoremap <silent> <F14> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>gv
 
-    inoremap <silent> <F13> <C-O>:silent doautocmd FocusLost %<CR>
-    inoremap <silent> <F14> <C-O>:silent doautocmd FocusGained %<CR>
+    inoremap <silent> <F13> <C-\><C-O>:silent doautocmd <nomodeline> FocusLost %<CR>
+    inoremap <silent> <F14> <C-\><C-O>:silent doautocmd <nomodeline> FocusGained %<CR>
 
     cnoremap <silent> <F13> <C-\>e<SID>do_autocmd('FocusLost')<CR>
     cnoremap <silent> <F14> <C-\>e<SID>do_autocmd('FocusGained')<CR>
@@ -220,10 +220,10 @@ function! s:tmux_focus_gained()
         " When gain focus, vim can't handle normal-mode cursor sharp
         if mode() == 'n'
             " Check locking
-            let timeout = 100
+            let timeout = 50
             while timeout > 0
-                " delay 10ms to wait losting-lock file create
-                sleep 10m
+                " delay 20ms to wait losting-lock file create
+                sleep 20m
                 if empty(glob(s:tmux_vim_focus_losting_lock))
                     break
                 endif
