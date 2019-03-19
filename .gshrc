@@ -15,7 +15,7 @@ alias ll='ls -l --time-style=long-iso -A'            # long list all file
 # grep file
 alias grep='grep -i -I --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'  # show differences in color
 alias grepc="find -type f | awk -v IGNORECASE=1 'gsub(/ /, \"\\\\ \"){}; /.*\.[chs](pp)?$/;' | xargs grep -nir -I --color=auto"
-alias grep-chinese="grep -P '[\p{Han}]'"
+alias gg-chinese="grep -P '[\p{Han}]'"
 
 # dumpbin with windows
 alias dumpbin-dependents='dumpbin_func dependents'
@@ -145,7 +145,43 @@ ff ()
 gg ()
 {
     for i; do
-        grep -nir "$i"
+        ag -i --nogroup "$i"
+    done
+}
+
+# find file
+ff-inc ()
+{
+    for i; do
+        find /usr/include -iname "*$i*"
+        find /usr/local/include -iname "*$i*"
+    done
+}
+
+# grep pattern
+gg-inc ()
+{
+    for i; do
+        ag -i --nogroup "$i" /usr/include
+        ag -i --nogroup "$i" /usr/local/include
+    done
+}
+
+# find file
+ff-py3 ()
+{
+    for i; do
+        find /usr/lib/python3* -iname "*$i*"
+        find /usr/local/lib/python3* -iname "*$i*"
+    done
+}
+
+# grep pattern
+gg-py3 ()
+{
+    for i; do
+        ag -i --nogroup "$i" /usr/lib/python3*
+        ag -i --nogroup "$i" /usr/local/lib/python3*
     done
 }
 
