@@ -27,10 +27,7 @@ alias gg-py3="gg -d /usr/lib/python3*"
 alias dumpbin-dependents='dumpbin_func dependents'
 alias dumpbin-exports='dumpbin_func exports'
 
-# Interactive operation...
-#alias rm='rm -i'
-#alias mv='mv -i'
-#alias cp='cp -i'
+# cp
 alias cpx='rsync --info=progress2'
 
 # cd to git root dir
