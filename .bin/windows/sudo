@@ -13,6 +13,12 @@ if [[ $root =~ "544" ]]; then
     exit
 fi
 
+# cygwin-sudo.py is better
+if [[ -n "$*" ]]; then
+    cygwin-sudo.py "$@"
+    exit
+fi
+
 # $TMUX env may lead some strange thing
 unset TMUX
 unset TMUX_PANE
