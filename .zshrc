@@ -157,6 +157,7 @@ fi
 
 # General shell config
 source ~/.dotfiles/.gshrc
+[[ -f ~/.gshrc ]] && source ~/.gshrc
 
 # prof finish
 #zprof
