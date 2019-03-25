@@ -91,13 +91,7 @@ function precmd() {
 
         # generate prompt
         git_current_info="$(prompt_git_current_info)"
-        tmp_prompt="export GIT_CURRENT_INFO='$git_current_info';"
-        if [[ -z "$git_current_info" ]]; then
-            tmp_prompt+="rprompt=''"
-        else
-            tmp_prompt+="rprompt='♪ $git_current_info'"
-        fi
-
+        tmp_prompt="export GIT_CURRENT_INFO='$git_current_info';rprompt='$git_current_info'"
         # save to temp file
         echo "$tmp_prompt" > "${HOME}/.zsh_tmp_prompt"
 
