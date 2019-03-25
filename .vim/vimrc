@@ -770,6 +770,8 @@ let g:alternateRelativeFiles = 1
 
 " Markdown
 let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_toc_autofit = 1
+"let g:vim_markdown_folding_style_pythonic = 1
 
 " YouCompleteMe
 let g:ycm_auto_trigger = 1
