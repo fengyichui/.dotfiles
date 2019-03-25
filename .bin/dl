@@ -93,7 +93,7 @@ do
         -ui) ui=1; shift ;;
         -t) tracker_update=1; shift ;;
         -p) misc_cfg="$misc_cfg --bt-prioritize-piece=head"; shift ;;
-        -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; rename_torrent=1; shift ;;
+        -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; rename_torrent=1; norpc=1; shift ;;
         -ls) list_torrent=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
@@ -136,6 +136,22 @@ if [[ -n "$list_torrent" ]]; then
     exit
 fi
 
+# Check
+if [[ -z "$norpc" ]]; then
+    if [[ $(pgrep aria2c) ]] ; then
+        read -n1 -r -p "Aria2c is running, use it? [yN] " answer
+        if [[ "$answer" != "N" ]]; then
+            if [[ -n "$dlthing" ]]; then
+                curl http://127.0.0.1:6800/jsonrpc \
+                    -H "Content-Type: application/json" \
+                    -H "Accept: application/json" \
+                    --data '{"jsonrpc":"2.0","id":1,"method":"aria2.addUri","params":["token:fyc", ["'$dlthing'"]]}'
+            fi
+            exit
+        fi
+    fi
+fi
+
 # dir
 if [[ ! -d $dir ]]; then
     mkdir -p "$dir"
@@ -148,14 +164,14 @@ if [[ -f $configtracker ]]; then
     diff_day=$(( ($sys_time_s - $modify_time_s) / 86400 ))
     echo "BT tracker updated $diff_day days ago"
     if [[ $diff_day -ge 7 ]]; then
-        read -r -p "BT tracker file is too old, update? [yN] " answer
-        if [[ "$answer" == "y" ]]; then
+        read -n1 -r -p "BT tracker file is too old, update? [yN] " answer
+        if [[ "$answer" != "N" ]]; then
             run_tracker_update
         fi
     fi
 else
-    read -r -p "BT tracker file is not exist, update? [yN] " answer
-    if [[ "$answer" == "y" ]]; then
+    read -n1 -r -p "BT tracker file is not exist, update? [yN] " answer
+    if [[ "$answer" != "N" ]]; then
         run_tracker_update
     fi
 fi
@@ -171,8 +187,8 @@ if [[ -s $save_session && -n "$dlthing" ]]; then
     cat "$save_session"
     echo "===================="
     echo ""
-    read -r -p "There are unfinished tasks, ignore those? [yN] " answer
-    if [[ "$answer" != "y" ]]; then
+    read -n1 -r -p "There are unfinished tasks, resume? [yN] " answer
+    if [[ "$answer" != "N" ]]; then
         echo -e "\e[32mPlease use UI to add this task: $dlthing\e[0m"
         echo -e "\e[32mNow resume unfinished tasks!\e[0m"
         dlthing=""
