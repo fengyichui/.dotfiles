@@ -140,12 +140,14 @@ fi
 if [[ -z "$norpc" ]]; then
     if [[ $(pgrep aria2c) ]] ; then
         read -n1 -r -p "Aria2c is running, use it? [yN] " answer
+        [[ -n "$answer" ]] && echo #newline
         if [[ "$answer" != "N" ]]; then
             if [[ -n "$dlthing" ]]; then
                 curl http://127.0.0.1:6800/jsonrpc \
                     -H "Content-Type: application/json" \
                     -H "Accept: application/json" \
                     --data '{"jsonrpc":"2.0","id":1,"method":"aria2.addUri","params":["token:fyc", ["'$dlthing'"]]}'
+                echo
             fi
             exit
         fi
@@ -165,12 +167,14 @@ if [[ -f $configtracker ]]; then
     echo "BT tracker updated $diff_day days ago"
     if [[ $diff_day -ge 7 ]]; then
         read -n1 -r -p "BT tracker file is too old, update? [yN] " answer
+        [[ -n "$answer" ]] && echo #newline
         if [[ "$answer" != "N" ]]; then
             run_tracker_update
         fi
     fi
 else
     read -n1 -r -p "BT tracker file is not exist, update? [yN] " answer
+    [[ -n "$answer" ]] && echo #newline
     if [[ "$answer" != "N" ]]; then
         run_tracker_update
     fi
@@ -188,6 +192,7 @@ if [[ -s $save_session && -n "$dlthing" ]]; then
     echo "===================="
     echo ""
     read -n1 -r -p "There are unfinished tasks, resume? [yN] " answer
+    [[ -n "$answer" ]] && echo #newline
     if [[ "$answer" != "N" ]]; then
         echo -e "\e[32mPlease use UI to add this task: $dlthing\e[0m"
         echo -e "\e[32mNow resume unfinished tasks!\e[0m"
