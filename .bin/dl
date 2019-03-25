@@ -81,6 +81,8 @@ function usage ()
     echo "  -h          Show this help and exit"
     echo "  --help      Show aria2c help"
     echo "  --xxx       As aria2c option"
+    echo "              --header 'Cookie: SOMETHING'"
+    echo "              --header 'User-Agent: SOMETHING'"
     echo "by liqiang (2018/12/20)"
     exit 0
 }
