@@ -80,7 +80,7 @@ Options:
   -NUM       Set number of max connection per server. default 16 in aria2.conf
   -h         Show this help and exit
   --help     Show aria2c help
-  --xxx      As aria2c option
+  --xxx=XXX  As aria2c option
              --load-cookies=cookies.txt  -> Chrome extension: cookies.txt
              --header='Cookie:SOMETHING' --header='User-Agent:SOMETHING'
              --bt-prioritize-piece=head  -> Useful for previewing files
@@ -101,7 +101,7 @@ do
         -ls) list_torrent=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
-        --*) misc_cfg="$misc_cfg $i"; shift ;;
+        --*) ii=$(sed "s/=/='/" <<< $i); [[ "$ii" != "$i" ]] && i="$ii'"; misc_cfg="$misc_cfg $i"; shift ;;
         -h) usage ;;
 
         *)
@@ -236,7 +236,7 @@ fi
 
 # execute
 echo "####################"
-echo "$cmd" | sed -e 's/ \+$//g' -e 's/ \+/\n/g'
+for i in $cmd; do echo $i; done
 echo "####################"
 eval "$cmd"
 
