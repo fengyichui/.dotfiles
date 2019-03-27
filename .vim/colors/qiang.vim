@@ -164,16 +164,16 @@ hi Todo             ctermfg=190             ctermbg=NONE            cterm=underl
 " --------
 " word not recognized
 hi SpellBad         guisp=#ee0000                                   gui=undercurl
-hi SpellBad                                 ctermbg=9               cterm=undercurl
+hi SpellBad                                 ctermbg=NONE            cterm=underline
 " word not capitalized
 hi SpellCap         guisp=#eeee00                                   gui=undercurl
-hi SpellCap                                 ctermbg=12              cterm=undercurl
+hi SpellCap                                 ctermbg=NONE            cterm=underline
 " rare word
 hi SpellRare        guisp=#ffa500                                   gui=undercurl
-hi SpellRare                                ctermbg=13              cterm=undercurl
+hi SpellRare                                ctermbg=NONE            cterm=underline
 " wrong spelling for selected region
 hi SpellLocal       guisp=#ffa500                                   gui=undercurl
-hi SpellLocal                               ctermbg=14              cterm=undercurl
+hi SpellLocal                               ctermbg=NONE            cterm=underline
 
 " Cursor
 " ------
@@ -341,6 +341,11 @@ hi SignifySignChange guifg=#eeee00 ctermfg=11   guibg=#444444 ctermbg=238   gui=
 " -------------
 hi YcmErrorSign     guifg=#ee0000 ctermfg=196   guibg=#444444 ctermbg=238   gui=none cterm=none
 hi YcmWarningSign   guifg=#eeee00 ctermfg=11    guibg=#444444 ctermbg=238   gui=none cterm=none
+
+" ALE
+" ---
+hi ALEErrorSign     guifg=#ee0000 ctermfg=196   guibg=#444444 ctermbg=238   gui=none cterm=none
+hi ALEWarningSign   guifg=#eeee00 ctermfg=11    guibg=#444444 ctermbg=238   gui=none cterm=none
 
 " Doxygen, liqiang+
 " -----------------
