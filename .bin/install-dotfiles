@@ -1,14 +1,8 @@
 #!/bin/bash
 
 # dir
-HOMEDIR="$(cd ~ && pwd)"
-SRCDIR="$HOMEDIR/.dotfiles"
-DSTDIR="$HOMEDIR"
-
-if [[ "$SRCDIR" == "$DSTDIR" ]]; then
-    echo "Please run me at .git directory!"
-    exit 1
-fi
+SRCDIR="$HOME/.dotfiles"
+DSTDIR="$HOME"
 
 # create soft link
 #ln -v -snf "$SRCDIR/.bin" "$DSTDIR/.bin"
@@ -38,4 +32,5 @@ ln -v -snf "$SRCDIR/.tigrc" "$DSTDIR/.tigrc"
 ln -v -snf "$SRCDIR/.termux" "$DSTDIR/.termux"
 ln -v -snf "$SRCDIR/.tmux.conf" "$DSTDIR/.tmux.conf"
 ln -v -snf "$SRCDIR/.zshrc" "$DSTDIR/.zshrc"
+ln -v -snf "$SRCDIR/.pip" "$DSTDIR/.pip"
 
