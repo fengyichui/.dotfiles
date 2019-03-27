@@ -147,6 +147,10 @@ export LESS='-R -M -x4 -j.3'
 # default open with $EDITER
 alias -s {c,cc,cpp,h,hpp,asm,s,java,bin,hex,map,dis,sct,symdefs,mk,mak,ini,log,md,xml,txt}=$EDITOR
 
+# General shell config
+source ~/.dotfiles/.gshrc
+[[ -f ~/.gshrc ]] && source ~/.gshrc
+
 # fix git files completion slowly in windows file system
 if [[ "$OSTYPE" == "cygwin" ]]; then
     __git_files () { _wanted files expl 'local files' _files }
@@ -154,10 +158,6 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     __git_changed-in-working-tree_files () { _wanted files expl 'local files' _files }
     __git_changed-in-index_files () { _wanted files expl 'local files' _files }
 fi
-
-# General shell config
-source ~/.dotfiles/.gshrc
-[[ -f ~/.gshrc ]] && source ~/.gshrc
 
 # prof finish
 #zprof
