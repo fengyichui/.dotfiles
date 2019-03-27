@@ -787,6 +787,7 @@ let g:ycm_key_invoke_completion = '<C-q>'
 let g:ycm_use_ultisnips_completer = 0
 
 " ALE
+"let g:ale_completion_enabled = 1
 let g:ale_sign_error = 'x'
 let g:ale_sign_warning = 'x'
 
