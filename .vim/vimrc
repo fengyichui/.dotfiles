@@ -752,6 +752,7 @@ command!       -nargs=0 Xhex        call lq#HexEndianToggle()
 command!       -nargs=0 XrootVCS    call lq#SwitchVCSRoot()
 command!       -nargs=0 Xycm        packadd YouCompleteMe
 command!       -nargs=0 Xhighlight  packadd TagHighlight | edit
+command!       -nargs=0 Xale        packadd ale | edit
 command!       -nargs=0 Xomni       packadd OmniCppComplete | call omni#cpp#complete#Init()
 command!       -nargs=0 Xsignify    let g:signify_disable_by_default=0 | SignifyEnable
 command!       -nargs=0 Xstartify   Startify
