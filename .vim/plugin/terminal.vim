@@ -97,6 +97,8 @@ call s:key_fix()
 let s:cursor_normal  = "\e[1 q" " blinking block
 let s:cursor_insert  = "\e[5 q" " blinking vertical bar
 let s:cursor_replace = "\e[3 q" " blinking underscore
+let s:cursor_undercurl_s = "\e[4:3m" " Undercurl start
+let s:cursor_undercurl_e = "\e[4:0m" " Undercurl end
 
 " tmux and xterm check
 if !exists('$TMUX')
@@ -106,6 +108,8 @@ if !exists('$TMUX')
         let &t_SR = s:cursor_replace . &t_SR
         let &t_EI = s:cursor_normal . &t_EI
         let &t_te = &t_te
+        let &t_Cs = s:cursor_undercurl_s . &t_Cs
+        let &t_Ce = s:cursor_undercurl_e . &t_Ce
     endif
     finish
 endif
