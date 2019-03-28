@@ -110,6 +110,10 @@ do
             mode=$mode_usr_server_password
             shift
             ;;
+        -p|--proxy)
+            proxy=1
+            shift
+            ;;
         -c|--copy)
             copy_info=1
             shift
@@ -233,6 +237,12 @@ fi
 # bank line
 echo ""
 
+# proxy
+if [[ -n "$proxy" ]]; then
+    proxy &
+    proxy_job=$!
+fi
+
 # catch interrupt
 trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
@@ -245,6 +255,12 @@ elif command -v sslocal > /dev/null 2>&1; then
     sslocal -t 300 $localparam $serverparam
 else
     echo -e "\e[31mRequest Shadowsocks: shadowsocks-libqss or shadowsocks-libev or sslocal\e[0m"
+fi
+
+# check
+if [[ -n "$proxy_job" ]]; then
+    kill $proxy_job 2>/dev/null
+    wait $proxy_job 2>/dev/null
 fi
 
 # sslocal only support socks5
