@@ -97,11 +97,6 @@ proxy_mode='' # HTTP or SOCKS5
 for i in "$@"
 do
     case $i in
-        -i=*|--inside-index=*)
-            inside_qr_index="${i#*=}"
-            mode=$mode_inside_qr_net_path
-            shift # past argument=value
-            ;;
         -n=*|--qr-net=*)
             qr_net_path="${i#*=}"
             mode=$mode_usr_qr_net_path
@@ -126,7 +121,7 @@ do
             proxy_mode=''
             shift # past argument with no value
             ;;
-        -0|--http)
+        --http)
             proxy_mode='--http-proxy'
             shift # past argument with no value
             ;;
@@ -134,30 +129,33 @@ do
             copy_info=1
             shift
             ;;
-        -h|--help)
-            echo "Automatic proxy with shadowsocks."
-            echo "Usage:"
-            echo "  -i|--inside-index  inside proxy table index"
-            echo "  -n|--qr-net        network QR picture address"
-            echo "  -l|--qr-local      local QR picture path"
-            echo "  -s|--server        encrypt_method:password@ip_addr:port"
-            echo "  -g|--global        use global proxy"
-            echo "  -5|--socks5        use socks5 proxy mode"
-            echo "  -0|--http          use http proxy mode"
-            echo "  -c|--copy          copy ss raw info to clipboard"
-            echo "  -h|--help          show this help"
-            echo "Example:"
-            echo "  -i=1"
-            echo "  -n='http://ss8.pm/images/server01.png'"
-            echo "  -l='./qr.png'"
-            echo "  -s='rc4-md5:52918214@138.68.61.42:23456'"
-            echo "Default is used inside proxy table index=0 to proxy."
-            echo "by liqiang"
-            exit 0
-            ;;
         *)
-            # unknown option
-        ;;
+            if [[ "$(awk '/^-[0-9]+$/' <<< $i)" == "$i" ]]; then
+                inside_qr_index="${i#*-}"
+                mode=$mode_inside_qr_net_path
+                shift
+            else
+                echo "Automatic proxy with shadowsocks."
+                echo "Usage:"
+                echo "  -NN                inside proxy table index"
+                echo "  -n|--qr-net        network QR picture address"
+                echo "  -l|--qr-local      local QR picture path"
+                echo "  -s|--server        encrypt_method:password@ip_addr:port"
+                echo "  -g|--global        use global proxy"
+                echo "  -5|--socks5        use socks5 proxy mode"
+                echo "     --http          use http proxy mode"
+                echo "  -c|--copy          copy ss raw info to clipboard"
+                echo "  -h|--help          show this help"
+                echo "Example:"
+                echo "  -12"
+                echo "  -n='http://ss8.pm/images/server01.png'"
+                echo "  -l='./qr.png'"
+                echo "  -s='rc4-md5:52918214@138.68.61.42:23456'"
+                echo "Default is used inside proxy table index=0(-0) to proxy."
+                echo "by liqiang"
+                exit 0
+            fi
+            ;;
     esac
 done
 
