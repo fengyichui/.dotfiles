@@ -81,7 +81,6 @@ mode_usr_server_password=3 #like: rc4-md5:52918214@138.68.61.42:23456 (encrypt_m
 
 # variable
 copy_info=0
-global_proxy=0
 inside_qr_index=0
 qr_net_path=''
 if [[ -z "$TMPDIR" ]]; then
@@ -91,7 +90,6 @@ else
 fi
 server_info='rc4-md5:52918214@138.68.61.42:23456'
 mode=$mode_inside_qr_net_path
-proxy_mode='' # HTTP or SOCKS5
 
 # Parse argument
 for i in "$@"
@@ -100,30 +98,17 @@ do
         -n=*|--qr-net=*)
             qr_net_path="${i#*=}"
             mode=$mode_usr_qr_net_path
-            shift # past argument=value
+            shift
             ;;
         -l=*|--qr-local=*)
             qr_local_path="${i#*=}"
             mode=$mode_usr_qr_local_path
-            shift # past argument=value
+            shift
             ;;
         -s=*|--server=*)
             server_info="${i#*=}"
             mode=$mode_usr_server_password
-            shift # past argument=value
-            ;;
-        -g|--global)
-            global_proxy=1
-            proxy_mode='--http-proxy' # window system proxy only support http-proxy
-            shift # past argument with no value
-            ;;
-        -5|--socks5)
-            proxy_mode=''
-            shift # past argument with no value
-            ;;
-        --http)
-            proxy_mode='--http-proxy'
-            shift # past argument with no value
+            shift
             ;;
         -c|--copy)
             copy_info=1
@@ -141,9 +126,6 @@ do
                 echo "  -n|--qr-net        network QR picture address"
                 echo "  -l|--qr-local      local QR picture path"
                 echo "  -s|--server        encrypt_method:password@ip_addr:port"
-                echo "  -g|--global        use global proxy"
-                echo "  -5|--socks5        use socks5 proxy mode"
-                echo "     --http          use http proxy mode"
                 echo "  -c|--copy          copy ss raw info to clipboard"
                 echo "  -h|--help          show this help"
                 echo "Example:"
@@ -248,12 +230,6 @@ if [[ $copy_info -eq 1 ]]; then
     exit 0
 fi
 
-# open system proxy
-if [ $global_proxy -eq 1 ]; then
-    echo -e "\e[32mSystem proxy running\e[0m"
-    sysproxy global 127.0.0.1:1080
-fi
-
 # bank line
 echo ""
 
@@ -262,11 +238,11 @@ trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
 
 # ss
 if command -v shadowsocks-libqss > /dev/null 2>&1; then
-    shadowsocks-libqss -t 300 $proxy_mode $localparam $serverparam 2>&1 | awk '!/INFO: TCP connection timeout./'
+    shadowsocks-libqss -t 300 $localparam $serverparam 2>&1 | awk '!/INFO: TCP connection timeout./'
 elif command -v shadowsocks-libev > /dev/null 2>&1; then
-    shadowsocks-libev -t 300 $proxy_mode $localparam $serverparam
+    shadowsocks-libev -t 300 $localparam $serverparam
 elif command -v sslocal > /dev/null 2>&1; then
-    sslocal -t 300 $proxy_mode $localparam $serverparam
+    sslocal -t 300 $localparam $serverparam
 else
     echo -e "\e[31mRequest Shadowsocks: shadowsocks-libqss or shadowsocks-libev or sslocal\e[0m"
 fi
@@ -276,11 +252,6 @@ fi
 #   $ pip3 install shadowsocks
 #   $ apt-cyg install openssl-devel
 #sslocal -v -t 600 $localparam $serverparam
-
-# close system proxy
-if [ $global_proxy -eq 1 ]; then
-    sysproxy off
-fi
 
 # @} #
 
