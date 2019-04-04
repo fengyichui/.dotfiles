@@ -21,7 +21,7 @@ setopt PROMPT_SUBST
 PROMPT='${ret_status} %{$fg[magenta]%}%c %{$fg[yellow]%}${root_status}%{$reset_color%} '
 
 # Set prompt (right)
-RPROMPT='%F{243}${rprompt}%F{reset}'
+RPROMPT='%F{8}${rprompt}%F{reset}'
 
 # Outputs the name of the current project
 function prompt_git_current_project() {
