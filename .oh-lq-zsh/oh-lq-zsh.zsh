@@ -1,7 +1,8 @@
 
 # zsh-autosuggestions
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=black,bold'
+#ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=black,bold'
 #ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=10
+#ZSH_AUTOSUGGEST_USE_ASYNC=1
 
 # zsh-syntax-highlighting
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=blue'
