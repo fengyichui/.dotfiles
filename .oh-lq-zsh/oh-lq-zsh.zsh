@@ -3,6 +3,23 @@
 #ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=black,bold'
 #ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=10
 #ZSH_AUTOSUGGEST_USE_ASYNC=1
+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
+    end-of-line
+    vi-end-of-line
+    vi-add-eol
+)
+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
+    forward-char
+    forward-word
+    emacs-forward-word
+    vi-forward-char
+    vi-forward-word
+    vi-forward-word-end
+    vi-forward-blank-word
+    vi-forward-blank-word-end
+    vi-find-next-char
+    vi-find-next-char-skip
+)
 
 # zsh-syntax-highlighting
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=blue'
