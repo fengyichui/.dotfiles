@@ -8,6 +8,7 @@
 ZSH_HIGHLIGHT_STYLES[single-hyphen-option]='fg=blue'
 ZSH_HIGHLIGHT_STYLES[double-hyphen-option]='fg=blue'
 ZSH_HIGHLIGHT_STYLES[back-quoted-argument]='fg=yellow'
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red'
 X_ZSH_HIGHLIGHT_DIRS_BLACKLIST+=(//)
 
 # history-substring-search
