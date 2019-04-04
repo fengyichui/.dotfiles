@@ -53,8 +53,11 @@ _zsh_autosuggest_modify() {
 	_zsh_autosuggest_invoke_original_widget $@
 	retval=$?
 
+	emulate -L zsh
+
 	# Don't fetch a new suggestion if there's more input to be read immediately
 	if (( $PENDING > 0 )) || (( $KEYS_QUEUED_COUNT > 0 )); then
+		POSTDISPLAY="$orig_postdisplay"
 		return $retval
 	fi
 
@@ -96,13 +99,15 @@ _zsh_autosuggest_fetch() {
 		_zsh_autosuggest_async_request "$BUFFER"
 	else
 		local suggestion
-		_zsh_autosuggest_strategy_$ZSH_AUTOSUGGEST_STRATEGY "$BUFFER"
+		_zsh_autosuggest_fetch_suggestion "$BUFFER"
 		_zsh_autosuggest_suggest "$suggestion"
 	fi
 }
 
 # Offer a suggestion
 _zsh_autosuggest_suggest() {
+	emulate -L zsh
+
 	local suggestion="$1"
 
 	if [[ -n "$suggestion" ]] && (( $#BUFFER )); then
@@ -152,7 +157,7 @@ _zsh_autosuggest_execute() {
 
 # Partially accept the suggestion
 _zsh_autosuggest_partial_accept() {
-	local -i retval
+	local -i retval cursor_loc
 
 	# Save the contents of the buffer so we can restore later if needed
 	local original_buffer="$BUFFER"
@@ -164,13 +169,19 @@ _zsh_autosuggest_partial_accept() {
 	_zsh_autosuggest_invoke_original_widget $@
 	retval=$?
 
+	# Normalize cursor location across vi/emacs modes
+	cursor_loc=$CURSOR
+	if [[ "$KEYMAP" = "vicmd" ]]; then
+		cursor_loc=$((cursor_loc + 1))
+	fi
+
 	# If we've moved past the end of the original buffer
-	if (( $CURSOR > $#original_buffer )); then
+	if (( $cursor_loc > $#original_buffer )); then
 		# Set POSTDISPLAY to text right of the cursor
-		POSTDISPLAY="$RBUFFER"
+		POSTDISPLAY="${BUFFER[$(($cursor_loc + 1)),$#BUFFER]}"
 
 		# Clip the buffer at the cursor
-		BUFFER="$LBUFFER"
+		BUFFER="${BUFFER[1,$cursor_loc]}"
 	else
 		# Restore the original buffer
 		BUFFER="$original_buffer"
@@ -179,28 +190,31 @@ _zsh_autosuggest_partial_accept() {
 	return $retval
 }
 
-for action in clear modify fetch suggest accept partial_accept execute enable disable toggle; do
-	eval "_zsh_autosuggest_widget_$action() {
-		local -i retval
+() {
+	local action
+	for action in clear modify fetch suggest accept partial_accept execute enable disable toggle; do
+		eval "_zsh_autosuggest_widget_$action() {
+			local -i retval
 
-		_zsh_autosuggest_highlight_reset
+			_zsh_autosuggest_highlight_reset
 
-		_zsh_autosuggest_$action \$@
-		retval=\$?
+			_zsh_autosuggest_$action \$@
+			retval=\$?
 
-		_zsh_autosuggest_highlight_apply
+			_zsh_autosuggest_highlight_apply
 
-		zle -R
+			zle -R
 
-		return \$retval
-	}"
-done
+			return \$retval
+		}"
+	done
 
-zle -N autosuggest-fetch _zsh_autosuggest_widget_fetch
-zle -N autosuggest-suggest _zsh_autosuggest_widget_suggest
-zle -N autosuggest-accept _zsh_autosuggest_widget_accept
-zle -N autosuggest-clear _zsh_autosuggest_widget_clear
-zle -N autosuggest-execute _zsh_autosuggest_widget_execute
-zle -N autosuggest-enable _zsh_autosuggest_widget_enable
-zle -N autosuggest-disable _zsh_autosuggest_widget_disable
-zle -N autosuggest-toggle _zsh_autosuggest_widget_toggle
+	zle -N autosuggest-fetch _zsh_autosuggest_widget_fetch
+	zle -N autosuggest-suggest _zsh_autosuggest_widget_suggest
+	zle -N autosuggest-accept _zsh_autosuggest_widget_accept
+	zle -N autosuggest-clear _zsh_autosuggest_widget_clear
+	zle -N autosuggest-execute _zsh_autosuggest_widget_execute
+	zle -N autosuggest-enable _zsh_autosuggest_widget_enable
+	zle -N autosuggest-disable _zsh_autosuggest_widget_disable
+	zle -N autosuggest-toggle _zsh_autosuggest_widget_toggle
+}

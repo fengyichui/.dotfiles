@@ -1,8 +1,8 @@
 # Fish-like fast/unobtrusive autosuggestions for zsh.
 # https://github.com/zsh-users/zsh-autosuggestions
-# v0.4.1
+# v0.5.0
 # Copyright (c) 2013 Thiago de Arruda
-# Copyright (c) 2016-2017 Eric Freese
+# Copyright (c) 2016-2018 Eric Freese
 # 
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -42,64 +42,104 @@ zmodload zsh/zpty
 # Color to use when highlighting suggestion
 # Uses format of `region_highlight`
 # More info: http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zle-Widgets
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+(( ! ${+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE} )) &&
+typeset -g ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
 # Prefix to use when saving original versions of bound widgets
-ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX=autosuggest-orig-
+(( ! ${+ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX} )) &&
+typeset -g ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX=autosuggest-orig-
 
-ZSH_AUTOSUGGEST_STRATEGY=default
+# Strategies to use to fetch a suggestion
+# Will try each strategy in order until a suggestion is returned
+(( ! ${+ZSH_AUTOSUGGEST_STRATEGY} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_STRATEGY
+	ZSH_AUTOSUGGEST_STRATEGY=(history)
+}
 
 # Widgets that clear the suggestion
-ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
-	history-search-forward
-	history-search-backward
-	history-beginning-search-forward
-	history-beginning-search-backward
-	history-substring-search-up
-	history-substring-search-down
-	up-line-or-history
-	down-line-or-history
-	accept-line
-)
+(( ! ${+ZSH_AUTOSUGGEST_CLEAR_WIDGETS} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_CLEAR_WIDGETS
+	ZSH_AUTOSUGGEST_CLEAR_WIDGETS=(
+		history-search-forward
+		history-search-backward
+		history-beginning-search-forward
+		history-beginning-search-backward
+		history-substring-search-up
+		history-substring-search-down
+		up-line-or-beginning-search
+		down-line-or-beginning-search
+		up-line-or-history
+		down-line-or-history
+		accept-line
+	)
+}
 
 # Widgets that accept the entire suggestion
-ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
-	forward-char
-	end-of-line
-	vi-forward-char
-	vi-end-of-line
-	vi-add-eol
-)
+(( ! ${+ZSH_AUTOSUGGEST_ACCEPT_WIDGETS} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_ACCEPT_WIDGETS
+	ZSH_AUTOSUGGEST_ACCEPT_WIDGETS=(
+		forward-char
+		end-of-line
+		vi-forward-char
+		vi-end-of-line
+		vi-add-eol
+	)
+}
 
 # Widgets that accept the entire suggestion and execute it
-ZSH_AUTOSUGGEST_EXECUTE_WIDGETS=(
-)
+(( ! ${+ZSH_AUTOSUGGEST_EXECUTE_WIDGETS} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_EXECUTE_WIDGETS
+	ZSH_AUTOSUGGEST_EXECUTE_WIDGETS=(
+	)
+}
 
 # Widgets that accept the suggestion as far as the cursor moves
-ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
-	forward-word
-	emacs-forward-word
-	vi-forward-word
-	vi-forward-word-end
-	vi-forward-blank-word
-	vi-forward-blank-word-end
-)
+(( ! ${+ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS
+	ZSH_AUTOSUGGEST_PARTIAL_ACCEPT_WIDGETS=(
+		forward-word
+		emacs-forward-word
+		vi-forward-word
+		vi-forward-word-end
+		vi-forward-blank-word
+		vi-forward-blank-word-end
+		vi-find-next-char
+		vi-find-next-char-skip
+	)
+}
 
 # Widgets that should be ignored (globbing supported but must be escaped)
-ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(
-	orig-\*
-	beep
-	run-help
-	set-local-history
-	which-command
-	yank
-)
+(( ! ${+ZSH_AUTOSUGGEST_IGNORE_WIDGETS} )) && {
+	typeset -ga ZSH_AUTOSUGGEST_IGNORE_WIDGETS
+	ZSH_AUTOSUGGEST_IGNORE_WIDGETS=(
+		orig-\*
+		beep
+		run-help
+		set-local-history
+		which-command
+		yank
+		yank-pop
+	)
+}
 
-# Max size of buffer to trigger autosuggestion. Leave undefined for no upper bound.
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=
+# Max size of buffer to trigger autosuggestion. Leave null for no upper bound.
+(( ! ${+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE} )) &&
+typeset -g ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=
 
 # Pty name for calculating autosuggestions asynchronously
-ZSH_AUTOSUGGEST_ASYNC_PTY_NAME=zsh_autosuggest_pty
+(( ! ${+ZSH_AUTOSUGGEST_ASYNC_PTY_NAME} )) &&
+typeset -g ZSH_AUTOSUGGEST_ASYNC_PTY_NAME=zsh_autosuggest_pty
+
+#--------------------------------------------------------------------#
+# Utility Functions                                                  #
+#--------------------------------------------------------------------#
+
+_zsh_autosuggest_escape_command() {
+	setopt localoptions EXTENDED_GLOB
+
+	# Escape special chars in the string (requires EXTENDED_GLOB)
+	echo -E "${1//(#m)[\"\'\\()\[\]|*?~]/\\$MATCH}"
+}
 
 #--------------------------------------------------------------------#
 # Feature Detection                                                  #
@@ -125,21 +165,8 @@ _zsh_autosuggest_feature_detect_zpty_returns_fd() {
 #--------------------------------------------------------------------#
 
 _zsh_autosuggest_incr_bind_count() {
-	if ((${+_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]})); then
-		((_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]++))
-	else
-		_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]=1
-	fi
-
-	typeset -gi bind_count=$_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]
-}
-
-_zsh_autosuggest_get_bind_count() {
-	if ((${+_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]})); then
-		typeset -gi bind_count=$_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]
-	else
-		typeset -gi bind_count=0
-	fi
+	typeset -gi bind_count=$((_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]+1))
+	_ZSH_AUTOSUGGEST_BIND_COUNTS[$1]=$bind_count
 }
 
 # Bind a single widget to an autosuggest widget, saving a reference to the original widget
@@ -155,29 +182,29 @@ _zsh_autosuggest_bind_widget() {
 	# Save a reference to the original widget
 	case $widgets[$widget] in
 		# Already bound
-		user:_zsh_autosuggest_(bound|orig)_*);;
+		user:_zsh_autosuggest_(bound|orig)_*)
+			bind_count=$((_ZSH_AUTOSUGGEST_BIND_COUNTS[$widget]))
+			;;
 
 		# User-defined widget
 		user:*)
 			_zsh_autosuggest_incr_bind_count $widget
-			zle -N $prefix${bind_count}-$widget ${widgets[$widget]#*:}
+			zle -N $prefix$bind_count-$widget ${widgets[$widget]#*:}
 			;;
 
 		# Built-in widget
 		builtin)
 			_zsh_autosuggest_incr_bind_count $widget
 			eval "_zsh_autosuggest_orig_${(q)widget}() { zle .${(q)widget} }"
-			zle -N $prefix${bind_count}-$widget _zsh_autosuggest_orig_$widget
+			zle -N $prefix$bind_count-$widget _zsh_autosuggest_orig_$widget
 			;;
 
 		# Completion widget
 		completion:*)
 			_zsh_autosuggest_incr_bind_count $widget
-			eval "zle -C $prefix${bind_count}-${(q)widget} ${${(s.:.)widgets[$widget]}[2,3]}"
+			eval "zle -C $prefix$bind_count-${(q)widget} ${${(s.:.)widgets[$widget]}[2,3]}"
 			;;
 	esac
-
-	_zsh_autosuggest_get_bind_count $widget
 
 	# Pass the original widget's name explicitly into the autosuggest
 	# function. Use this passed in widget name to call the original
@@ -190,12 +217,14 @@ _zsh_autosuggest_bind_widget() {
 	}"
 
 	# Create the bound widget
-	zle -N $widget _zsh_autosuggest_bound_${bind_count}_$widget
+	zle -N -- $widget _zsh_autosuggest_bound_${bind_count}_$widget
 }
 
 # Map all configured widgets to the right autosuggest widgets
 _zsh_autosuggest_bind_widgets() {
-	local widget
+	emulate -L zsh
+
+ 	local widget
 	local ignore_widgets
 
 	ignore_widgets=(
@@ -227,7 +256,7 @@ _zsh_autosuggest_bind_widgets() {
 # Given the name of an original widget and args, invoke it, if it exists
 _zsh_autosuggest_invoke_original_widget() {
 	# Do nothing unless called with at least one arg
-	(( $# )) || return
+	(( $# )) || return 0
 
 	local original_widget_name="$1"
 
@@ -318,8 +347,11 @@ _zsh_autosuggest_modify() {
 	_zsh_autosuggest_invoke_original_widget $@
 	retval=$?
 
+	emulate -L zsh
+
 	# Don't fetch a new suggestion if there's more input to be read immediately
 	if (( $PENDING > 0 )) || (( $KEYS_QUEUED_COUNT > 0 )); then
+		POSTDISPLAY="$orig_postdisplay"
 		return $retval
 	fi
 
@@ -361,13 +393,15 @@ _zsh_autosuggest_fetch() {
 		_zsh_autosuggest_async_request "$BUFFER"
 	else
 		local suggestion
-		_zsh_autosuggest_strategy_$ZSH_AUTOSUGGEST_STRATEGY "$BUFFER"
+		_zsh_autosuggest_fetch_suggestion "$BUFFER"
 		_zsh_autosuggest_suggest "$suggestion"
 	fi
 }
 
 # Offer a suggestion
 _zsh_autosuggest_suggest() {
+	emulate -L zsh
+
 	local suggestion="$1"
 
 	if [[ -n "$suggestion" ]] && (( $#BUFFER )); then
@@ -417,7 +451,7 @@ _zsh_autosuggest_execute() {
 
 # Partially accept the suggestion
 _zsh_autosuggest_partial_accept() {
-	local -i retval
+	local -i retval cursor_loc
 
 	# Save the contents of the buffer so we can restore later if needed
 	local original_buffer="$BUFFER"
@@ -429,13 +463,19 @@ _zsh_autosuggest_partial_accept() {
 	_zsh_autosuggest_invoke_original_widget $@
 	retval=$?
 
+	# Normalize cursor location across vi/emacs modes
+	cursor_loc=$CURSOR
+	if [[ "$KEYMAP" = "vicmd" ]]; then
+		cursor_loc=$((cursor_loc + 1))
+	fi
+
 	# If we've moved past the end of the original buffer
-	if (( $CURSOR > $#original_buffer )); then
+	if (( $cursor_loc > $#original_buffer )); then
 		# Set POSTDISPLAY to text right of the cursor
-		POSTDISPLAY="$RBUFFER"
+		POSTDISPLAY="${BUFFER[$(($cursor_loc + 1)),$#BUFFER]}"
 
 		# Clip the buffer at the cursor
-		BUFFER="$LBUFFER"
+		BUFFER="${BUFFER[1,$cursor_loc]}"
 	else
 		# Restore the original buffer
 		BUFFER="$original_buffer"
@@ -444,45 +484,58 @@ _zsh_autosuggest_partial_accept() {
 	return $retval
 }
 
-for action in clear modify fetch suggest accept partial_accept execute enable disable toggle; do
-	eval "_zsh_autosuggest_widget_$action() {
-		local -i retval
+() {
+	local action
+	for action in clear modify fetch suggest accept partial_accept execute enable disable toggle; do
+		eval "_zsh_autosuggest_widget_$action() {
+			local -i retval
 
-		_zsh_autosuggest_highlight_reset
+			_zsh_autosuggest_highlight_reset
 
-		_zsh_autosuggest_$action \$@
-		retval=\$?
+			_zsh_autosuggest_$action \$@
+			retval=\$?
 
-		_zsh_autosuggest_highlight_apply
+			_zsh_autosuggest_highlight_apply
 
-		zle -R
+			zle -R
 
-		return \$retval
-	}"
-done
+			return \$retval
+		}"
+	done
 
-zle -N autosuggest-fetch _zsh_autosuggest_widget_fetch
-zle -N autosuggest-suggest _zsh_autosuggest_widget_suggest
-zle -N autosuggest-accept _zsh_autosuggest_widget_accept
-zle -N autosuggest-clear _zsh_autosuggest_widget_clear
-zle -N autosuggest-execute _zsh_autosuggest_widget_execute
-zle -N autosuggest-enable _zsh_autosuggest_widget_enable
-zle -N autosuggest-disable _zsh_autosuggest_widget_disable
-zle -N autosuggest-toggle _zsh_autosuggest_widget_toggle
+	zle -N autosuggest-fetch _zsh_autosuggest_widget_fetch
+	zle -N autosuggest-suggest _zsh_autosuggest_widget_suggest
+	zle -N autosuggest-accept _zsh_autosuggest_widget_accept
+	zle -N autosuggest-clear _zsh_autosuggest_widget_clear
+	zle -N autosuggest-execute _zsh_autosuggest_widget_execute
+	zle -N autosuggest-enable _zsh_autosuggest_widget_enable
+	zle -N autosuggest-disable _zsh_autosuggest_widget_disable
+	zle -N autosuggest-toggle _zsh_autosuggest_widget_toggle
+}
 
 #--------------------------------------------------------------------#
-# Default Suggestion Strategy                                        #
+# History Suggestion Strategy                                        #
 #--------------------------------------------------------------------#
 # Suggests the most recent history item that matches the given
 # prefix.
 #
 
-_zsh_autosuggest_strategy_default() {
-	local prefix="$1"
+_zsh_autosuggest_strategy_history() {
+	# Reset options to defaults and enable LOCAL_OPTIONS
+	emulate -L zsh
+
+	# Enable globbing flags so that we can use (#m)
+	setopt EXTENDED_GLOB
+
+	# Escape backslashes and all of the glob operators so we can use
+	# this string as a pattern to search the $history associative array.
+	# - (#m) globbing flag enables setting references for match data
+	# TODO: Use (b) flag when we can drop support for zsh older than v5.0.8
+	local prefix="${1//(#m)[\\*?[\]<>()|^~#]/\\$MATCH}"
 
 	# Get the history items that match
 	# - (r) subscript flag makes the pattern match on values
-	typeset -g suggestion="${history[(r)${(b)prefix}*]}"
+	typeset -g suggestion="${history[(r)${prefix}*]}"
 }
 
 #--------------------------------------------------------------------#
@@ -507,18 +560,25 @@ _zsh_autosuggest_strategy_default() {
 # `HIST_EXPIRE_DUPS_FIRST`.
 
 _zsh_autosuggest_strategy_match_prev_cmd() {
-	local prefix="$1"
+	# Reset options to defaults and enable LOCAL_OPTIONS
+	emulate -L zsh
+
+	# Enable globbing flags so that we can use (#m)
+	setopt EXTENDED_GLOB
+
+	# TODO: Use (b) flag when we can drop support for zsh older than v5.0.8
+	local prefix="${1//(#m)[\\*?[\]<>()|^~#]/\\$MATCH}"
 
 	# Get all history event numbers that correspond to history
 	# entries that match pattern $prefix*
 	local history_match_keys
-	history_match_keys=(${(k)history[(R)${(b)prefix}*]})
+	history_match_keys=(${(k)history[(R)$prefix*]})
 
 	# By default we use the first history number (most recent history entry)
 	local histkey="${history_match_keys[1]}"
 
 	# Get the previously executed command
-	local prev_cmd="${history[$((HISTCMD-1))]}"
+	local prev_cmd="$(_zsh_autosuggest_escape_command "${history[$((HISTCMD-1))]}")"
 
 	# Iterate up to the first 200 history event numbers that match $prefix
 	for key in "${(@)history_match_keys[1,200]}"; do
@@ -535,6 +595,30 @@ _zsh_autosuggest_strategy_match_prev_cmd() {
 
 	# Give back the matched history entry
 	typeset -g suggestion="$history[$histkey]"
+}
+
+#--------------------------------------------------------------------#
+# Fetch Suggestion                                                   #
+#--------------------------------------------------------------------#
+# Loops through all specified strategies and returns a suggestion
+# from the first strategy to provide one.
+#
+
+_zsh_autosuggest_fetch_suggestion() {
+	typeset -g suggestion
+	local -a strategies
+	local strategy
+
+	# Ensure we are working with an array
+	strategies=(${=ZSH_AUTOSUGGEST_STRATEGY})
+
+	for strategy in $strategies; do
+		# Try to get a suggestion from this strategy
+		_zsh_autosuggest_strategy_$strategy "$1"
+
+		# Break once we've found a suggestion
+		[[ -n "$suggestion" ]] && break
+	done
 }
 
 #--------------------------------------------------------------------#
@@ -555,13 +639,15 @@ _zsh_autosuggest_async_server() {
 		sleep 1 # Block for long enough for the signal to come through
 	}
 
-	# Output only newlines (not carriage return + newline)
+	# Don't add any extra carriage returns
 	stty -onlcr
+
+	# Don't translate carriage returns to newlines
+	stty -icrnl
 
 	# Silence any error messages
 	exec 2>/dev/null
 
-	local strategy=$1
 	local last_pid
 
 	while IFS='' read -r -d $'\0' query; do
@@ -571,7 +657,7 @@ _zsh_autosuggest_async_server() {
 		# Run suggestion search in the background
 		(
 			local suggestion
-			_zsh_autosuggest_strategy_$ZSH_AUTOSUGGEST_STRATEGY "$query"
+			_zsh_autosuggest_fetch_suggestion "$query"
 			echo -n -E "$suggestion"$'\0'
 		) &
 
@@ -608,7 +694,7 @@ _zsh_autosuggest_async_pty_create() {
 	fi
 
 	# Fork a zpty process running the server function
-	zpty -b $ZSH_AUTOSUGGEST_ASYNC_PTY_NAME "_zsh_autosuggest_async_server _zsh_autosuggest_strategy_$ZSH_AUTOSUGGEST_STRATEGY"
+	zpty -b $ZSH_AUTOSUGGEST_ASYNC_PTY_NAME _zsh_autosuggest_async_server
 
 	# Store the fd so we can remove the handler later
 	if (( REPLY )); then
@@ -622,13 +708,11 @@ _zsh_autosuggest_async_pty_create() {
 }
 
 _zsh_autosuggest_async_pty_destroy() {
-	if zpty -t $ZSH_AUTOSUGGEST_ASYNC_PTY_NAME &>/dev/null; then
-		# Remove the input handler
-		zle -F $_ZSH_AUTOSUGGEST_PTY_FD &>/dev/null
+	# Remove the input handler
+	zle -F $_ZSH_AUTOSUGGEST_PTY_FD &>/dev/null
 
-		# Destroy the zpty
-		zpty -d $ZSH_AUTOSUGGEST_ASYNC_PTY_NAME &>/dev/null
-	fi
+	# Destroy the zpty
+	zpty -d $ZSH_AUTOSUGGEST_ASYNC_PTY_NAME &>/dev/null
 }
 
 _zsh_autosuggest_async_pty_recreate() {

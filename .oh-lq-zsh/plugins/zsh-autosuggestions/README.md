@@ -4,6 +4,8 @@ _[Fish](http://fishshell.com/)-like fast/unobtrusive autosuggestions for zsh._
 
 It suggests commands as you type, based on command history.
 
+Requirements: Zsh v4.3.11 or later
+
 [![CircleCI](https://circleci.com/gh/zsh-users/zsh-autosuggestions.svg?style=svg)](https://circleci.com/gh/zsh-users/zsh-autosuggestions)
 
 <a href="https://asciinema.org/a/37390" target="_blank"><img src="https://asciinema.org/a/37390.png" width="400" /></a>
@@ -11,72 +13,8 @@ It suggests commands as you type, based on command history.
 
 ## Installation
 
-### Manual
+See [INSTALL.md](INSTALL.md).
 
-1. Clone this repository somewhere on your machine. This guide will assume `~/.zsh/zsh-autosuggestions`.
-
-    ```sh
-    git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
-    ```
-
-2. Add the following to your `.zshrc`:
-
-    ```sh
-    source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-    ```
-
-3. Start a new terminal session.
-
-
-### Oh My Zsh
-
-1. Clone this repository into `$ZSH_CUSTOM/plugins` (by default `~/.oh-my-zsh/custom/plugins`)
-
-    ```sh
-    git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions
-    ```
-
-2. Add the plugin to the list of plugins for Oh My Zsh to load:
-
-    ```sh
-    plugins=(zsh-autosuggestions)
-    ```
-
-3. Start a new terminal session.
-
-### Arch Linux via the AUR
-1. Install the [`zsh-autosuggestions`](https://aur.archlinux.org/packages/zsh-autosuggestions/) or the [`zsh-autosuggestions-git`](https://aur.archlinux.org/packages/zsh-autosuggestions-git/) packages from the [AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository).
-
-    ```sh
-    pacaur -S zsh-autosuggestions
-    ```
-    or
-    ```
-    pacaur -S zsh-autosuggestions-git
-    ```
-
-2. Add the following to your `.zshrc`:
-
-    ```sh
-    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-    ```
-
-3. Start a new terminal session.
-
-### macOS via Homebrew
-1. Install the `zsh-autosuggestions` package using [Homebrew](https://brew.sh/).
-
-    ```sh
-    brew install zsh-autosuggestions
-    ```
-
-2. Add the following to your `.zshrc`:
-
-    ```sh
-    source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-    ```
-
-3. Start a new terminal session.
 
 ## Usage
 
@@ -89,7 +27,7 @@ If you invoke the `forward-word` widget, it will partially accept the suggestion
 
 ## Configuration
 
-You may want to override the default global config variables after sourcing the plugin. Default values of these variables can be found [here](src/config.zsh).
+You may want to override the default global config variables. Default values of these variables can be found [here](src/config.zsh).
 
 **Note:** If you are using Oh My Zsh, you can put this configuration in a file in the `$ZSH_CUSTOM` directory. See their comments on [overriding internals](https://github.com/robbyrussell/oh-my-zsh/wiki/Customization#overriding-internals).
 
@@ -101,10 +39,10 @@ Set `ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE` to configure the style that the suggestion
 
 ### Suggestion Strategy
 
-Set `ZSH_AUTOSUGGEST_STRATEGY` to choose the strategy for generating suggestions. There are currently two to choose from:
+`ZSH_AUTOSUGGEST_STRATEGY` is an array that specifies how suggestions should be generated. The strategies in the array are tried successively until a suggestion is found. There are currently two built-in strategies to choose from:
 
-- `default`: Chooses the most recent match.
-- `match_prev_cmd`: Chooses the most recent match whose preceding history item matches the most recently executed command ([more info](src/strategies/match_prev_cmd.zsh)). Note that this strategy won't work as expected with ZSH options that don't preserve the history order such as `HIST_IGNORE_ALL_DUPS` or `HIST_EXPIRE_DUPS_FIRST`.
+- `history`: Chooses the most recent match from history.
+- `match_prev_cmd`: Like `history`, but chooses the most recent match whose preceding history item matches the most recently executed command ([more info](src/strategies/match_prev_cmd.zsh)). Note that this strategy won't work as expected with ZSH options that don't preserve the history order such as `HIST_IGNORE_ALL_DUPS` or `HIST_EXPIRE_DUPS_FIRST`.
 
 
 ### Widget Mapping
@@ -200,6 +138,20 @@ Pull requests are welcome! If you send a pull request, please:
 Tests are written in ruby using the [`rspec`](http://rspec.info/) framework. They use [`tmux`](https://tmux.github.io/) to drive a pseudoterminal, sending simulated keystrokes and making assertions on the terminal content.
 
 Test files live in `spec/`. To run the tests, run `make test`. To run a specific test, run `TESTS=spec/some_spec.rb make test`. You can also specify a `zsh` binary to use by setting the `TEST_ZSH_BIN` environment variable (ex: `TEST_ZSH_BIN=/bin/zsh make test`).
+
+A docker image for testing is available [on docker hub](https://hub.docker.com/r/ericfreese/zsh-autosuggestions-test). It comes with ruby, the bundler dependencies, and all supported versions of zsh installed.
+
+Pull the docker image with:
+
+```sh
+docker pull ericfreese/zsh-autosuggestions-test
+```
+
+To run the tests for a specific version of zsh (where `<version>` below is substituted with the contents of a line from the [`ZSH_VERSIONS`](ZSH_VERSIONS) file):
+
+```sh
+docker run -it -e TEST_ZSH_BIN=zsh-<version> -v $PWD:/zsh-autosuggestions zsh-autosuggestions-test make test
+```
 
 
 ## License

@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.5.1
+- Speed up widget rebinding (#413)
+- Clean up global variable creations (#403)
+- Respect user's set options when running original widget (#402)
+
+## v0.5.0
+- Don't overwrite config with default values (#335)
+- Support fallback strategies by supplying array to suggestion config var
+- Rename "default" suggestion strategy to "history" to name it based on what it actually does
+- Reset opts in some functions affected by `GLOB_SUBST` (#334)
+- Support widgets starting with dashes (ex: `-a-widget`) (#337)
+- Skip async tests in zsh versions less than 5.0.8 because of reliability issues
+- Fix handling of newline + carriage return in async pty (#333)
+
+
+## v0.4.3
+- Avoid bell when accepting suggestions with `autosuggest-accept` (#228)
+- Don't fetch suggestions after [up,down]-line-or-beginning-search (#227, #241)
+- We are now running CI against new 5.5.1 version
+- Fix partial-accept in vi mode (#188)
+- Fix suggestion disappearing on fast movement after switching to `vicmd` mode (#290)
+- Fix issue rotating through kill ring with `yank-pop` (#301)
+- Fix issue creating new pty for async mode when previous pty is not properly cleaned up (#249)
+
+## v0.4.2
+- Fix bug in zsh versions older than 5.0.8 (#296)
+- Officially support back to zsh v4.3.11
+
 ## v0.4.1
 - Switch to [[ and (( conditionals instead of [ (#257)
 - Avoid warnnestedvar warnings with `typeset -g` (#275)
