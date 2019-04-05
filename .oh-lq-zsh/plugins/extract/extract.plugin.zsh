@@ -7,7 +7,6 @@ extract() {
 			Usage: extract [-option] [file ...]
 			Default: Extract archive file
 			Options:
-			    -r, --remove    Remove archive after unpacking.
 			    -l, --list      List archive files' name.
 			    -c, --compress  Compress files/directories to archive file
 			                    extract -c <archive-name> <files>
@@ -27,16 +26,8 @@ extract() {
 
     else
 
-        local remove_archive
         local list_archive
-        local success
         local extract_dir
-
-        remove_archive=1
-        if [[ "$1" == "-r" ]] || [[ "$1" == "--remove" ]]; then
-            remove_archive=0
-            shift
-        fi
 
         list_archive=0
         if [[ "$1" == "-l" ]] || [[ "$1" == "--list" ]]; then
@@ -61,12 +52,22 @@ extract() {
                 esac
             else
                 # extract
-                success=0
                 case "$1" in
                     (*.tar.gz|*.tar.bz2|*.tar.xz|*.tar.zma) extract_dir="${1:t:r:r}" ;;
                     (*) extract_dir="${1:t:r}" ;;
                 esac
-                mkdir $extract_dir 2>/dev/null
+                # exist ?
+                if [[ -d $extract_dir ]]; then
+                    echo -n "'$extract_dir' is exist, remove and replace it? [yN] "
+                    read -rs -k 1 answer
+                    [[ -n "$answer" ]] && echo
+                    if [[ "$answer" != "y" ]]; then
+                        echo "Abort extract!" >&2
+                        return
+                    fi
+                    rm -rf "$extract_dir"
+                fi
+                mkdir "$extract_dir"
                 case "$1" in
                     (*.tar.gz|*.tgz) tar zxvf "$1" -C $extract_dir ;;
                     (*.tar.bz2|*.tbz|*.tbz2) tar xvjf "$1" -C $extract_dir ;;
@@ -92,21 +93,29 @@ extract() {
                     ;;
                     (*)
                         echo "extract: '$1' cannot be extracted" >&2
-                        success=1
                     ;;
                 esac
                 rmdir --ignore-fail-on-non-empty "$extract_dir"
 
                 # remove double dir
-                extract_sub_dir=$(ls $extract_dir)
-                if [[ "$extract_sub_dir" == "$extract_dir" ]]; then
-                    mv "$extract_dir/$extract_sub_dir" "${extract_dir}.tmp"
-                    rmdir --ignore-fail-on-non-empty $extract_dir
-                    mv "${extract_dir}.tmp" $extract_dir
+                extract_sub_dir=$(ls -A $extract_dir)
+                sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
+                if [[ "$sub_dir_files_num" == "1" ]]; then
+                    if [[ -e "$extract_sub_dir" && "$extract_sub_dir" != "$extract_dir" ]]; then
+                        echo -n "'$extract_sub_dir' is exist, remove and replace it? [yN] "
+                        read -rs -k 1 answer
+                        [[ -n "$answer" ]] && echo
+                        if [[ "$answer" != "y" ]]; then
+                            echo "Abort triming extracted directory!" >&2
+                            return
+                        fi
+                        rm -rf "$extract_sub_dir"
+                    fi
+                    rm -rf "${extract_sub_dir}.$$"
+                    mv "$extract_dir/$extract_sub_dir" "${extract_sub_dir}.$$"
+                    rmdir --ignore-fail-on-non-empty "$extract_dir"
+                    mv "${extract_sub_dir}.$$" $extract_sub_dir
                 fi
-
-                (( success = $success > 0 ? $success : $? ))
-                (( $success == 0 )) && (( $remove_archive == 0 )) && rm "$1"
             fi
 
             shift
