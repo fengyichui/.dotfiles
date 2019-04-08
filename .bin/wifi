@@ -18,13 +18,15 @@ function usage()
     echo "    disonnect: Disconnect from WIFI"
     echo "    delete:    Delete profile (wifi show profiles)"
     echo "    show:      Show all WLAN info"
+    echo "    help:      Show me"
     echo ""
     echo "wifi show:"
     netsh wlan show '/?'
 }
 
 if [ $# == 0 ]; then
-    usage
+    ipconfig '/all'
+    netsh wlan show interfaces
     exit 1
 fi
 
