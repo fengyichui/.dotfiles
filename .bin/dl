@@ -201,13 +201,19 @@ if [[ -s $save_session && -n "$dlthing" ]]; then
         echo -e "\e[32mPlease use UI to add this task: $dlthing\e[0m"
         echo -e "\e[32mNow resume unfinished tasks!\e[0m"
         dlthing=""
+    else
+        cp "$save_session" "$save_session.$$"
     fi
 fi
 
 # input file
 if [[ -z "$dlthing" ]]; then
-    if [[ -s $save_session && -z "$ignore_unfinished" ]]; then
-        inputfile_cfg="--input-file='$save_session'"
+    if [[ -s $save_session ]]; then
+        if [[ -z "$ignore_unfinished" ]]; then
+            inputfile_cfg="--input-file='$save_session'"
+        else
+            cp "$save_session" "$save_session.$$"
+        fi
     fi
 elif [[ -f "$dlthing" ]]; then
     dlthing=$(realpath $dlthing)
