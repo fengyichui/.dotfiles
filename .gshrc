@@ -175,7 +175,7 @@ gg ()
         fi
     done
     for i; do
-        eval "ag -i '$i' $dir" #--nogroup
+        eval "ag -a -i '$i' $dir" #--nogroup
     done
 }
 
