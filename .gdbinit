@@ -780,6 +780,26 @@ define dump_fault_armcm
             printf "Auxiliary Fault Status: 0x%08X\n", $aux_fault_status
             printf "\n"
         end
+
+        # Fix GDB can't backstrace when hardware fault issue
+        printf "Fault backtrace (Workaround GDB IRQ issue):\n"
+        # save
+        set $save_lr=$lr
+        set $save_pc=$pc
+        set $save_xpsr=$xpsr
+        set $save_sp=$sp
+        # fix
+        set $lr=*(unsigned int *)($sp+20)
+        set $pc=*(unsigned int *)($sp+24)
+        set $xpsr=*(unsigned int *)($sp+28)
+        set $sp=$sp+32
+        printf "#-  0x%08X in Fault ()\n", $save_pc
+        bt
+        # restore
+        set $lr=$save_lr
+        set $pc=$save_pc
+        set $xpsr=$save_xpsr
+        set $sp=$save_sp
     end
 end
 document dump_fault_armcm
