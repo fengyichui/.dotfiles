@@ -175,7 +175,7 @@ gg ()
         fi
     done
     for i; do
-        eval "ag -i '$i' $dir" #--nogroup
+        eval "ag --color-match 31 -i '$i' $dir" #--nogroup
     done
 }
 
@@ -194,7 +194,7 @@ ggg ()
         fi
     done
     for i; do
-        eval "ag --hidden --all-text -i '$i' $dir" #--nogroup
+        eval "ag --color-match 31 --hidden --all-text -i '$i' $dir" #--nogroup
     done
 }
 
