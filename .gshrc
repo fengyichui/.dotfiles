@@ -175,7 +175,26 @@ gg ()
         fi
     done
     for i; do
-        eval "ag -a -i '$i' $dir" #--nogroup
+        eval "ag -i '$i' $dir" #--nogroup
+    done
+}
+
+# grep pattern
+ggg ()
+{
+    dir=""
+    for i; do
+        if [[ "$1" == "-d" ]]; then
+            if [[ -d "$2" ]]; then
+                dir="$dir $2"
+            fi
+            shift; shift
+        else
+            break
+        fi
+    done
+    for i; do
+        eval "ag --hidden --all-text -i '$i' $dir" #--nogroup
     done
 }
 
