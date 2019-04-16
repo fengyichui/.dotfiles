@@ -57,13 +57,13 @@ def parse_dump_data(file_path, parse_reg=False, parse_mem=False):
 
         # restore reg
         if parse_reg:
-            match = re.match(r'^(\w+)  +(0x[0-9a-f]+)\t', line, flags=re.I)
+            match = re.match(r'^(\w+)\s+(0x[0-9a-f]+)\s', line, flags=re.I)
             if match:
                 cmds += ["set ${}={}".format(match.group(1), match.group(2))]
 
         # restore memery
         if parse_mem:
-            match = re.match(r'^(0x[0-9a-f]+):\t(0x[0-9a-f]+)(?:\t(0x[0-9a-f]+))?(?:\t(0x[0-9a-f]+))?(?:\t(0x[0-9a-f]+))?', line, flags=re.I)
+            match = re.match(r'^(0x[0-9a-f]+):\s+(0x[0-9a-f]+)(?:\s+(0x[0-9a-f]+))?(?:\s+(0x[0-9a-f]+))?(?:\s+(0x[0-9a-f]+))?', line, flags=re.I)
             if match:
                 address = int(match.group(1), 0)
                 cmds += ["set *0x{:08x}={}".format(address, match.group(2))]
