@@ -264,6 +264,16 @@ proxy_disable ()
     export no_proxy=
 }
 
+# make exe file smaller
+exe-smaller ()
+{
+    size_old=$(ls -sh "$1" | awk '{print $1}')
+    strip "$1"
+    upx --best --force "$1"
+    size_new=$(ls -sh "$1" | awk '{print $1}')
+    echo "\nSize: $size_old -> $size_new"
+}
+
 #####################################
 #             Export                #
 #####################################
