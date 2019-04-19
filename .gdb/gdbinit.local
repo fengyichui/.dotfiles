@@ -21,6 +21,7 @@ end
 define connect
 #connect2remote
 connect2local
+disable_wdt
 end
 
 define reconnect

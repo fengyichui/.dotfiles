@@ -51,9 +51,21 @@ APP_MAX_SIZE             = 128 * flash_sector_size
 CFG_MAX_SIZE             = 3 * flash_sector_size
 PATCH_MAX_SIZE           = 2 * flash_sector_size
 
+CHIP_HS6620             = 0x6620
+CHIP_HS6621             = 0x6621
+
 ######################################################################
 # FUNCTIONS
 ######################################################################
+
+def chip():
+    device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int'))) >> 16
+#    print("HS{:04X}".format(device_info))
+    if device_info == 0x6620:
+        return CHIP_HS6620
+    else:
+        return CHIP_HS6621
+
 
 def flash_prepare_and_show():
     # Init
@@ -194,6 +206,19 @@ def flash_download_part(part_type, file_path, is_verify=True):
 # CLASS
 ######################################################################
 
+# disable wdt
+class disable_wdt_register(gdb.Command):
+
+    """HS662x diable WDT
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("disable_wdt", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+        gdb.execute('set *0x400e0024 |= 1<<27')
+
+
 # remap to RAM
 class remap2ram_register(gdb.Command):
 
@@ -204,8 +229,12 @@ class remap2ram_register(gdb.Command):
         super(self.__class__, self).__init__("remap2ram", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        gdb.execute('set *0x400e003c=0x336')
-        gdb.execute('set *0x400e003c=0x336')
+        if chip() == CHIP_HS6620:
+            gdb.execute('set *0x400e003c |= 0x20')
+            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 6')
+        else:
+            gdb.execute('set *0x400e003c |= 0x20')
+            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 2')
 
 
 # remap to ROM
@@ -218,8 +247,12 @@ class remap2rom_register(gdb.Command):
         super(self.__class__, self).__init__("remap2rom", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        gdb.execute('set *0x400e003c=0x335')
-        gdb.execute('set *0x400e003c=0x335')
+        if chip() == CHIP_HS6620:
+            gdb.execute('set *0x400e003c |= 0x20')
+            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 5')
+        else:
+            gdb.execute('set *0x400e003c |= 0x20')
+            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 1')
 
 
 # reboot
@@ -558,6 +591,7 @@ class issue_reappear_register(gdb.Command):
 
 
 # register
+disable_wdt_register()
 remap2ram_register()
 remap2rom_register()
 reboot_register()
