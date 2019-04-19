@@ -73,10 +73,12 @@ Options:
   -i         Ignore unfinished tasks
   -ui        Show ui
   -t         Update BT tracker
+  -r         Get running aria2c information
   -m         Just download torrent file
   -ls        List torrent included files
   -ls=1,3-9  Select torrent included files to download (List by -ls)
   -d=<dir>   Set download directory
+  -d         Daemon mode
   -NUM       Set number of max connection per server. default 16 in aria2.conf
   -h         Show this help and exit
   --help     Show aria2c help
@@ -97,6 +99,7 @@ do
         -i) ignore_unfinished=1; shift ;;
         -ui) ui=1; shift ;;
         -t) tracker_update=1; shift ;;
+        -r) get_remote_info=1; shift ;;
         -m) misc_cfg="$misc_cfg --enable-rpc=false --bt-metadata-only=true --bt-save-metadata=true --bt-load-saved-metadata=false"; rename_torrent=1; norpc=1; shift ;;
         -ls) list_torrent=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
@@ -138,6 +141,17 @@ fi
 # list torrent
 if [[ -n "$list_torrent" ]]; then
     aria2c --show-files "$dlthing"
+    exit
+fi
+
+# Get remote info
+if [[ -n "$get_remote_info" ]]; then
+    if [[ $(pgrep aria2c) ]] ; then
+        curl http://127.0.0.1:6800/jsonrpc -H "Content-Type: application/json" -H "Accept: application/json" --data '{"jsonrpc":"2.0","id":1,"method":"aria2.tellActive","params":["token:fyc"]}' 2>/dev/null | jq
+        curl http://127.0.0.1:6800/jsonrpc -H "Content-Type: application/json" -H "Accept: application/json" --data '{"jsonrpc":"2.0","id":1,"method":"aria2.getGlobalStat","params":["token:fyc"]}' 2>/dev/null | jq
+    else
+        echo "No aria2c running!"
+    fi
     exit
 fi
 
