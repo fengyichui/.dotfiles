@@ -64,6 +64,19 @@ function humanize_torrent_file ()
     fi
 }
 
+# $1 = method
+# $2 = params
+function aria2c_rpc_curl ()
+{
+    method=$1
+    params=$2
+    if [[ -n "$params" ]]; then
+        params=",$params"
+    fi
+    curl http://127.0.0.1:6800/jsonrpc -H "Content-Type: application/json" -H "Accept: application/json" \
+        --data '{"jsonrpc":"2.0","id":1,"method":"aria2.'"$method"'","params":["token:fyc"'"$params"']}' 2>/dev/null
+}
+
 function usage ()
 {
     cat <<EOF
@@ -147,8 +160,8 @@ fi
 # Get remote info
 if [[ -n "$get_remote_info" ]]; then
     if [[ $(pgrep aria2c) ]] ; then
-        curl http://127.0.0.1:6800/jsonrpc -H "Content-Type: application/json" -H "Accept: application/json" --data '{"jsonrpc":"2.0","id":1,"method":"aria2.tellActive","params":["token:fyc"]}' 2>/dev/null | jq
-        curl http://127.0.0.1:6800/jsonrpc -H "Content-Type: application/json" -H "Accept: application/json" --data '{"jsonrpc":"2.0","id":1,"method":"aria2.getGlobalStat","params":["token:fyc"]}' 2>/dev/null | jq
+        aria2c_rpc_curl tellActive    | jq '.result[].files[] | select(.selected == "true") | del(.uris,.selected)'
+        aria2c_rpc_curl getGlobalStat | jq '.result'
     else
         echo "No aria2c running!"
     fi
@@ -162,10 +175,7 @@ if [[ -z "$norpc" ]]; then
         [[ -n "$answer" ]] && echo #newline
         if [[ "$answer" != "N" ]]; then
             if [[ -n "$dlthing" ]]; then
-                curl http://127.0.0.1:6800/jsonrpc \
-                    -H "Content-Type: application/json" \
-                    -H "Accept: application/json" \
-                    --data '{"jsonrpc":"2.0","id":1,"method":"aria2.addUri","params":["token:fyc", ["'$dlthing'"]]}'
+                aria2c_rpc_curl addUri '["'$dlthing'"]'
                 echo
             fi
             exit
