@@ -175,7 +175,12 @@ if [[ -z "$norpc" ]]; then
         [[ -n "$answer" ]] && echo #newline
         if [[ "$answer" != "N" ]]; then
             if [[ -n "$dlthing" ]]; then
-                aria2c_rpc_curl addUri '["'$dlthing'"]'
+                if [[ "$dlthing" == *.torrent ]]; then
+                    dlthing=$(base64 -w0 $dlthing)
+                    aria2c_rpc_curl addTorrent '"'$dlthing'"'
+                else
+                    aria2c_rpc_curl addUri '["'$dlthing'"]'
+                fi
                 echo
             fi
             exit
