@@ -871,9 +871,7 @@ let g:tagbar_iconchars = ['▸', '▾']
 " Rainbow
 let g:rainbow_active = 1
 let g:rainbow_c_parentheses = [
-            \ 'start=/(/ end=/)/ fold',
-            \ 'start=/\[/ end=/\]/ fold',
-            \ 'start=/{/ end=/}/ fold',
+            \ 'start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold',
             \ 'start=/^\s*#\s*\(if\|ifdef\|ifndef\)\( \d\@!\)/ step=/^\s*#\s*\(else\|elif\)/ end=/^\s*#\s*endif/ fold',
             \ ]
 let g:rainbow_conf = {
@@ -884,6 +882,11 @@ let g:rainbow_conf = {
             \     'c': {'parentheses': g:rainbow_c_parentheses},
             \     'cpp': {'parentheses': g:rainbow_c_parentheses},
             \     'java': {'parentheses': g:rainbow_c_parentheses},
+            \     'sh': {'parentheses': ['start=/\<if\>/ step=/\<\(then\|else\|elif\)\>/ end=/\<fi\>/',
+            \                            'start=/\<for\>/ step=/\<\(do\|in\)\>/ end=/\<done\>/',
+            \                            'start=/\<while\>/ step=/\<do\>/ end=/\<done\>/',
+            \                            'start=/\<case\>/ step=/\(\S*)\|\<in\>\|;;\)/ end=/\<esac\>/'],
+            \            'after': ['syn clear shCondError']},
             \     }
             \ }
 
