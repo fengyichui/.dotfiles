@@ -46,6 +46,12 @@ function torrent_name ()
     dl -ls "$1" | awk '/^Name:/{print $2}'
 }
 
+# $1 = *.torrent
+function torrent_magnet ()
+{
+    dl -ls "$1" | awk '/Magnet URI:/{sub("^Magnet URI: ",""); print}'
+}
+
 # $1 = dir
 # $2 = magnet_url
 function humanize_torrent_file ()
