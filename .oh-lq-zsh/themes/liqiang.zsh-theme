@@ -86,7 +86,7 @@ function precmd() {
     function async() {
         # kill child if necessary
         if [[ ! -z "$1" ]]; then
-            kill -s HUP $1 >/dev/null 2>&1 || :
+            kill -s HUP $1 &>/dev/null || :
         fi
 
         # generate prompt
@@ -94,6 +94,8 @@ function precmd() {
         tmp_prompt="export GIT_CURRENT_INFO='$git_current_info';rprompt='$git_current_info'"
         # save to temp file
         echo "$tmp_prompt" > "${HOME}/.zsh_tmp_prompt"
+        # valid flag
+        echo "#;" >> "${HOME}/.zsh_tmp_prompt"
 
         # signal parent, trigger TRAPUSR1()
         kill -s USR1 $$
@@ -108,8 +110,18 @@ function precmd() {
 
 # Hook Functions: trigger by `kill -s USR1 $$`
 function TRAPUSR1() {
-    # read from temp file
-    source "${HOME}/.zsh_tmp_prompt"
+    # try 10 times
+    for i in {1..10}; do
+        # read from temp file
+        tmp_prompt=$(cat "${HOME}/.zsh_tmp_prompt" 2>/dev/null)
+        # make sure the data is valid
+        if [[ "${tmp_prompt:(-2)}" == "#;" ]]; then
+            # execute it
+            eval "$tmp_prompt"
+            break
+        fi
+        sleep 0.01
+    done
 
     # reset proc number
     async_procs=''
