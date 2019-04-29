@@ -113,7 +113,6 @@ plugins=(
     dircycle
     zsh-fzf
     pip
-    zsh-autosuggestions
     zsh-syntax-highlighting
     zsh-history-substring-search
 )
