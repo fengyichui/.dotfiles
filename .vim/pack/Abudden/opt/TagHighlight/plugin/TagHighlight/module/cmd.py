@@ -63,13 +63,10 @@ def ProcessCommandLine():
                     help=AllOptions[dest]['Help'])
         else:
             optparse_type='string'
-            optparse_default='DEFAULT_OPTION_USED'
             if AllOptions[dest]['Type'] in ['string', 'int']:
                 action='store'
             elif AllOptions[dest]['Type'] == 'list':
                 action='append'
-                if dest=='SkipPatterns':
-                    optparse_default=[]
             else:
                 # TODO: This needs handling somehow
                 pyoptions.remove(dest)
@@ -77,7 +74,7 @@ def ProcessCommandLine():
                 raise Exception('Unrecognised option type: ' + AllOptions[dest]['Type'])
             parser.add_option(*AllOptions[dest]['CommandLineSwitches'],
                     action=action,
-                    default=optparse_default,
+                    default='DEFAULT_OPTION_USED',
                     type=optparse_type,
                     dest=dest,
                     help=AllOptions[dest]['Help'])
