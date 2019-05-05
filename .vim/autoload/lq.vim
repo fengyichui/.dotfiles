@@ -882,30 +882,46 @@ function! lq#ShowLists()
     endif
 endfunction
 
-" PDF read
-function! lq#PdfRead(pdffile)
+" Document converter
+function! lq#DocumentConverter(docfile, docfile_abs)
     setlocal nomodified
-    let l:txtfile = a:pdffile . '.txt' "fnameescape()
+    let l:ext = fnamemodify(a:docfile, ":e")
+    let l:txtfile = a:docfile . '.txt'
     if !filereadable(l:txtfile)
-        let l:spdffile = shellescape(a:pdffile, 0)
+        let l:sdocfile = shellescape(a:docfile, 0)
         let l:stxtfile = shellescape(l:txtfile, 0)
-        echo "converting " . a:pdffile . " ..."
-        call system('pdftotext -enc UTF-8 -layout -nopgbrk ' . l:spdffile . ' ' . l:stxtfile)
+        let l:command = ''
+        if l:ext == 'pdf'
+            let l:command = 'pdftotext -enc UTF-8 -layout -nopgbrk ' . l:sdocfile . ' ' . l:stxtfile
+        elseif l:ext == 'xls' || l:ext == 'xlsx' || l:ext == 'xlsm'
+            if has('win32')
+                let l:sdocfile = shellescape(a:docfile_abs, 0)
+                let l:stxtfile = shellescape(a:docfile_abs . '.txt', 0)
+                let l:svbscript = shellescape(fnamemodify($MYVIMRC, ":p:h") . "/res/windows/xlstocsv.vbs", 0)
+                let l:command = 'wscript ' . l:svbscript . ' ' . l:sdocfile . ' ' . l:stxtfile
+            else
+                echomsg "XLS converter is not support your OS !"
+            endif
+        elseif l:ext == 'doc' || l:ext == 'docx' || l:ext == 'docm'
+            let l:command = 'pandoc -o ' . l:stxtfile . ' ' . l:sdocfile
+        endif
+        if l:command == ''
+            echomsg "Not support file type [" . l:ext . "] !"
+            return
+        else
+            echo "converting " . a:docfile . " ..."
+            let l:output=system(l:command)
+            if v:shell_error
+                echomsg "command execute fail: " . l:command
+                echomsg l:output
+                return
+            endif
+        endif
     endif
     execute "edit " . l:txtfile
-endfunction
-
-" Excel read
-function! lq#ExcelRead(excelfile)
-    setlocal nomodified
-    let l:csv = a:excelfile . '.csv'
-    let l:svbscript = shellescape(fnamemodify($MYVIMRC, ":p:h") . "/res/windows/xlstocsv.vbs", 0)
-    let l:sexcel = shellescape(a:excelfile, 0)
-    let l:scsv = shellescape(l:csv, 0)
-    echo "converting " . a:excelfile . " ..."
-    call system('wscript ' . l:svbscript . ' ' . l:sexcel . ' ' . l:scsv)
-    execute "edit " . l:csv
-    set filetype=csv
+    if l:ext == 'xls' || l:ext == 'xlsx' || l:ext == 'xlsm'
+        set filetype=csv
+    endif
 endfunction
 
 " ARM gdb, need vim-8.1

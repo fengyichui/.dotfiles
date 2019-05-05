@@ -380,14 +380,9 @@ autocmd BufReadPost  * if &binary | call lq#BinaryBufReadPost() | endif
 autocmd BufWritePre  * if &binary | let b:oldbinview = winsaveview() | silent! undojoin | silent! exe '%s#^[^:]*: \(\%(\x\+ \)\+\) .*#\1# | %!xxd -r -p' | endif
 autocmd BufWritePost * if &binary | silent! undojoin | silent! exe '%!xxd' | setlocal nomodified | call winrestview(b:oldbinview) | endif
 
-" For PDF
-autocmd BufReadCmd *.pdf call lq#PdfRead(expand("<afile>"))
-
-" For Excel
-if has("win32")
-let g:zipPlugin_ext='*.apk,*.celzip,*.crtx,*.docm,*.docx,*.dotm,*.dotx,*.ear,*.epub,*.gcsx,*.glox,*.gqsx,*.ja,*.jar,*.kmz,*.oxt,*.potm,*.potx,*.ppam,*.ppsm,*.ppsx,*.pptm,*.pptx,*.sldx,*.thmx,*.vdw,*.war,*.wsz,*.xap,*.xlam,*.xlam,*.xlsb,*.xltm,*.xltx,*.xpi,*.zip'
-autocmd BufReadCmd *.xls,*.xlsx,*.xlsm call lq#ExcelRead(expand("<amatch>"))
-endif
+" For PDF,Excel,Doc
+let g:zipPlugin_ext='*.apk,*.celzip,*.crtx,*.dotm,*.dotx,*.ear,*.epub,*.gcsx,*.glox,*.gqsx,*.ja,*.jar,*.kmz,*.oxt,*.potm,*.potx,*.ppam,*.ppsm,*.ppsx,*.pptm,*.pptx,*.sldx,*.thmx,*.vdw,*.war,*.wsz,*.xap,*.xlam,*.xlam,*.xlsb,*.xltm,*.xltx,*.xpi,*.zip'
+autocmd BufReadCmd *.pdf,*.xls,*.xlsx,*.xlsm,*.doc,*.docx,*.docm call lq#DocumentConverter(expand("<afile>"),expand("<amatch>"))
 
 " For csv
 autocmd BufNewFile,BufRead *.csv set filetype=csv
