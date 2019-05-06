@@ -89,6 +89,9 @@ alias rm-repeat-line="awk '!x[\$0]++'"
 # trans
 alias trans='translate'
 
+# like man
+alias men='tldr'
+
 #####################################
 #             Function              #
 #####################################
