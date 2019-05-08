@@ -886,17 +886,20 @@ endfunction
 function! lq#DocumentConverter(docfile, docfile_abs)
     setlocal nomodified
     let l:ext = fnamemodify(a:docfile, ":e")
-    let l:txtfile = a:docfile . '.txt'
-    if !filereadable(l:txtfile)
+    if has('win32')
+        let l:txtfile  = a:docfile_abs . '.txt'
+        let l:sdocfile = shellescape(a:docfile_abs, 0)
+    else
+        let l:txtfile  = a:docfile . '.txt'
         let l:sdocfile = shellescape(a:docfile, 0)
-        let l:stxtfile = shellescape(l:txtfile, 0)
+    endif
+    let l:stxtfile = shellescape(l:txtfile, 0)
+    if !filereadable(l:txtfile)
         let l:command = ''
         if l:ext == 'pdf'
             let l:command = 'pdftotext -enc UTF-8 -layout -nopgbrk ' . l:sdocfile . ' ' . l:stxtfile
         elseif l:ext == 'xls' || l:ext == 'xlsx' || l:ext == 'xlsm'
             if has('win32')
-                let l:sdocfile = shellescape(a:docfile_abs, 0)
-                let l:stxtfile = shellescape(a:docfile_abs . '.txt', 0)
                 let l:svbscript = shellescape(fnamemodify($MYVIMRC, ":p:h") . "/res/windows/xlstocsv.vbs", 0)
                 let l:command = 'wscript ' . l:svbscript . ' ' . l:sdocfile . ' ' . l:stxtfile
             else
