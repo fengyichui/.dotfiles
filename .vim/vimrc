@@ -880,10 +880,18 @@ let g:rainbow_conf = {
             \     'sh': {'parentheses': ['start=/\<if\>/ step=/\<\(then\|else\|elif\)\>/ end=/\<fi\>/',
             \                            'start=/\<for\>/ step=/\<\(do\|in\)\>/ end=/\<done\>/',
             \                            'start=/\<while\>/ step=/\<do\>/ end=/\<done\>/',
-            \                            'start=/\<case\>/ step=/\(\S*)\|\<in\>\|;;\)/ end=/\<esac\>/'],
+            \                            'start=/\<case\>/ step=/\S*)\|\<in\>\|;;/ end=/\<esac\>/'],
             \            'after': ['syn clear shCondError']},
+            \     'gdb': {'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold',
+            \                             'start=/\(^\|\s\+\)if\($\|\s\+\)/ step=/\(^\|\s\+\)else\($\|\s\+\)/ end=/\(^\|\s\+\)end\($\|\s\+\)/',
+            \                             'start=/\(^\|\s\+\)while\($\|\s\+\)/ end=/\(^\|\s\+\)end\($\|\s\+\)/']},
             \     }
             \ }
+
+" syntax minlines (Almost for `Rainbow` plugin)
+let gdb_minlines = 100
+"let c_minlines = 100
+"let java_minlines = 100
 
 " Load vimrc flag
 let g:load_vimrc = 1
