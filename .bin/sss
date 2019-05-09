@@ -118,6 +118,10 @@ do
             copy_info=1
             shift
             ;;
+        -t|--test)
+            test_server=1
+            shift
+            ;;
         *)
             if [[ "$(awk '/^-[0-9]+$/' <<< $i)" == "$i" ]]; then
                 inside_qr_index="${i#*-}"
@@ -131,6 +135,7 @@ do
                 echo "  -l|--qr-local      local QR picture path"
                 echo "  -s|--server        encrypt_method:password@ip_addr:port"
                 echo "  -c|--copy          copy ss raw info to clipboard"
+                echo "  -t|--test          test all inside proxy server"
                 echo "  -h|--help          show this help"
                 echo "Example:"
                 echo "  -12"
@@ -149,6 +154,21 @@ finalurl ()
 {
     curl --insecure --progress-bar -A foxfire -w %{url_effective} -I -L "$1" -o /dev/null
 }
+
+# test server
+if [[ -n "$test_server" ]]; then
+    i=0
+    for s in ${urls[@]}; do
+        ping -c 1 -W 2 "$s" > /dev/null
+        if [[ "$?" == "0" ]]; then
+            echo -e "-${i}x  ${s}\tpass"
+        else
+            echo -e "-${i}x  ${s}\tfail"
+        fi
+        i=$(($i+1))
+    done
+    exit
+fi
 
 # Get inside QR network path
 if [[ $mode -eq $mode_inside_qr_net_path ]]; then
