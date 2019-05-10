@@ -91,6 +91,8 @@ fi
 server_info='rc4-md5:52918214@138.68.61.42:23456'
 mode=$mode_inside_qr_net_path
 
+noopt=$1
+
 # Parse argument
 for i in "$@"
 do
@@ -154,6 +156,20 @@ finalurl ()
 {
     curl --insecure --progress-bar -A foxfire -w %{url_effective} -I -L "$1" -o /dev/null
 }
+
+free_ss_list ()
+{
+    curl --insecure --progress-bar -A foxfire -L https://raw.githubusercontent.com/dxxzst/Free-SS-SSR/master/README.md > /tmp/free_ss_list
+    cat /tmp/free_ss_list | awk '/最新更新日期/'
+    cat /tmp/free_ss_list | awk '/### SS账号/,/### SSR账号/' | awk -v FS='|' '/^\|[0-9]/{print "sss -s=\""$5":"$4"@"$2":"$3"\""}'
+}
+
+# list
+if [[ -z "$noopt" ]]; then
+    echo "List free ss:"
+    free_ss_list
+    exit
+fi
 
 # test server
 if [[ -n "$test_server" ]]; then
