@@ -287,20 +287,6 @@ image2txt ()
     fi
 }
 
-# fzf execute
-fzfe ()
-{
-    if [[ -t 0 ]]; then
-        __d="$(cat $@)"
-    else
-        __d="$(cat -)"
-    fi
-
-    __fzfe=$(echo "$__d" | fzf +2 -e)
-    echo ">>> $__fzfe\n"
-    eval $__fzfe
-}
-
 #####################################
 #             Export                #
 #####################################

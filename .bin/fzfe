@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ -t 0 ]]; then
+    __d="$(cat $@)"
+else
+    __d="$(cat -)"
+fi
+
+__fzfe=$(fzf +2 -e <<< $__d)
+if [[ -n "$__fzfe" ]]; then
+    echo -e ">>> $__fzfe\n"
+    eval "$__fzfe"
+fi
+
