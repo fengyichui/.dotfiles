@@ -161,7 +161,7 @@ free_ss_list ()
 {
     curl --insecure --progress-bar -A foxfire -L https://raw.githubusercontent.com/dxxzst/Free-SS-SSR/master/README.md > /tmp/free_ss_list
     cat /tmp/free_ss_list | awk '/最新更新日期/' > /tmp/sss_list
-    cat /tmp/free_ss_list | awk '/### SS账号/,/### SSR账号/' | awk -v FS='|' '/^\|[0-9]/{print "sss -s=\""$5":"$4"@"$2":"$3"\""}' >> /tmp/sss_list
+    cat /tmp/free_ss_list | awk '/### SS账号/,/### SSR账号/' | awk -v FS='|' '/^\|[0-9]/{print "sss -s=\""$4":"$5"@"$2":"$3"\""}' >> /tmp/sss_list
     cat /tmp/sss_list
 }
 
