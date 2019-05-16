@@ -292,10 +292,13 @@ f-bin2hex           () {              objcopy --change-addresses $1 -I binary -O
 f-hex2bin           () {              objcopy -I ihex -O binary $1 ${2:-${1%.*}.bin}}
 f-elf2hex           () {              objcopy -O ihex $1 ${2:-${1%.*}.hex}}
 f-elf2hex-arm       () {arm-none-eabi-objcopy -O ihex $1 ${2:-${1%.*}.hex}}
+f-elf2hex-keil      () {              fromelf --i32 --output ${2:-${1%.*}.hex} $1}
 f-elf2bin           () {              objcopy -O binary $1 ${2:-${1%.*}.bin}}
 f-elf2bin-arm       () {arm-none-eabi-objcopy -O binary $1 ${2:-${1%.*}.bin}}
+f-elf2bin-keil      () {              fromelf --bin --output ${2:-${1%.*}.bin} $1}
 f-elf2dis           () {              objdump -d $1 > ${2:-${1%.*}.dis}}
 f-elf2dis-arm       () {arm-none-eabi-objdump -d $1 > ${2:-${1%.*}.dis}}
+f-elf2dis-keil      () {              fromelf --text -c --output ${2:-${1%.*}.dis} $1}
 f-bin2dis-arm-thumb () {arm-none-eabi-objdump -D -b binary -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}}
 f-hex2dis-arm-thumb () {arm-none-eabi-objdump -D -b ihex -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}}
 
