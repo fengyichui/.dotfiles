@@ -78,6 +78,7 @@ mode_inside_qr_net_path=0
 mode_usr_qr_net_path=1
 mode_usr_qr_local_path=2
 mode_usr_server_password=3 #like: rc4-md5:52918214@138.68.61.42:23456 (encrypt_method:password@ip_address:port)
+mode_usr_server_password_base64=4
 
 # variable
 copy_info=0
@@ -112,6 +113,11 @@ do
             mode=$mode_usr_server_password
             shift
             ;;
+        -S=*|--server-base64=*)
+            server_info_raw="${i#*=}"
+            mode=$mode_usr_server_password_base64
+            shift
+            ;;
         -p|--proxy)
             proxy=1
             shift
@@ -136,6 +142,7 @@ do
                 echo "  -n|--qr-net        network QR picture address"
                 echo "  -l|--qr-local      local QR picture path"
                 echo "  -s|--server        encrypt_method:password@ip_addr:port"
+                echo "  -S|--server-base64 base64 -d server: ss://XXXXXXX"
                 echo "  -c|--copy          copy ss raw info to clipboard"
                 echo "  -t|--test          test all inside proxy server"
                 echo "  -h|--help          show this help"
@@ -254,6 +261,8 @@ fi
 if [[ $mode -eq $mode_usr_qr_net_path || $mode -eq $mode_inside_qr_net_path || $mode -eq $mode_usr_qr_local_path ]]; then
     # like: rc4-md5:52918214@138.68.61.42:23456
     server_info_raw=$(zbarimg -q --raw $qr_local_path)
+    server_info=$(echo "$server_info_raw" | sed 's#^ss://##' | base64 -d)
+elif [[ $mode -eq $mode_usr_server_password_base64 ]]; then
     server_info=$(echo "$server_info_raw" | sed 's#^ss://##' | base64 -d)
 fi
 
