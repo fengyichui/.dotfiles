@@ -36,11 +36,12 @@
 # inside proxy table
 #
 # iShadow: isx.yt == dwz.pm/x
+# ss8:     ss8.pm == dwz.pm/f
 # freess:  f55.fun == 55r.run
 #
 # name      ss8      iShadow  freess   freess
 # index     0-2      10-18    20-22    30-35
-urls=(     'ss8.pm' 'isx.yt' 'ssx.re' 'f55.fun')
+urls=(   'dwz.pm/f' 'isx.yt' 'ssx.re' 'f55.fun')
 addrmodes=('re_img' 're_img' 're_img' 're_base64_img')
 address=( \
     '\"images/server03-[^\"]+\"' \
