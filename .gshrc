@@ -204,7 +204,7 @@ ggg ()
 # create a daemon process
 daemon ()
 {
-    (nohup "$@" &) &
+    (nohup "$@" >/tmp/$1.nohup &) &
 }
 
 # do some commands in each sub-directory
