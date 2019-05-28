@@ -131,6 +131,14 @@ do
             test_server=1
             shift
             ;;
+        -D|--dns)
+            chinadns=1
+            shift
+            ;;
+        -R|--gen-route-dns)
+            gen_chinadns_route=1
+            shift
+            ;;
         *)
             if [[ "$(awk '/^-[0-9]+$/' <<< $i)" == "$i" ]]; then
                 inside_qr_index="${i#*-}"
@@ -146,6 +154,8 @@ do
                 echo "  -S|--server-base64 base64 -d server: ss://XXXXXXX"
                 echo "  -c|--copy          copy ss raw info to clipboard"
                 echo "  -t|--test          test all inside proxy server"
+                echo "  -D|--dns           use chinadns"
+                echo "  -R|--gen-route-dns generate new china dns route"
                 echo "  -h|--help          show this help"
                 echo "Example:"
                 echo "  -12"
@@ -183,6 +193,49 @@ free_ss_list ()
 if [[ -z "$noopt" ]]; then
     echo "List free ss:" 1>&2
     free_ss_list
+    exit
+fi
+
+# Chinadns
+if [[ -n "$chinadns" ]]; then
+    echo -e "\e[32mUDP DNS Server at 127.0.0.1:53\e[0m"
+
+    # chcp
+    cmd /c chcp 437 >/dev/null
+
+    # Flush DNS
+    ipconfig /flushdns
+
+    # Read all NIC
+    nics="$(netsh interface show interface | awk '$2 ~ /Connected/{$1=$2=$3="";print}' | sed 's/^ \+\| \+$\|\r//g')"
+
+    # catch interrupt
+    trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
+
+    IFS=$'\n'
+
+    # DNS server is 127.0.0.1:53
+    for nic in $nics; do
+        echo -e "\e[32mSetup DNS server: $nic (127.0.0.1) ...\e[0m"
+        sudo netsh interface ip set dnsservers "$nic" static "127.0.0.1" both
+    done
+
+    # chinadns
+    chinadns -v -m -c ~/.dotfiles/.config/chnroute.txt
+
+    # DNS server restore to dhcp
+    for nic in $nics; do
+        echo -e "\e[32mRestore DNS server: $nic (DHCP) ...\e[0m"
+        sudo netsh interface ip set dnsservers "$nic" dhcp
+    done
+
+    exit
+fi
+
+# Generate new China DNS route
+if [[ -n "$gen_chinadns_route" ]]; then
+    echo "Generate new China DNS route ..."
+    curl --insecure --progress-bar -A foxfire -L 'http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest' | grep ipv4 | grep CN | awk -F\| '{ printf("%s/%d\n", $4, 32-log($5)/log(2)) }' > ~/.dotfiles/.config/chnroute.txt
     exit
 fi
 
