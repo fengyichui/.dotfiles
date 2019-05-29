@@ -170,6 +170,11 @@ do
     esac
 done
 
+function gbk2utf8()
+{
+    iconv -f GBK -t UTF8
+}
+
 finalurl ()
 {
     curl --insecure --progress-bar -A foxfire -w %{url_effective} -I -L "$1" -o /dev/null
@@ -207,7 +212,7 @@ if [[ -n "$chinadns" ]]; then
     ipconfig /flushdns
 
     # Read all NIC
-    nics="$(netsh interface show interface | awk '$2 ~ /Connected/{$1=$2=$3="";print}' | sed 's/^ \+\| \+$\|\r//g')"
+    nics="$(netsh interface show interface | awk '$2 ~ /Connected/{$1=$2=$3="";print}' | sed 's/^ \+\| \+$\|\r//g' | gbk2utf8)"
 
     # catch interrupt
     trap 'echo -e "\e[31minterrupt\e[0m"' HUP INT QUIT ABRT TERM
@@ -217,7 +222,7 @@ if [[ -n "$chinadns" ]]; then
     # DNS server is 127.0.0.1:53
     for nic in $nics; do
         echo -e "\e[32mSetup DNS server: $nic (127.0.0.1) ...\e[0m"
-        sudo netsh interface ip set dnsservers "$nic" static "127.0.0.1" both
+        sudo netsh interface ip set dnsservers "$nic" static "127.0.0.1" both | gbk2utf8
     done
 
     # chinadns
@@ -226,7 +231,7 @@ if [[ -n "$chinadns" ]]; then
     # DNS server restore to dhcp
     for nic in $nics; do
         echo -e "\e[32mRestore DNS server: $nic (DHCP) ...\e[0m"
-        sudo netsh interface ip set dnsservers "$nic" dhcp
+        sudo netsh interface ip set dnsservers "$nic" dhcp | gbk2utf8
     done
 
     exit

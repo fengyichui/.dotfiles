@@ -24,9 +24,14 @@ function usage()
     netsh wlan show '/?'
 }
 
+function gbk2utf8()
+{
+    iconv -f GBK -t UTF8
+}
+
 if [ $# == 0 ]; then
-    ipconfig '/all'
-    netsh wlan show interfaces
+    ipconfig '/all' | gbk2utf8
+    netsh wlan show interfaces | gbk2utf8
     exit 1
 fi
 
@@ -59,9 +64,9 @@ case $1 in
         ;;
     "show")
         if [[ "$2" ]]; then
-            netsh wlan show "$2"
+            netsh wlan show "$2" | gbk2utf8
         else
-            netsh wlan show all
+            netsh wlan show all | gbk2utf8
         fi
         ;;
     *)
