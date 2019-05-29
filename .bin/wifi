@@ -30,7 +30,7 @@ function gbk2utf8()
 }
 
 if [ $# == 0 ]; then
-    ipconfig '/all' | gbk2utf8
+    ipconfig '/all' | gbk2utf8 | awk '/^\w/{h=1;hs=hsn;hsn=$0}; /^\s+\w/{bs=bs$0"\n"}; {if(h){if(!match(bs, "Media disconnected")){print hs;print bs}h=0;bs=""}}'
     netsh wlan show interfaces | gbk2utf8
     exit 1
 fi
