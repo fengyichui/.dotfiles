@@ -195,11 +195,11 @@ free_ss_list ()
 }
 
 # list
-if [[ -z "$noopt" ]]; then
-    echo "List free ss:" 1>&2
-    free_ss_list
-    exit
-fi
+#if [[ -z "$noopt" ]]; then
+#    echo "List free ss:" 1>&2
+#    free_ss_list
+#    exit
+#fi
 
 # Chinadns
 if [[ -n "$chinadns" ]]; then
