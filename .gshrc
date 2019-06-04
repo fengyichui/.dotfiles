@@ -302,6 +302,34 @@ f-elf2dis-keil      () {              fromelf --text -c --output ${2:-${1%.*}.di
 f-bin2dis-arm-thumb () {arm-none-eabi-objdump -D -b binary -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}}
 f-hex2dis-arm-thumb () {arm-none-eabi-objdump -D -b ihex -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}}
 
+# ffmpeg
+mpg ()
+{
+    if [[ -z "$2" ]]; then
+        if [[ -z "$1" ]]; then
+            echo "  mpg a.mp4                       Show media file infomation"
+            echo "  mpg 640x360 a.mp4               Scale to 640x360"
+            echo "  mpg 00:01:00-00:02:00 a.mp4     Cut from 00:01:00 to 00:02:00"
+            echo "  mpg .avi a.mp4                  Covert to .avi format"
+        else
+            ffmpeg -hide_banner -i "$1"
+        fi
+    else
+        if grep -q '[0-9]\+x[0-9]\+' <<<"$1"; then
+            ffmpeg -hide_banner -i "$2" -s "$1" -c:a copy "${1}_${2}"
+        elif grep -q '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' <<<"$1"; then
+            ss=$(sed 's/-.\+//' <<<"$1")
+            to=$(sed 's/.\+-//' <<<"$1")
+            tm=$(sed 's/://g' <<<"$1")
+            ffmpeg -hide_banner -i "$2" -ss "$ss" -to "$to" -c copy "${tm}_${2}"
+        elif grep -q '\..\+' <<<"$1"; then
+            ffmpeg -hide_banner -i "$2" -qscale 0 "${2%.*}$1"
+        else
+            echo "Invalid params!"
+        fi
+    fi
+}
+
 #####################################
 #             Export                #
 #####################################
