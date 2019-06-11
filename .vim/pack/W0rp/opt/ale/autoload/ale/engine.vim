@@ -39,8 +39,8 @@ function! ale#engine#MarkLinterActive(info, linter) abort
     endif
 endfunction
 
-function! ale#engine#MarkLinterInactive(info, linter) abort
-    call filter(a:info.active_linter_list, 'v:val.name isnot# a:linter.name')
+function! ale#engine#MarkLinterInactive(info, linter_name) abort
+    call filter(a:info.active_linter_list, 'v:val.name isnot# a:linter_name')
 endfunction
 
 function! ale#engine#ResetExecutableCache() abort
@@ -195,7 +195,7 @@ function! s:HandleExit(job_info, buffer, output, data) abort
     let l:next_chain_index = a:job_info.next_chain_index
 
     " Remove this job from the list.
-    call ale#engine#MarkLinterInactive(l:buffer_info, l:linter)
+    call ale#engine#MarkLinterInactive(l:buffer_info, l:linter.name)
 
     " Stop here if we land in the handle for a job completing if we're in
     " a sandbox.
@@ -708,6 +708,10 @@ function! ale#engine#Cleanup(buffer) abort
     " Don't bother with cleanup code when newer NeoVim versions are exiting.
     if get(v:, 'exiting', v:null) isnot v:null
         return
+    endif
+
+    if exists('*ale#lsp#CloseDocument')
+        call ale#lsp#CloseDocument(a:buffer)
     endif
 
     if !has_key(g:ale_buffer_info, a:buffer)
