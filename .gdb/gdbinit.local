@@ -33,16 +33,21 @@ connect
 end
 
 define rc
+# 1st-rst: halt cpu
 mon reset 1
 load
+# 2nd-rst: make MSP valid
+mon reset 1
 c
 end
 
 define rc1
 remap2ram
-#reset core only
+# 1st-rst: halt cpu
 mon reset 1
 load
+# 2nd-rst: make MSP valid
+mon reset 1
 c
 end
 
