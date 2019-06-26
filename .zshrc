@@ -134,6 +134,8 @@ setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history 
 setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
 setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
 setopt NO_SHARE_HISTORY          # Not share history with other window
+# Glob
+setopt EXTENDED_GLOB             # Complete more pattern: ^x x~y x# x##
 
 # Show time a command took if over 4 sec
 #autoload -Uz colors && colors
