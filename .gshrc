@@ -318,13 +318,26 @@ mpg ()
     else
         if grep -q '[0-9]\+x[0-9]\+' <<<"$1"; then
             ffmpeg -hide_banner -i "$2" -s "$1" -c:a copy "${1}_${2}"
+
         elif grep -q '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' <<<"$1"; then
-            ss=$(sed 's/-.\+//' <<<"$1")
-            to=$(sed 's/.\+-//' <<<"$1")
+            ss=$(sed 's/-.*//' <<<"$1")
+            to=$(sed 's/.*-//' <<<"$1")
             tm=$(sed 's/://g' <<<"$1")
             ffmpeg -hide_banner -i "$2" -ss "$ss" -to "$to" -c copy "${tm}_${2}"
+
+        elif grep -q '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]-' <<<"$1"; then
+            ss=$(sed 's/-.*//' <<<"$1")
+            tm=$(sed 's/://g' <<<"$1")
+            ffmpeg -hide_banner -i "$2" -ss "$ss" -c copy "${tm}END_${2}"
+
+        elif grep -q -e '-[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' <<<"$1"; then
+            to=$(sed 's/.*-//' <<<"$1")
+            tm=$(sed 's/://g' <<<"$1")
+            ffmpeg -hide_banner -i "$2" -to "$to" -c copy "BEGIN${tm}_${2}"
+
         elif grep -q '\..\+' <<<"$1"; then
             ffmpeg -hide_banner -i "$2" -qscale 0 "${2%.*}$1"
+
         else
             echo "Invalid params!"
         fi
