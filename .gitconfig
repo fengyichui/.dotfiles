@@ -71,6 +71,9 @@
     # (i)ndex, (w)ork, (c)ommit, (o)bject
     mnemonicPrefix = true
 
+    # not show any source or destination prefix
+    #noprefix = true
+
 [difftool]
     # Not prompt before each invocation of the diff tool.
     prompt = false
