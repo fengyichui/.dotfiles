@@ -272,10 +272,12 @@ proxy_disable ()
 exe-smaller ()
 {
     size_old=$(ls -sh "$1" | awk '{print $1}')
-    strip "$1"
-    upx --best --force "$1"
+    echo "strip..."
+    strip "$1" >/dev/null
+    echo "upx..."
+    upx --best --force "$1" >/dev/null
     size_new=$(ls -sh "$1" | awk '{print $1}')
-    echo "\nSize: $size_old -> $size_new"
+    echo "$size_old -> $size_new"
 }
 
 # ocr
