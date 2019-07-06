@@ -298,7 +298,13 @@ EOF
         winrar a -sfx -iicon.sfx/sfx.ico -k -z.sfx/sfx.opt $exeresult $@
         rm -r .sfx
     else
-        echo "Usage: exe-sfx setup_exe_file input_files_dirs"
+        cat << EOF
+Usage:
+  exe-sfx setup_exe_file input_files_dirs
+Dependent:
+  wrestool: Extract ico from Windows binaries. (icoutils package)
+  WinRAR:   Create SFX file
+EOF
     fi
 }
 
