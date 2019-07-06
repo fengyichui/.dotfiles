@@ -308,6 +308,14 @@ EOF
     fi
 }
 
+# Extract ico from Win32 exe
+ico-extract ()
+{
+    echo "Extract to '$1.ico'"
+    wrestool -x -t14 $1 >$1.ico
+    icotool -l $1.ico
+}
+
 # ocr
 image2txt ()
 {
