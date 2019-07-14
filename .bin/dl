@@ -230,25 +230,25 @@ if [[ ! -d $dir ]]; then
 fi
 
 # config
-if [[ -f $configtracker ]]; then
-    sys_time_s=$(date +%s) 
-    modify_time_s=$(stat -c %Y $configtracker)
-    diff_day=$(( ($sys_time_s - $modify_time_s) / 86400 ))
-    echo "BT tracker updated $diff_day days ago"
-    if [[ $diff_day -ge 7 ]]; then
-        read -n1 -r -p "BT tracker file is too old, update? [yN] " answer
-        [[ -n "$answer" ]] && echo #newline
-        if [[ "$answer" != "N" ]]; then
-            run_tracker_update
-        fi
-    fi
-else
-    read -n1 -r -p "BT tracker file is not exist, update? [yN] " answer
-    [[ -n "$answer" ]] && echo #newline
-    if [[ "$answer" != "N" ]]; then
-        run_tracker_update
-    fi
-fi
+#if [[ -f $configtracker ]]; then
+#    sys_time_s=$(date +%s) 
+#    modify_time_s=$(stat -c %Y $configtracker)
+#    diff_day=$(( ($sys_time_s - $modify_time_s) / 86400 ))
+#    echo "BT tracker updated $diff_day days ago"
+#    if [[ $diff_day -ge 7 ]]; then
+#        read -n1 -r -p "BT tracker file is too old, update? [yN] " answer
+#        [[ -n "$answer" ]] && echo #newline
+#        if [[ "$answer" != "N" ]]; then
+#            run_tracker_update
+#        fi
+#    fi
+#else
+#    read -n1 -r -p "BT tracker file is not exist, update? [yN] " answer
+#    [[ -n "$answer" ]] && echo #newline
+#    if [[ "$answer" != "N" ]]; then
+#        run_tracker_update
+#    fi
+#fi
 if [[ -f $configtracker ]]; then
     misc_cfg="$misc_cfg --conf-path='$configtracker'"
 fi
