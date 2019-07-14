@@ -5,6 +5,8 @@ Columns=80
 Rows=46
 Font=Consolas
 FontHeight=11
+FontChoice=Han:8
+Font8=Microsoft YaHei UI
 OpaqueWhenFocused=yes
 CursorType=line
 AllowBlinking=yes
@@ -27,6 +29,7 @@ CtrlAltIsAltGr=no
 PgUpDnScroll=yes
 Language=en
 ScrollbackLines=1000000
+Scrollbar=none
 
 # Workaround cursor not blink in Tmux [https://github.com/mintty/mintty/issues/818]
 # Fix on v3.0.1
