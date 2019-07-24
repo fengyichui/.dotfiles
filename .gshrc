@@ -73,7 +73,7 @@ alias whereami="curl https://freegeoip.app/xml/"
 alias weather="curl wttr.in"
 
 # http file server
-alias www="python -m SimpleHTTPServer 8000"
+alias www="python3 -m http.server 8000"
 
 # check zsh startup time
 alias zsh-startup-time="zsh -i -xv -c exit 2>&1 | ts -i "%.s" > zsh_startup.log"
