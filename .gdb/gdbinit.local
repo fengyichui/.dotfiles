@@ -22,6 +22,7 @@ define connect
 #connect2remote
 connect2local
 disable_wdt
+mon exec EnableLowPowerHandlingMode
 end
 
 define reconnect
