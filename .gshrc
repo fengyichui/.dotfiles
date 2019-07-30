@@ -382,6 +382,26 @@ mpg ()
     fi
 }
 
+# url encode and decode
+urlencode ()
+{
+    if [[ -t 0 ]]; then
+        urlcode_data="$*"
+    else
+        urlcode_data="$(cat -)"
+    fi
+    python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))" "$urlcode_data"
+}
+urldecode ()
+{
+    if [[ -t 0 ]]; then
+        urlcode_data="$*"
+    else
+        urlcode_data="$(cat -)"
+    fi
+    python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$urlcode_data"
+}
+
 #####################################
 #             Export                #
 #####################################
