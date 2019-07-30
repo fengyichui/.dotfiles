@@ -390,7 +390,7 @@ urlencode ()
     else
         urlcode_data="$(cat -)"
     fi
-    python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))" "$urlcode_data"
+    python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], sys.argv[2]))" "$urlcode_data" "$urlencode_safe"
 }
 urldecode ()
 {
