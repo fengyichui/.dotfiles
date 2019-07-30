@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#
+# fzf and then execute the selected item
+#
+
 if [[ -t 0 ]]; then
     __d="$(cat $@)"
 else
