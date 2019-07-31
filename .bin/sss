@@ -152,6 +152,7 @@ do
                 echo "  -l|--qr-local      local QR picture path"
                 echo "  -s|--server        encrypt_method:password@ip_addr:port"
                 echo "  -S|--server-base64 base64 -d server: ss://XXXXXXX"
+                echo "  -p|--proxy         Also run proxy"
                 echo "  -c|--copy          copy ss raw info to clipboard"
                 echo "  -t|--test          test all inside proxy server"
                 echo "  -D|--dns           use chinadns"
@@ -362,6 +363,8 @@ if command -v shadowsocks-libqss > /dev/null 2>&1; then
     shadowsocks-libqss -t 300 $localparam $serverparam 2>&1 | awk '!/INFO: TCP connection timeout./'
 elif command -v shadowsocks-libev > /dev/null 2>&1; then
     shadowsocks-libev -t 300 $localparam $serverparam
+elif command -v ss-local > /dev/null 2>&1; then
+    ss-local -v -t 300 $localparam $serverparam
 elif command -v sslocal > /dev/null 2>&1; then
     sslocal -t 300 $localparam $serverparam
 else
