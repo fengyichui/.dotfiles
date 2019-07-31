@@ -893,6 +893,14 @@ let gdb_minlines = 100
 "let c_minlines = 100
 "let java_minlines = 100
 
+" C syntax
+if exists("c_comment_strings")
+unlet c_comment_strings
+endif
+let c_gnu = 1
+let c_space_errors = 1
+let c_syntax_for_h = 1
+
 " Load vimrc flag
 let g:load_vimrc = 1
 
