@@ -402,6 +402,12 @@ urldecode ()
     python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$urlcode_data"
 }
 
+# explainshell
+explainshell ()
+{
+    chrome 'https://www.explainshell.com/explain?cmd='$(urlencode "$1") &!
+}
+
 #####################################
 #             Export                #
 #####################################
