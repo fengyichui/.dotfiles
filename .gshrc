@@ -389,7 +389,7 @@ mpg ()
             for i in "$@"; do
                 echo file \'$i\' >> combine.list
             done
-            ffmpeg -f concat -safe 0 -i combine.list -c copy combine.mp4
+            ffmpeg -f concat -safe 0 -i combine.list -c copy "+.${1##*.}"
             rm combine.list
 
         else
