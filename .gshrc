@@ -350,31 +350,47 @@ mpg ()
             echo "  mpg 640x360 a.mp4               Scale to 640x360"
             echo "  mpg 00:01:00-00:02:00 a.mp4     Cut from 00:01:00 to 00:02:00"
             echo "  mpg .avi a.mp4                  Covert to .avi format"
+            echo "  mpg + 1.mp4 2.mp4 3.mp4         Conbine all media files"
         else
             ffmpeg -hide_banner -i "$1"
         fi
     else
+        # Show info
         if grep -q '[0-9]\+x[0-9]\+' <<<"$1"; then
             ffmpeg -hide_banner -i "$2" -s "$1" -c:a copy "${1}_${2}"
 
+        # Cut (TIME1 - TIME2)
         elif grep -q '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]-[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' <<<"$1"; then
             ss=$(sed 's/-.*//' <<<"$1")
             to=$(sed 's/.*-//' <<<"$1")
             tm=$(sed 's/://g' <<<"$1")
             ffmpeg -hide_banner -i "$2" -ss "$ss" -to "$to" -c copy "${tm}_${2}"
 
+        # Cut (TIME - END)
         elif grep -q '[0-9][0-9]:[0-9][0-9]:[0-9][0-9]-' <<<"$1"; then
             ss=$(sed 's/-.*//' <<<"$1")
             tm=$(sed 's/://g' <<<"$1")
             ffmpeg -hide_banner -i "$2" -ss "$ss" -c copy "${tm}END_${2}"
 
+        # Cut (Begin - TIME)
         elif grep -q -e '-[0-9][0-9]:[0-9][0-9]:[0-9][0-9]' <<<"$1"; then
             to=$(sed 's/.*-//' <<<"$1")
             tm=$(sed 's/://g' <<<"$1")
             ffmpeg -hide_banner -i "$2" -to "$to" -c copy "BEGIN${tm}_${2}"
 
+        # Convert
         elif grep -q '\..\+' <<<"$1"; then
             ffmpeg -hide_banner -i "$2" -qscale 0 "${2%.*}$1"
+
+        # Combine
+        elif grep -q '+' <<<"$1"; then
+            shift
+            touch combine.list
+            for i in "$@"; do
+                echo file \'$i\' >> combine.list
+            done
+            ffmpeg -f concat -safe 0 -i combine.list -c copy combine.mp4
+            rm combine.list
 
         else
             echo "Invalid params!"
