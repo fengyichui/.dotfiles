@@ -79,7 +79,7 @@ Scrollbar=none
 
 # Monokai colorscheme
 ForegroundColour=248,248,242
-BackgroundColour=39,40,34
+BackgroundColour=28,28,28
 CursorColour=253,157,79
 Black=39,40,34
 BoldBlack=117,113,94
