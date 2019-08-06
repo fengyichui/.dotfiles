@@ -283,24 +283,36 @@ exe-smaller ()
 # exe with SelF-eXtracting, use WinRAR
 exe-sfx ()
 {
+    notemp=0
+    if [[ "$1" == "-n" ]]; then
+        notemp=1
+        shift
+    fi
     if [[ -n "$2" ]]; then
         exepath=$1; shift
         exeresult=out.exe
         mkdir -p .sfx
         wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
-        cat >.sfx/sfx.opt << EOF
-Setup=${exepath//\//\\} %sfxpar%
-SetupCode
-TempMode
-Silent=1
-Overwrite=1
-EOF
+        # setup sfx.opt
+        echo "Setup=${exepath//\//\\} %sfxpar%" >.sfx/sfx.opt
+        echo "SetupCode" >>.sfx/sfx.opt
+        echo "Silent=1" >>.sfx/sfx.opt
+        echo "Update=U" >>.sfx/sfx.opt
+        if [[ "$notemp" == "1" ]]; then
+            echo "Overwrite=2" >>.sfx/sfx.opt # skip exist files
+            echo "Path=%TEMP%\\RarSFX_LQ\\$(date '+%Y%m%d%H%M%S')" >>.sfx/sfx.opt
+        else
+            echo "Overwrite=1" >>.sfx/sfx.opt
+            echo "TempMode" >>.sfx/sfx.opt
+        fi
+        # WinRAR
         WinRAR a -sfx -afrar -s -m5 -ma -iicon.sfx/sfx.ico -k -z.sfx/sfx.opt $exeresult $@
         rm -r .sfx
     else
         cat << EOF
 Usage:
-  exe-sfx setup_exe_file input_files_dirs
+  exe-sfx [-n] setup_exe_file input_files_dirs
+    -n: Not delete temp file after exit and fix temp sfx path
 Dependent:
   wrestool: Extract ico from Windows binaries. (icoutils package)
   WinRAR:   Create SFX file
