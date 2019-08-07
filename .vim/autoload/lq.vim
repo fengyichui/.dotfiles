@@ -352,9 +352,14 @@ function! lq#MakeDoxygenComment()
     endif
 
     mark d
-    let l:funcName = expand("<cword>")
+    let l:funcDesc = expand("<cword>")
+    let l:funcDesc = substitute(l:funcDesc, '\C\([A-Z][a-z]\)', '\=tolower("_" . submatch(1))', 'g') " AbcDefGhiJHL -> abc_def_ghiJHL
+    let l:funcDesc = substitute(l:funcDesc, '\C\([A-Z]\+\)', {m -> '_' . m[1]}, 'g') " abc_def_ghiJKL -> abc_def_ghi_JHL
+    let l:funcDesc = substitute(l:funcDesc, '_', ' ', 'g') " abc_def_ghi_JHL -> abc def ghi JHL
+    let l:funcDesc = substitute(l:funcDesc, '\s\+', ' ', 'g')
+    let l:funcDesc = substitute(l:funcDesc, '^ ', '', 'g')
     exec "normal! {"
-    exec "normal! o/**" . l:MakeDoxygenComment_blockHeader ."\<cr>" . l:MakeDoxygenComment_briefTag . l:funcName . "()"
+    exec "normal! o/**" . l:MakeDoxygenComment_blockHeader ."\<cr>" . l:MakeDoxygenComment_briefTag . ' ' . l:funcDesc
     let l:synopsisLine=line(".")
     let l:synopsisCol=col(".")
     let l:nextParamLine=l:synopsisLine+2
