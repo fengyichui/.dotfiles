@@ -24,9 +24,7 @@ function! sy#sign#get_current_signs(sy) abort
   let a:sy.internal = {}
   let a:sy.external = {}
 
-  redir => signlist
-    silent! execute 'sign place buffer='. a:sy.buffer
-  redir END
+  let signlist = sy#util#execute('sign place buffer='. a:sy.buffer)
 
   for signline in split(signlist, '\n')[2:]
     let tokens = matchlist(signline, '\v^\s+\S+\=(\d+)\s+\S+\=(\d+)\s+\S+\=(.*)$')
@@ -62,13 +60,14 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
     let a:sy.lines = []
     let ids        = []
 
-    let tokens = matchlist(line, '^@@ -\v(\d+),?(\d*) \+(\d+),?(\d*)')
+    let [old_line, new_line, old_count, new_count] = sy#sign#parse_hunk(line)
 
-    let old_line = str2nr(tokens[1])
-    let new_line = str2nr(tokens[3])
-
-    let old_count = empty(tokens[2]) ? 1 : str2nr(tokens[2])
-    let new_count = empty(tokens[4]) ? 1 : str2nr(tokens[4])
+    " Workaround for non-conventional diff output in older Fossil versions:
+    " https://fossil-scm.org/forum/forumpost/834ce0f1e1
+    " Fixed as of: https://fossil-scm.org/index.html/info/7fd2a3652ea7368a
+    if a:vcs == 'fossil' && new_line == 0
+      let new_line = old_line - 1 - deleted
+    endif
 
     " 2 lines added:
 
@@ -164,9 +163,9 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
           let offset += 1
           if s:external_sign_present(a:sy, line) | continue | endif
           call add(ids, s:add_sign(a:sy, line, 'SignifyChange'))
-          let added += 1
         endwhile
         while offset < new_count
+          let added  += 1
           let line    = new_line + offset
           let offset += 1
           if s:external_sign_present(a:sy, line) | continue | endif
@@ -222,6 +221,46 @@ function! sy#sign#remove_all_signs(bufnr) abort
   let sy.hunks = []
 endfunction
 
+" Function: #parse_hunk {{{1
+" Parse a hunk as '@@ -273,3 +267,14' into [old_line, new_line, old_count, new_count]
+function! sy#sign#parse_hunk(diffline) abort
+  let tokens = matchlist(a:diffline, '^@@ -\v(\d+),?(\d*) \+(\d+),?(\d*)')
+  return [
+        \ str2nr(tokens[1]),
+        \ str2nr(tokens[3]),
+        \ empty(tokens[2]) ? 1 : str2nr(tokens[2]),
+        \ empty(tokens[4]) ? 1 : str2nr(tokens[4])
+        \ ]
+endfunction
+
+" Function: #set_signs {{{1
+function! sy#sign#set_signs(sy, vcs, diff) abort
+  call sy#verbose('sy#sign#set_signs()', a:vcs)
+
+  if a:sy.stats == [-1, -1, -1]
+    let a:sy.stats = [0, 0, 0]
+  endif
+
+  if empty(a:diff)
+    call sy#verbose('No changes found.', a:vcs)
+    let a:sy.stats = [0, 0, 0]
+    call sy#sign#remove_all_signs(a:sy.buffer)
+    return
+  endif
+
+  if get(g:, 'signify_line_highlight')
+    call sy#highlight#line_enable()
+  else
+    call sy#highlight#line_disable()
+  endif
+
+  call sy#sign#process_diff(a:sy, a:vcs, a:diff)
+
+  if exists('#User#Signify')
+    doautocmd <nomodeline> User Signify
+  endif
+endfunction
+
 " Function: s:add_sign {{{1
 function! s:add_sign(sy, line, type, ...) abort
   call add(a:sy.lines, a:line)
@@ -267,4 +306,3 @@ function! s:external_sign_present(sy, line) abort
     return 1
   endif
 endfunction
-

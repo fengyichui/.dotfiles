@@ -31,7 +31,7 @@ function! sy#util#refresh_windows() abort
   endif
 
   if !get(g:, 'signify_cmdwin_active')
-    windo if exists('b:sy') | call sy#start() | endif
+    keepjumps windo if exists('b:sy') | call sy#start() | endif
   endif
 
   if exists('winid')
@@ -96,4 +96,66 @@ function! sy#util#return_if_no_changes() abort
     return 'return'
   endif
   return ''
+endfunction
+
+" Function: #execute {{{1
+function! sy#util#execute(cmd) abort
+  let lang = v:lang
+  redir => output
+    silent! execute a:cmd
+  redir END
+  silent! execute 'language message' lang
+  return output
+endfunction
+
+let s:popup_window = 0
+
+function! sy#util#popup_close() abort
+  if s:popup_window
+    call nvim_win_close(s:popup_window, 1)
+    let s:popup_window = 0
+  endif
+endfunction
+
+function! sy#util#popup_create(hunkdiff) abort
+  let max_width = 100
+  let max_height = 16
+  let width = max(map(copy(a:hunkdiff), {_, v -> len(v)})) + 1
+  let width = (width > max_width) ? max_width : width
+  let height = len(a:hunkdiff)
+  let height = (height > max_height) ? max_height : height
+
+  if exists('*nvim_open_win')
+    call sy#util#popup_close()
+    let buf = nvim_create_buf(0, 1)
+    call nvim_buf_set_option(buf, 'syntax', 'diff')
+    call nvim_buf_set_lines(buf, 0, -1, 0, a:hunkdiff)
+    let s:popup_window = nvim_open_win(buf, v:false, {
+          \ 'relative': 'cursor',
+          \ 'row': 0,
+          \ 'col': 0,
+          \ 'width': width,
+          \ 'height': height,
+          \ })
+    call nvim_win_set_option(s:popup_window, 'cursorline', v:false)
+    call nvim_win_set_option(s:popup_window, 'foldenable', v:false)
+    call nvim_win_set_option(s:popup_window, 'number', v:false)
+    call nvim_win_set_option(s:popup_window, 'relativenumber', v:false)
+    call nvim_win_set_option(s:popup_window, 'wrap', v:true)
+    autocmd CursorMoved * ++once call sy#util#popup_close()
+  elseif exists('*popup_create')
+    let s:popup_window = popup_create(a:hunkdiff, {
+          \ 'line': 'cursor',
+          \ 'col': 'cursor',
+          \ 'maxwidth': width,
+          \ 'maxheight': height,
+          \ 'moved': 'any',
+          \ 'zindex': 1000,
+          \ })
+    call setbufvar(winbufnr(s:popup_window), '&filetype', 'diff')
+  else
+    return 0
+  endif
+
+  return 1
 endfunction

@@ -47,6 +47,7 @@ Supported VCS:~
     accurev
     perforce
     tfs
+    yadm
 <
 ==============================================================================
 MODUS OPERANDI                                          *signify-modus-operandi*
@@ -83,7 +84,7 @@ If signs aren't showing up as expected, see if |signify-:SignifyDebug| shows
 anything suspicious. It will try all VCS and shows either errors or a diff for
 each VCS.
 
-If the output looks fine though, create an issue on Github:
+If the output looks fine though, create an issue on GitHub:
 
     https://github.com/mhinz/vim-signify/issues/new
 
@@ -129,6 +130,7 @@ Most important options:~
 Other options:~
 
     |g:signify_vcs_cmds|
+    |g:signify_vcs_cmds_diffmode|
     |g:signify_disable_by_default|
     |g:signify_skip_filetype|
     |g:signify_skip_filename|
@@ -164,6 +166,7 @@ Possible values: 'accurev'
                  'rcs'
                  'svn'
                  'tfs'
+                 'yadm'
 
 NOTE: This is the most important option, so read closely.
 
@@ -242,22 +245,43 @@ escape spaces by quoting, e.g.:
       \ 'git': '"C:\Program Files (x86)\Git\bin\git.exe" diff --no-color --no-ext-diff -U0 -- %f'
       \ }
 <
+NOTE: Always test these commands on the shell first and make sure that no
+colors are emitted. Our parser expects lines in the diff output to start with
+"@@", but with colors the line starts with escape sequences instead.
+
 Default:
 >
     let g:signify_vcs_cmds = {
       \ 'git':      'git diff --no-color --no-ext-diff -U0 -- %f',
+      \ 'yadm':     'yadm diff --no-color --no-ext-diff -U0 -- %f',
       \ 'hg':       'hg diff --config extensions.color=! --config defaults.diff= --nodates -U0 -- %f',
       \ 'svn':      'svn diff --diff-cmd %d -x -U0 -- %f',
       \ 'bzr':      'bzr diff --using %d --diff-options=-U0 -- %f',
       \ 'darcs':    'darcs diff --no-pause-for-gui --diff-command="%d -U0 %1 %2" -- %f',
-      \ 'fossil':   'fossil set diff-command "%d -U 0" && fossil diff --unified -c 0 -- %f',
+      \ 'fossil':   'fossil diff --unified -c 0 -- %f',
       \ 'cvs':      'cvs diff -U0 -- %f',
       \ 'rcs':      'rcsdiff -U0 %f 2>%n',
       \ 'accurev':  'accurev diff %f -- -U0',
-      \ 'perforce': 'p4 info '. sy#util#shell_redirect('%n') .' && env P4DIFF=%d p4 diff -dU0 %f'
+      \ 'perforce': 'p4 info '. sy#util#shell_redirect('%n') . (has('win32') ? ' &&' : ' && env P4DIFF= P4COLORS=') .' p4 diff -du0 %f',
       \ 'tfs':      'tf diff -version:W -noprompt %f',
       \ }
 <
+------------------------------------------------------------------------------
+                                                   *g:signify_vcs_cmds_diffmode*  >
+    let g:signify_vcs_cmds_diffmode = {
+      \ 'git':      'git show HEAD:./%f',
+      \ 'yadm':     'yadm show HEAD:./%f',
+      \ 'hg':       'hg cat %f',
+      \ 'svn':      'svn cat %f',
+      \ 'bzr':      'bzr cat %f',
+      \ 'darcs':    'darcs show contents -- %f',
+      \ 'cvs':      'cvs up -p -- %f 2>%n',
+      \ 'perforce': 'p4 print %f',
+      \ }
+<
+The command to use for |:SignifyDiff|. This option takes the same format as
+|g:signify_vcs_cmds|.
+
 ------------------------------------------------------------------------------
                                                   *g:signify_disable_by_default*  >
     let g:signify_disable_by_default = 0
@@ -427,6 +451,17 @@ Refresh signs in all windows.
 NOTE: Nothing will happen, if :SignifyRefresh is used from the |cmdline-window|.
 
 ------------------------------------------------------------------------------
+                                                          *signify-:SignifyDiff*  >
+    :SignifyDiff[!]
+<
+Open a new tab with two windows using |diff-mode| to show the differences
+between the current file and its version that was last checked in.
+
+With [!], no new tab will be opened.
+
+Also see |g:signify_vcs_cmds_diffmode|.
+
+------------------------------------------------------------------------------
                                                           *signify-:SignifyFold*  >
     :SignifyFold[!]
 <
@@ -470,7 +505,7 @@ User SignifySetup~
 
 User Signify~
 
-  This event fires when Sy detects changes in a version-controlled file.
+  This event fires when Sy updated the signs.
 
 NOTE: Autocmds don't nest by default. If you use any command that triggers new
 events, make sure to use |autocmd-nested|.
@@ -487,7 +522,13 @@ Hunk jumping:~
     ]C   Jump to last hunk.
     [C   Jump to first hunk.
 
-If you don't like these mappings, you can map them yourself:
+These keys only get mapped by default when:
+
+  - The keys are not mapped already (by you or another plugin).
+  - There are no other keys that are mapped to do the same (to avoid duplicate
+    mappings).
+
+Mapping other keys:
 >
     nmap <leader>gj <plug>(signify-next-hunk)
     nmap <leader>gk <plug>(signify-prev-hunk)
@@ -512,7 +553,7 @@ COLORS                                                          *signify-colors*
 
 This plugin defines highlighting groups for two different places: for lines
 and signs. Per default these don't really exist but are linked to the standard
-highlighting groups: DiffAdd, DiffChange, DiffDelete:
+highlighting groups: |hl-DiffAdd|, |hl-DiffChange|, |hl-DiffDelete|:
 >
     highlight link SignifyLineAdd             DiffAdd
     highlight link SignifyLineChange          DiffChange
@@ -527,9 +568,13 @@ highlighting groups: DiffAdd, DiffChange, DiffDelete:
     highlight link SignifySignDeleteFirstLine SignifySignDelete
 <
 Thus if you do not want to change the standard highlighting groups, but want
-different colors for either your signs or lines, you can define one of these 6
-Signify groups yourself in your vimrc.
+different colors for either your signs or lines, you can overwrite these
+highlighting groups in your vimrc.
 
+Assuming you prefer |hl-DiffText| over |hl-DiffChange| for changed lines:
+>
+    highlight link SignifyLineChange DiffText
+<
 Personally I use (256 colors terminal):
 >
     " highlight lines in Sy and vimdiff etc.)
@@ -548,6 +593,14 @@ For Unix people there is a small script, showcolors.bash, in the repo that
 shows all 256 colors available to the terminal. That makes picking the right
 numbers much easier.
 
+Default highlight groups:~
+
+The sign column (often mistakenly called "gutter") itself (all lines without
+signs) is highlighted by |hl-SignColumn|. Some colorschemes define no background
+color for |hl-Normal| but for |hl-SignColumn|. To avoid that visible difference:
+>
+    highlight SignColumn ctermbg=NONE cterm=NONE guibg=NONE gui=NONE
+<
 ==============================================================================
 FAQ                                                                *signify-faq*
 
