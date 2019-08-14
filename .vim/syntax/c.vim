@@ -489,6 +489,7 @@ syn keyword cFunction  alarm fgetc initstate putwchar stpcpy vscanf cfree getlin
 syn keyword cFunction  duplocale fwscanf memcmp setresgid swscanf wcstouq fclose iswxdigit siggetmask clock_gettime getresgid wcsftime pread
 syn keyword cFunction  ffs gsignal putw sscanf vfwscanf bzero fpathconf nanosleep strfry fegetexceptflag lldiv cuserid setdomainname
 syn keyword cFunction  fwprintf mbtowc setpgid strxfrm wcstoul fchdir getgroups readlink timer_delete fread pclose ferror_unlocked sigreturn
+syn keyword cFunction  va_start va_end
 
 " syn keyword cCPPType   auto_ptr binder1st divides hash_multimap istreambuf_iterator ostream_iterator random_access_iterator temporary_buffer
 " syn keyword cCPPType   back_insert_iterator binder2nd equal_to hash_multiset istringstream ostringstream random_access_iterator_tag unary_compose
