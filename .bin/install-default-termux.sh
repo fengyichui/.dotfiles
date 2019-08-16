@@ -32,7 +32,7 @@ apt install git \
             man \
             curl \
             wget \
-            ssh \
+            openssh \
 
 # install my dotfiles
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
