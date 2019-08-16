@@ -25,7 +25,6 @@ apt install termux-api
 # Package
 apt install git \
             zsh \
-            tmux \
             vim \
             coreutils \
             python \
@@ -33,6 +32,7 @@ apt install git \
             man \
             curl \
             wget \
+            ssh \
 
 # install my dotfiles
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
