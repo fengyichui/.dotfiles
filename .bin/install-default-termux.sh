@@ -23,21 +23,19 @@ termux-set-storage
 apt install termux-api
 
 # Package
-apt install git
-apt install zsh
-apt install tmux
-apt install vim
-apt install coreutils
-apt install python
-apt install silversearcher-ag
-apt install man
-apt install curl
-apt install wget
+apt install git \
+            zsh \
+            tmux \
+            vim \
+            coreutils \
+            python \
+            silversearcher-ag \
+            man \
+            curl \
+            wget \
 
 # install my dotfiles
-git clone --depth 1 https://github.com/fengyichui/.dotfiles.git storage/downloads/dotfiles
-rm -rf .dotfiles
-ln -s storage/downloads/dotfiles .dotfiles
+git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
 ./.dotfiles/.bin/install-dotfiles
 
 # default shell
