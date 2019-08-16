@@ -12,13 +12,8 @@ endfunction
 
 " Function: s:callback_nvim_stdout{{{1
 function! s:callback_nvim_stdout(_job_id, data, _event) dict abort
-  if empty(self.stdoutbuf) || empty(self.stdoutbuf[-1])
-    let self.stdoutbuf += a:data
-  else
-    let self.stdoutbuf = self.stdoutbuf[:-2]
-          \ + [self.stdoutbuf[-1] . get(a:data, 0, '')]
-          \ + a:data[1:]
-  endif
+  let self.stdoutbuf[-1] .= a:data[0]
+  call extend(self.stdoutbuf, a:data[1:])
 endfunction
 
 " Function: s:callback_nvim_exit {{{1
@@ -47,18 +42,17 @@ endfunction
 " Function: sy#get_diff {{{1
 function! sy#repo#get_diff(vcs, func) abort
   call sy#verbose('sy#repo#get_diff()', a:vcs)
-
   let job_id = get(b:, 'sy_job_id_'.a:vcs)
+  let [cmd, options] = s:initialize_job(a:vcs)
+  let options.func = a:func
+
   " Neovim
   if has('nvim')
     if job_id
       silent! call jobstop(job_id)
     endif
 
-    let [cmd, options] = s:initialize_job(a:vcs)
-    let options.func = a:func
     let [cwd, chdir] = sy#util#chdir()
-
     call sy#verbose(['CMD: '. string(cmd), 'CMD DIR:  '. b:sy.info.dir, 'ORIG DIR: '. cwd], a:vcs)
 
     try
@@ -81,10 +75,7 @@ function! sy#repo#get_diff(vcs, func) abort
       silent! call job_stop(job_id)
     endif
 
-    let [cmd, options] = s:initialize_job(a:vcs)
-    let options.func = a:func
     let [cwd, chdir] = sy#util#chdir()
-
     call sy#verbose(['CMD: '. string(cmd), 'CMD DIR:  '. b:sy.info.dir, 'ORIG DIR: '. cwd], a:vcs)
 
     try
@@ -105,8 +96,8 @@ function! sy#repo#get_diff(vcs, func) abort
 
   " Older Vim
   else
-    let diff = split(s:run(a:vcs), '\n')
-    call sy#repo#get_diff_{a:vcs}(b:sy, v:shell_error, diff)
+    let options.stdoutbuf = split(s:run(a:vcs), '\n')
+    call s:handle_diff(options, v:shell_error)
   endif
 endfunction
 
@@ -324,14 +315,14 @@ endfunction
 
 function! s:is_cur_line_in_hunk(hunkline) abort
   let cur_line = line('.')
-  let [old_line, new_line, _old_count, new_count] = sy#sign#parse_hunk(a:hunkline)
+  let [_old_line, new_line, old_count, new_count] = sy#sign#parse_hunk(a:hunkline)
 
   if cur_line == 1 && new_line == 0
     " deleted first line
     return 1
   endif
 
-  if cur_line == new_line && new_line < old_line
+  if cur_line == new_line && new_count < old_count
     " deleted lines
     return 1
   endif
@@ -363,7 +354,7 @@ function! s:initialize_job(vcs) abort
     let cmd = ['sh', '-c', vcs_cmd]
   endif
   let options = {
-        \ 'stdoutbuf':   [],
+        \ 'stdoutbuf':   [''],
         \ 'vcs':         a:vcs,
         \ 'bufnr':       bufnr('%'),
         \ }
