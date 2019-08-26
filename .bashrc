@@ -29,6 +29,9 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
+# Force invoke ZSH
+#[[ -t 1 ]] && exec zsh
+
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" =~ "linux" ]]; then
     export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux:$PATH
@@ -110,6 +113,9 @@ export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 
 # Advanced cd
 alias cd=cd_func
+
+# Prompt
+#PS1="\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ "
 
 # Umask
 #
