@@ -34,9 +34,9 @@
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" =~ "linux" ]]; then
-    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux:$PATH
+    export PATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux:$PATH
 elif [[ "$OSTYPE" =~ "cygwin" ]]; then
-    export PATH=$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$PATH
+    export PATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$PATH
 fi
 
 # Shell Options
