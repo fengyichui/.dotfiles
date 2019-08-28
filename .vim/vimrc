@@ -901,9 +901,11 @@ let c_gnu = 1
 let c_space_errors = 1
 let c_syntax_for_h = 1
 
+" sh syntax
+let g:is_bash = 1
+
 " Load vimrc flag
 let g:load_vimrc = 1
-
 
 " Function {{{1
 
