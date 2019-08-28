@@ -15,7 +15,7 @@ function! s:Path.AbsolutePathFor(pathStr)
     let l:prependWorkingDir = 0
 
     if nerdtree#runningWindows()
-        let l:prependWorkingDir = a:pathStr !~# '^.:\(\\\|\/\)' && a:pathStr !~# '^\(\\\\\|\/\/\)'
+        let l:prependWorkingDir = a:pathStr !~# '^.:\(\\\|\/\)\?' && a:pathStr !~# '^\(\\\\\|\/\/\)'
     else
         let l:prependWorkingDir = a:pathStr !~# '^/'
     endif
@@ -23,7 +23,13 @@ function! s:Path.AbsolutePathFor(pathStr)
     let l:result = a:pathStr
 
     if l:prependWorkingDir
-        let l:result = getcwd() . s:Path.Slash() . a:pathStr
+        let l:result = getcwd()
+
+        if l:result[-1:] == s:Path.Slash()
+            let l:result = l:result . a:pathStr
+        else
+            let l:result = l:result . s:Path.Slash() . a:pathStr
+        endif
     endif
 
     return l:result
@@ -39,10 +45,10 @@ endfunction
 
 " FUNCTION: Path.cacheDisplayString() {{{1
 function! s:Path.cacheDisplayString() abort
-    let self.cachedDisplayString = self.getLastPathComponent(1)
+    let self.cachedDisplayString = g:NERDTreeNodeDelimiter . self.getLastPathComponent(1)
 
     if self.isExecutable
-        let self.cachedDisplayString = self.cachedDisplayString . '*'
+        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) . '*'
     endif
 
     let self._bookmarkNames = []
@@ -52,15 +58,24 @@ function! s:Path.cacheDisplayString() abort
         endif
     endfor
     if !empty(self._bookmarkNames) && g:NERDTreeMarkBookmarks == 1
-        let self.cachedDisplayString .= ' {' . join(self._bookmarkNames) . '}'
+        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) . ' {' . join(self._bookmarkNames) . '}'
     endif
 
     if self.isSymLink
-        let self.cachedDisplayString .=  ' -> ' . self.symLinkDest
+        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) . ' -> ' . self.symLinkDest
     endif
 
     if self.isReadOnly
-        let self.cachedDisplayString .=  ' ['.g:NERDTreeGlyphReadOnly.']'
+        let self.cachedDisplayString = self.addDelimiter(self.cachedDisplayString) . ' ['.g:NERDTreeGlyphReadOnly.']'
+    endif
+endfunction
+
+" FUNCTION: Path.addDelimiter() {{{1
+function! s:Path.addDelimiter(line)
+    if a:line =~# '\(.*' . g:NERDTreeNodeDelimiter . '\)\{2}'
+        return a:line
+    else
+        return a:line . g:NERDTreeNodeDelimiter
     endif
 endfunction
 
@@ -365,7 +380,8 @@ endfunction
 function! s:Path.getSortOrderIndex()
     let i = 0
     while i < len(g:NERDTreeSortOrder)
-        if  self.getLastPathComponent(1) =~# g:NERDTreeSortOrder[i]
+        if g:NERDTreeSortOrder[i] !~? '\[\[-\?\(timestamp\|size\|extension\)\]\]' &&
+        \ self.getLastPathComponent(1) =~# g:NERDTreeSortOrder[i]
             return i
         endif
         let i = i + 1
@@ -393,6 +409,27 @@ endfunction
 " returns a key used in compare function for sorting
 function! s:Path.getSortKey()
     if !exists("self._sortKey") || g:NERDTreeSortOrder !=# g:NERDTreeOldSortOrder
+        " Look for file metadata tags: [[timestamp]], [[extension]], [[size]]
+        let metadata = []
+        for tag in g:NERDTreeSortOrder
+            if tag =~? '\[\[-\?timestamp\]\]'
+                let metadata += [self.isDirectory ? 0 : getftime(self.str()) * (tag =~ '-' ? -1 : 1)]
+            elseif tag =~? '\[\[-\?size\]\]'
+                let metadata += [self.isDirectory ? 0 : getfsize(self.str()) * (tag =~ '-' ? -1 : 1)]
+            elseif tag =~? '\[\[extension\]\]'
+                let extension = matchstr(self.getLastPathComponent(0), '[^.]\+\.\zs[^.]\+$')
+                let metadata += [self.isDirectory ? '' : (extension == '' ? nr2char(str2nr('0x10ffff',16)) : extension)]
+            endif
+        endfor
+
+        if g:NERDTreeSortOrder[0] =~ '\[\[.*\]\]'
+            " Apply tags' sorting first if specified first.
+            let self._sortKey = metadata + [self.getSortOrderIndex()]
+        else
+            " Otherwise, do regex grouping first.
+            let self._sortKey = [self.getSortOrderIndex()] + metadata
+        endif
+
         let path = self.getLastPathComponent(1)
         if !g:NERDTreeSortHiddenFirst
             let path = substitute(path, '^[._]', '', '')
@@ -400,13 +437,9 @@ function! s:Path.getSortKey()
         if !g:NERDTreeCaseSensitiveSort
             let path = tolower(path)
         endif
-        if !g:NERDTreeNaturalSort
-            let self._sortKey = [self.getSortOrderIndex(), path]
-        else
-            let self._sortKey = [self.getSortOrderIndex()] + self._splitChunks(path)
-        endif
-    endif
 
+        call extend(self._sortKey, (g:NERDTreeNaturalSort ? self._splitChunks(path) : [path]))
+    endif
     return self._sortKey
 endfunction
 
@@ -543,7 +576,11 @@ endfunction
 " Args:
 " path: the other path obj to compare this with
 function! s:Path.equals(path)
-    return self.str() ==# a:path.str()
+    if nerdtree#runningWindows()
+        return self.str() ==? a:path.str()
+    else
+        return self.str() ==# a:path.str()
+    endif
 endfunction
 
 " FUNCTION: Path.New(pathStr) {{{1

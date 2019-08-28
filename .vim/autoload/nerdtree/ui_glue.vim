@@ -14,10 +14,15 @@ function! nerdtree#ui_glue#createDefaultBindings()
     call NERDTreeAddKeyMap({ 'key': '<2-LeftMouse>', 'scope': "Bookmark", 'callback': s."activateBookmark" })
     call NERDTreeAddKeyMap({ 'key': '<2-LeftMouse>', 'scope': "all", 'callback': s."activateAll" })
 
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapCustomOpen, 'scope':'FileNode', 'callback': s."customOpenFile"})
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapCustomOpen, 'scope':'DirNode', 'callback': s."customOpenDir"})
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapCustomOpen, 'scope':'Bookmark', 'callback': s."customOpenBookmark"})
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapCustomOpen, 'scope':'all', 'callback': s."activateAll" })
 
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapActivateNode, 'scope': "DirNode", 'callback': s."activateDirNode" })
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapActivateNode, 'scope': "FileNode", 'callback': s."activateFileNode" })
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapActivateNode, 'scope': "Bookmark", 'callback': s."activateBookmark" })
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapPreview, 'scope': "Bookmark", 'callback': s."previewBookmark" })
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapActivateNode, 'scope': "all", 'callback': s."activateAll" })
 
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapOpenSplit, 'scope': "Node", 'callback': s."openHSplit" })
@@ -67,6 +72,7 @@ function! nerdtree#ui_glue#createDefaultBindings()
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapOpenInTabSilent, 'scope': 'Bookmark', 'callback': s . 'openInNewTabSilent' })
 
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapOpenExpl, 'scope': "DirNode", 'callback': s."openExplorer" })
+    call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapOpenExpl, 'scope': "FileNode", 'callback': s."openExplorer" })
 
     call NERDTreeAddKeyMap({ 'key': g:NERDTreeMapDeleteBookmark, 'scope': "Bookmark", 'callback': s."deleteBookmark" })
 endfunction
@@ -74,6 +80,35 @@ endfunction
 
 "SECTION: Interface bindings {{{1
 "============================================================
+
+"FUNCTION: s:customOpenFile() {{{1
+" Open file node with the "custom" key, initially <CR>.
+function! s:customOpenFile(node)
+    call a:node.activate(s:initCustomOpenArgs().file)
+endfunction
+
+"FUNCTION: s:customOpenDir() {{{1
+" Open directory node with the "custom" key, initially <CR>.
+function! s:customOpenDir(node)
+    call s:activateDirNode(a:node, s:initCustomOpenArgs().dir)
+endfunction
+
+"FUNCTION: s:customOpenBookmark() {{{1
+" Open bookmark node with the "custom" key, initially <CR>.
+function! s:customOpenBookmark(node)
+    if a:node.path.isDirectory
+        call a:node.activate(b:NERDTree, s:initCustomOpenArgs().dir)
+    else
+        call a:node.activate(b:NERDTree, s:initCustomOpenArgs().file)
+    endif
+endfunction
+
+"FUNCTION: s:initCustomOpenArgs() {{{1
+" Make sure NERDTreeCustomOpenArgs has needed keys
+function! s:initCustomOpenArgs()
+    let g:NERDTreeCustomOpenArgs = get(g:, 'NERDTreeCustomOpenArgs', {})
+    return extend(g:NERDTreeCustomOpenArgs, {'file':{'reuse': 'all', 'where': 'p'}, 'dir':{}}, 'keep')
+endfunction
 
 "FUNCTION: s:activateAll() {{{1
 "handle the user activating the updir line
@@ -83,15 +118,16 @@ function! s:activateAll()
     endif
 endfunction
 
-" FUNCTION: s:activateDirNode(directoryNode) {{{1
-function! s:activateDirNode(directoryNode)
+" FUNCTION: s:activateDirNode(directoryNode, options) {{{1
+" Open a directory with optional options
+function! s:activateDirNode(directoryNode, ...)
 
     if a:directoryNode.isRoot() && a:directoryNode.isOpen
         call nerdtree#echo('cannot close tree root')
         return
     endif
 
-    call a:directoryNode.activate()
+    call a:directoryNode.activate((a:0 > 0) ? a:1 : {})
 endfunction
 
 "FUNCTION: s:activateFileNode() {{{1
@@ -100,7 +136,7 @@ function! s:activateFileNode(node)
     call a:node.activate({'reuse': 'all', 'where': 'p'})
 endfunction
 
-"FUNCTION: s:activateBookmark() {{{1
+"FUNCTION: s:activateBookmark(bookmark) {{{1
 "handle the user activating a bookmark
 function! s:activateBookmark(bm)
     call a:bm.activate(b:NERDTree, !a:bm.path.isDirectory ? {'where': 'p'} : {})
@@ -255,6 +291,7 @@ function! s:findAndRevealPath(pathStr)
     endif
 
     try
+        let l:pathStr = g:NERDTreePath.Resolve(l:pathStr)
         let l:pathObj = g:NERDTreePath.New(l:pathStr)
     catch /^NERDTree.InvalidArgumentsError/
         call nerdtree#echoWarning('invalid path')
@@ -365,7 +402,7 @@ function! s:jumpToLastChild(node)
     call s:jumpToChild(a:node, 1)
 endfunction
 
-" FUNCTION: s:jumpToChild(node, last) {{{2
+" FUNCTION: s:jumpToChild(node, last) {{{1
 " Jump to the first or last child node at the same file system level.
 "
 " Args:
@@ -423,7 +460,7 @@ function! s:jumpToPrevSibling(node)
     call s:jumpToSibling(a:node, 0)
 endfunction
 
-" FUNCTION: s:jumpToSibling(node, forward) {{{2
+" FUNCTION: s:jumpToSibling(node, forward) {{{1
 " Move the cursor to the next or previous node at the same file system level.
 "
 " Args:
@@ -490,8 +527,16 @@ function! s:openNodeRecursively(node)
     call nerdtree#echo("Recursively opening node. Please wait...")
     call a:node.openRecursively()
     call b:NERDTree.render()
-    redraw
-    call nerdtree#echo("Recursively opening node. Please wait... DONE")
+    call nerdtree#echo("")
+endfunction
+
+" FUNCTION: s:previewBookmark(bookmark) {{{1
+function! s:previewBookmark(bookmark)
+    if a:bookmark.path.isDirectory
+        execute 'NERDTreeFind '.a:bookmark.path.str()
+    else
+        call a:bookmark.activate(b:NERDTree, {'stay': 1, 'where': 'p', 'keepopen': 1})
+    endif
 endfunction
 
 "FUNCTION: s:previewNodeCurrent(node) {{{1
@@ -524,11 +569,18 @@ endfunction
 " Reloads the current root. All nodes below this will be lost and the root dir
 " will be reloaded.
 function! s:refreshRoot()
+    if !g:NERDTree.IsOpen()
+        return
+    endif
     call nerdtree#echo("Refreshing the root node. This could take a while...")
+
+    let l:curWin = winnr()
+    call nerdtree#exec(g:NERDTree.GetWinNum() . "wincmd w", 1)
     call b:NERDTree.root.refresh()
     call b:NERDTree.render()
     redraw
-    call nerdtree#echo("Refreshing the root node. This could take a while... DONE")
+    call nerdtree#exec(l:curWin . "wincmd w", 1)
+    call nerdtree#echo("")
 endfunction
 
 " FUNCTION: s:refreshCurrent(node) {{{1
@@ -542,8 +594,7 @@ function! s:refreshCurrent(node)
     call nerdtree#echo("Refreshing node. This could take a while...")
     call node.refresh()
     call b:NERDTree.render()
-    redraw
-    call nerdtree#echo("Refreshing node. This could take a while... DONE")
+    call nerdtree#echo("")
 endfunction
 
 " FUNCTION: nerdtree#ui_glue#setupCommands() {{{1
@@ -554,6 +605,7 @@ function! nerdtree#ui_glue#setupCommands()
     command! -n=1 -complete=customlist,nerdtree#completeBookmarks -bar NERDTreeFromBookmark call g:NERDTreeCreator.CreateTabTree('<args>')
     command! -n=0 -bar NERDTreeMirror call g:NERDTreeCreator.CreateMirror()
     command! -n=? -complete=file -bar NERDTreeFind call s:findAndRevealPath('<args>')
+    command! -n=0 -bar NERDTreeRefreshRoot call s:refreshRoot()
     command! -n=0 -bar NERDTreeFocus call NERDTreeFocus()
     command! -n=0 -bar NERDTreeCWD call NERDTreeCWD()
 endfunction
