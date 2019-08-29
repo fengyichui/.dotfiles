@@ -121,7 +121,6 @@
     s   = status --short --untracked-files=no
     st  = status --short
     st2 = status --porcelain=2 --untracked-files=no
-    cleanall = !git clean -dxf && git submodule foreach --recursive git clean -dxf
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
     ls = "!f() { git ls-files | grep "${@:-''}"; }; f"
@@ -138,9 +137,6 @@
     # https://github.com/prabirshrestha/ProfilesAndSettings/blob/master/.gitconfig
     # show tags and any tag annotation (tito adds tag annotations for example)
     tags = tag -n1 -l
-
-    # for ansible, with its submodules
-    pullall = "!f() { git pull; git submodule update --recursive; } ; f"
 
     # not useful itself, but handy to remember for use in scripts
     thisbranch = rev-parse --abbrev-ref HEAD
@@ -169,6 +165,13 @@
     # find what commit a file was added
     # usage: `git whatadded --foo.c`
     whatadded = log --follow --diff-filter=A --find-renames=40%
+
+    # All
+    cloneall = !git clone --recursive
+    cloneall1 = !git clone --depth=1 --recursive
+    pullall = !git pull && git submodule update --recursive
+    stall = !git status --short --ignored && git submodule foreach --recursive git status --short --ignored
+    cleanall = !git clean -dxf && git submodule foreach --recursive git clean -dxf
 
 [gui]
     fontui = -family \"DejaVu Sans\" -size 11 -weight normal -slant roman -underline 0 -overstrike 0
