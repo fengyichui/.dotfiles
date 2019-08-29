@@ -121,7 +121,7 @@
     s   = status --short --untracked-files=no
     st  = status --short
     st2 = status --porcelain=2 --untracked-files=no
-    cleanall = clean -dxf
+    cleanall = !git clean -dxf && git submodule foreach --recursive git clean -dxf
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
     ls = "!f() { git ls-files | grep "${@:-''}"; }; f"
