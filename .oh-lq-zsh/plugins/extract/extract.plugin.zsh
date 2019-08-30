@@ -97,24 +97,26 @@ extract() {
                 esac
                 rmdir --ignore-fail-on-non-empty "$extract_dir"
 
-                # remove double dir
-                extract_sub_dir=$(ls -A $extract_dir)
-                sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
-                if [[ "$sub_dir_files_num" == "1" ]]; then
-                    if [[ -e "$extract_sub_dir" && "$extract_sub_dir" != "$extract_dir" ]]; then
-                        echo -n "'$extract_sub_dir' is exist, remove and replace it? [yN] "
-                        read -rs -k 1 answer
-                        [[ -n "$answer" ]] && echo
-                        if [[ "$answer" != "y" ]]; then
-                            echo "Abort triming extracted directory!" >&2
-                            return
+                if [[ -d "$extract_dir" ]]; then
+                    # remove double dir
+                    extract_sub_dir=$(ls -A $extract_dir)
+                    sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
+                    if [[ "$sub_dir_files_num" == "1" ]]; then
+                        if [[ -e "$extract_sub_dir" && "$extract_sub_dir" != "$extract_dir" ]]; then
+                            echo -n "'$extract_sub_dir' is exist, remove and replace it? [yN] "
+                            read -rs -k 1 answer
+                            [[ -n "$answer" ]] && echo
+                            if [[ "$answer" != "y" ]]; then
+                                echo "Abort triming extracted directory!" >&2
+                                return
+                            fi
+                            rm -rf "$extract_sub_dir"
                         fi
-                        rm -rf "$extract_sub_dir"
+                        rm -rf "${extract_sub_dir}.$$"
+                        mv "$extract_dir/$extract_sub_dir" "${extract_sub_dir}.$$"
+                        rmdir --ignore-fail-on-non-empty "$extract_dir"
+                        mv "${extract_sub_dir}.$$" $extract_sub_dir
                     fi
-                    rm -rf "${extract_sub_dir}.$$"
-                    mv "$extract_dir/$extract_sub_dir" "${extract_sub_dir}.$$"
-                    rmdir --ignore-fail-on-non-empty "$extract_dir"
-                    mv "${extract_sub_dir}.$$" $extract_sub_dir
                 fi
             fi
 
