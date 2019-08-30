@@ -90,14 +90,16 @@
 " (*) command :Mark
 "     -> e.g. :Mark Mark.\{-}\ze(
 
-" default colors/groups
+" default colors/groups (liqinag)
 " you may define your own colors in you vimrc file, in the form as below:
-hi MarkWord1  ctermbg=Cyan     ctermfg=Black  guibg=#8CCBEA    guifg=Black
-hi MarkWord2  ctermbg=Green    ctermfg=Black  guibg=#A4E57E    guifg=Black
-hi MarkWord3  ctermbg=Brown    ctermfg=Black  guibg=#FFDB72    guifg=Black
-hi MarkWord4  ctermbg=Red      ctermfg=Black  guibg=#FF7272    guifg=Black
-hi MarkWord5  ctermbg=Magenta  ctermfg=Black  guibg=#FFB3FF    guifg=Black
-hi MarkWord6  ctermbg=Blue     ctermfg=Black  guibg=#9999FF    guifg=Black
+hi MarkWord1  ctermbg=Cyan      ctermfg=Black  guibg=#8CCBEA    guifg=Black
+hi MarkWord2  ctermbg=Green     ctermfg=Black  guibg=#A4E57E    guifg=Black
+hi MarkWord3  ctermbg=Brown     ctermfg=Black  guibg=#FFDB72    guifg=Black
+hi MarkWord4  ctermbg=Red       ctermfg=Black  guibg=#FF7272    guifg=Black
+hi MarkWord5  ctermbg=Magenta   ctermfg=Black  guibg=#FFB3FF    guifg=Black
+hi MarkWord6  ctermbg=Blue      ctermfg=Black  guibg=#9999FF    guifg=Black
+hi MarkWord7  ctermbg=DarkGreen ctermfg=Black  guibg=#D0FFA1    guifg=Black
+hi MarkWord8  ctermbg=Gray      ctermfg=Black  guibg=#A3A396    guifg=Black
 
 " Anti reinclusion guards
 if exists('g:loaded_mark') && !exists('g:force_reload_mark')
@@ -108,7 +110,7 @@ endif
 let s:save_cpo = &cpo
 set cpo&vim
 
-" Default bindings
+" Default bindings (liqiang)
 
 if !hasmapto('<Plug>MarkSet', 'n')
 	nmap <unique> <silent> \m <Plug>MarkSet
