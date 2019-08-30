@@ -295,7 +295,7 @@ exe-sfx ()
         mkdir -p .sfx
         wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
         # setup sfx.opt
-        echo "Setup=${exepath//\//\\} %sfxpar%" >.sfx/sfx.opt
+        echo "Setup=${exepath//\//\\\\} %sfxpar%" >.sfx/sfx.opt
         echo "SetupCode" >>.sfx/sfx.opt
         echo "Silent=1" >>.sfx/sfx.opt
         echo "Update=U" >>.sfx/sfx.opt
