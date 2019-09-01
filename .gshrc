@@ -25,6 +25,7 @@ alias ff-py3="ff -d /usr/lib/python3*"
 alias gg-py3="gg -d /usr/lib/python3*"
 
 # dumpbin with windows
+alias dumpbin-machine='dumpbin_func machine'
 alias dumpbin-dependents='dumpbin_func dependents'
 alias dumpbin-exports='dumpbin_func exports'
 
@@ -111,11 +112,11 @@ dumpbin_func ()
     while (($#!=0))
     do
         case $mode in
-            'machine')      dumpbin /HEADERS $1 | awk "/machine \(/{print \$3 \": $1\"}"
+            'machine')      dumpbin /HEADERS $1 | tr -d '\r' | awk "/machine \(/{print \$3 \": $1\"}"
             ;;
-            'dependents')   dumpbin /DEPENDENTS $1
+            'dependents')   dumpbin /DEPENDENTS $1 | tr -d '\r'
             ;;
-            'exports')      dumpbin /EXPORTS $1
+            'exports')      dumpbin /EXPORTS $1 | tr -d '\r'
             ;;
         esac
         shift
@@ -272,13 +273,38 @@ proxy-disable ()
 # make exe file smaller
 exe-smaller ()
 {
-    size_old=$(ls -sh "$1" | awk '{print $1}')
-    echo "strip..."
-    strip "$1" >/dev/null
-    echo "upx..."
-    upx --best --force "$1" >/dev/null
-    size_new=$(ls -sh "$1" | awk '{print $1}')
-    echo "$size_old -> $size_new"
+    upx_force=""
+    if [[ "$1" == "-f" ]]; then
+        upx_force="--force"
+        shift
+    fi
+    if [[ -f "$1" ]]; then
+        while (($#!=0)); do
+            size_old=$(ls -sh "$1" | awk '{print $1}')
+            stripped=$(file "$1" | grep 'stripped')
+            upxed=$(file "$1" | grep 'UPX compressed')
+            [[ -n "$stripped" ]] && echo "$1: Already striped!"
+            [[ -n "$upxed" ]] && echo "$1: Already compressed by UPX!"
+            if [[ -z "$stripped" && -z "$upxed" ]]; then
+                echo "$1: strip..."
+                strip "$1" >/dev/null
+            fi
+            if [[ -z "$upxed" ]]; then
+                echo "$1: upx..."
+                upx --best $upx_force "$1" >/dev/null
+            fi
+            size_new=$(ls -sh "$1" | awk '{print $1}')
+            echo "$1: $size_old -> $size_new"
+            file "$1"
+            shift
+        done
+    else
+        cat << EOF
+Usage:
+  exe-smaller [-f] exe_file
+    -f: upx use --force option
+EOF
+    fi
 }
 
 # exe with SelF-eXtracting, use WinRAR
