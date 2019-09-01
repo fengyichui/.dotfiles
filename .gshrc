@@ -295,7 +295,6 @@ exe-smaller ()
             fi
             size_new=$(ls -sh "$1" | awk '{print $1}')
             echo "$1: $size_old -> $size_new"
-            file "$1"
             shift
         done
     else
