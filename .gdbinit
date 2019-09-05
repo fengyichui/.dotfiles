@@ -355,6 +355,33 @@ Syntax: memfind <START> <END> <"PATTERN"> [<PATTERN_LENGTH>]
 | if no PATTERN_LENGTH field, PATTERN_LENGTH is strlen(PATTERN)
 end
 
+define memdiff
+    if $argc != 3
+        help memdiff
+    else
+        set $start1 = (unsigned char *) $arg0
+        set $start2 = (unsigned char *) $arg1
+        set $length = $arg2
+        set $same = 1
+
+        set $i = 0
+        while ($i < $length && $same)
+            if $start1[$i] != $start2[$i]
+                set $same = 0
+            else
+                set $i++
+            end
+        end
+        if $same
+            printf "Same\n"
+        else
+            printf "Not match at %d (0x%02X != 0x%02X)\n", $i, $start1[$i], $start2[$i]
+        end
+    end
+end
+document memdiff
+Syntax: memdiff <START1> <START2> <LENGTH>
+end
 
 define strcpy
     if $argc != 2
