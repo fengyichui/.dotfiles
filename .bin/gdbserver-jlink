@@ -2,6 +2,7 @@
 
 device="Cortex-M3"
 speed="6000"
+rtos=""
 
 # Parse argument
 for i in "$@"
@@ -15,18 +16,23 @@ do
             echo "Supported Devices: https://www.segger.com/jlink_supported_devices.html"
             exit 0
             ;;
+
+        --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
+        --freertos) rtos="-rtos GDBServer/RTOSPlugin_FreeRTOS" ;;
+        --chibios)  rtos="-rtos GDBServer/RTOSPlugin_ChibiOS" ;;
+
         *)
             if [[ "$(echo $i | awk '/^[0-9]+$/')" == "$i" ]]; then
                 speed="$i"
             else
                 device="$i"
             fi
-        ;;
+            ;;
     esac
 done
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
-params="-device $device -speed $speed -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout"  #-select usb=20151001
+params="-device $device -speed $speed -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout $rtos"  #-select usb=20151001
 
 # Segger Jlink GDB Server
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
