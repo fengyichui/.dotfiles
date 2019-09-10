@@ -309,14 +309,21 @@ EOF
 # exe with SelF-eXtracting, use WinRAR
 exe-sfx ()
 {
-    notemp=0
-    if [[ "$1" == "-n" ]]; then
-        notemp=1
-        shift
-    fi
+    mode='temp'
+    # Parse argument
+    for i in "$@"; do
+        case $i in
+            -d) mode='temp'; shift ;;
+            -t) mode='notemp_to_temp'; shift ;;
+            -a) mode='notemp_to_appdata'; shift ;;
+            *) break ;;
+        esac
+    done
     if [[ -n "$2" ]]; then
         exepath=$1; shift
-        exeresult=out.exe
+        exename=${exepath##*/}; exename=${exename%.*}
+        time=$(date '+%Y%m%d%H%M%S')
+        exeresult=${exename}_sfx.exe
         mkdir -p .sfx
         wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
         # setup sfx.opt
@@ -324,13 +331,20 @@ exe-sfx ()
         echo "SetupCode" >>.sfx/sfx.opt
         echo "Silent=1" >>.sfx/sfx.opt
         echo "Update=U" >>.sfx/sfx.opt
-        if [[ "$notemp" == "1" ]]; then
+        if [[ "$mode" == "notemp_to_temp" ]]; then
+            sfxpath="%TEMP%\\RarSFX_LQ\\${exename}_${time}"
             echo "Overwrite=2" >>.sfx/sfx.opt # skip exist files
-            echo "Path=%TEMP%\\RarSFX_LQ\\$(date '+%Y%m%d%H%M%S')" >>.sfx/sfx.opt
+            echo "Path=$sfxpath" >>.sfx/sfx.opt
+        elif [[ "$mode" == "notemp_to_appdata" ]]; then
+            sfxpath="%APPDATA%\\RarSFX_LQ\\${exename}_${time}"
+            echo "Overwrite=2" >>.sfx/sfx.opt # skip exist files
+            echo "Path=$sfxpath" >>.sfx/sfx.opt
         else
+            sfxpath="TempMode"
             echo "Overwrite=1" >>.sfx/sfx.opt
             echo "TempMode" >>.sfx/sfx.opt
         fi
+        echo "SFX: $sfxpath"
         # WinRAR
         WinRAR a -sfx -afrar -s -m5 -ma -iicon.sfx/sfx.ico -k -z.sfx/sfx.opt $exeresult $@
         rm -r .sfx
@@ -338,7 +352,9 @@ exe-sfx ()
         cat << EOF
 Usage:
   exe-sfx [-n] setup_exe_file input_files_dirs
-    -n: Not delete temp file after exit and fix temp sfx path
+    -d: Delete unpack files after exit, unpack to %TEMP% (Default)
+    -t: Not delete unpack files after exit, unpack to %TEMP%
+    -a: Not delete unpack files after exit, unpack to %APPDATA%
 Dependent:
   wrestool: Extract ico from Windows binaries. (icoutils package)
   WinRAR:   Create SFX file
