@@ -47,15 +47,37 @@ function torrent_name ()
 }
 
 # $1 = *.torrent
+function torrent_size ()
+{
+    dl -ls "$1" | awk '/^Total Length/{print $3}'
+}
+
+# $1 = magnet
+function magnet_hash ()
+{
+    awk -v FS='&' '{print $1}' <<< $1
+}
+
+# $1 = *.torrent
 function torrent_magnet ()
 {
     dl -ls "$1" | awk '/Magnet URI:/{sub("^Magnet URI: ",""); print}'
 }
 
 # $1 = *.torrent
-function torrent_size ()
+function torrent_magnet_hash ()
 {
-    dl -ls "$1" | awk '/^Total Length/{print $3}'
+    magnet_hash $(torrent_magnet $1)
+}
+
+# $1 = cmd
+# $2,$3... = foreach data
+function foreach_do ()
+{
+    cmd=$1; shift
+    for i; do
+        $cmd $i
+    done
 }
 
 # $1 = dir
@@ -104,6 +126,7 @@ Options:
   -ls-name   List torrent name
   -ls-size   List torrent size
   -ls-magnet List torrent magnet
+  -ls-m      List torrent magnet (only hash, remove &tr=* &dn=* ...)
   -ls=1,3-9  Select torrent included files to download (List by -ls)
   -d=<dir>   Set download directory
   -d         Daemon mode
@@ -133,6 +156,7 @@ do
         -ls-name) list_torrent_name=1; shift ;;
         -ls-size) list_torrent_size=1; shift ;;
         -ls-magnet) list_torrent_magnet=1; shift ;;
+        -ls-m) list_torrent_magnet_hash=1; shift ;;
         -ls=*) torrent_cfg="$torrent_cfg --select-file=${i#*=}"; shift ;;
         -d=*) dir="${i#*=}"; shift ;;
         -d) misc_cfg="$misc_cfg --daemon"; shift ;;
@@ -144,7 +168,7 @@ do
                 misc_cfg="$misc_cfg --max-connection-per-server=${i#*-}"
                 shift
             else
-                dlthing="$*"
+                dlthing=$@
                 break
             fi
             ;;
@@ -171,25 +195,31 @@ fi
 
 # list torrent
 if [[ -n "$list_torrent" ]]; then
-    aria2c --show-files "$dlthing"
+    foreach_do 'aria2c --show-files' $dlthing
     exit
 fi
 
 # list torrent name
 if [[ -n "$list_torrent_name" ]]; then
-    torrent_name "$dlthing"
+    foreach_do torrent_name $dlthing
     exit
 fi
 
 # list torrent size
 if [[ -n "$list_torrent_size" ]]; then
-    torrent_size "$dlthing"
+    foreach_do torrent_size $dlthing
     exit
 fi
 
 # list torrent magnet
 if [[ -n "$list_torrent_magnet" ]]; then
-    torrent_magnet "$dlthing"
+    foreach_do torrent_magnet $dlthing
+    exit
+fi
+
+# list torrent magnet min
+if [[ -n "$list_torrent_magnet_hash" ]]; then
+    foreach_do torrent_magnet_hash $dlthing
     exit
 fi
 
