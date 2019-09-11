@@ -607,6 +607,10 @@ nnoremap <silent> <leader>R :call lq#ReplaceAllAuto("\\C\\<<C-R>=expand('<cword>
 " Coding mode: taghighlight, Signify,
 nnoremap <leader>x :call lq#LoadCodingPlugin()<cr>
 
+" Append data to reg 'o'
+vnoremap <silent> <leader>o :call lq#Append2RegO(lq#GetVisualSelectText(),1)<cr>
+nnoremap <silent> <leader>o :call lq#Append2RegO("<C-R>=expand('<cword>')<cr>",1)<cr>
+nnoremap <silent> <leader>O :S echo @o<cr>
 
 " Shortcut: Other {{{2
 
