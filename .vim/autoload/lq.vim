@@ -738,10 +738,10 @@ function! lq#Scratch(...) abort range
                 redir => l:result
                 silent execute l:cmd
                 redir END
-                silent put =l:result
+                silent put! =l:result
             endif
         else
-            silent put =l:result
+            silent put! =l:result
         endif
         normal gg
     endif
