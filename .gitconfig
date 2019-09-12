@@ -108,6 +108,10 @@
 [tar "tar.xz"]
     command = xz -c
 
+[svn]
+    # see: https://aboullaite.me/migration-from-svn-to-git-a-developer-guide/
+    rmdir = true
+
 [alias]
     co  = checkout
     coh = checkout HEAD
