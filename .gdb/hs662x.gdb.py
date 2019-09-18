@@ -73,7 +73,7 @@ def flash_prepare_and_show():
     gdb.execute('mon halt', to_string=True)
     gdb.execute('file ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
     gdb.execute('restore ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
-    gdb.execute('set $sp=&FlashDevice.sectors[1024]')
+    gdb.execute('set $sp=&m_stack_mem[1024]')
     gdb.execute('set $res=Init(0, 6000000, 3)')
 
     # Show device name
@@ -161,23 +161,25 @@ def flash_download_part(part_type, file_path, is_verify=True):
     print("  Erase...")
     gdb.execute('set $res=Init(0, 6000000, 1)')
     gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
-    addr = 0
-    while addr < erase_size:
-        gdb.execute('set $res=EraseSector({})'.format(addr))
-        addr += flash_sector_size
+#    addr = 0
+#    while addr < erase_size:
+#        gdb.execute('set $res=EraseSector({})'.format(addr))
+#        addr += flash_sector_size
+    gdb.execute('set $res=EraseSectorEx({},{})'.format(0, erase_size))
     gdb.execute('set $res=UnInit(1)')
 
     # Program
     print("  Program...")
     gdb.execute('set $res=Init(0, 6000000, {})'.format(int(part_type)))
     gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
+    program_size = 32*1024
     addr = 0
     while addr < file_size:
         left = file_size - addr
-        len = left if left<flash_sector_size else flash_sector_size
+        len = left if left<program_size else program_size
         gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
         gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, len, buffer))
-        addr += flash_sector_size
+        addr += program_size
     gdb.execute('set $res=UnInit({})'.format(int(part_type)))
 
     # Verify
@@ -380,6 +382,26 @@ class flash_download_image_register(gdb.Command):
 
 
 # download app
+class flash_download_app_noverify_register(gdb.Command):
+
+    """HS662x download APP to flash
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_download_app_noverify", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+
+        # Get file name
+        if args == '':
+            file_path = 'a.bin'
+        else:
+            file_path = args
+
+        # Download
+        flash_download_part(FLASH_PART_APP, file_path, is_verify=False)
+
+# download app
 class flash_download_app_register(gdb.Command):
 
     """HS662x download APP to flash
@@ -398,7 +420,6 @@ class flash_download_app_register(gdb.Command):
 
         # Download
         flash_download_part(FLASH_PART_APP, file_path)
-
 
 # download cfg
 class flash_download_cfg_register(gdb.Command):
@@ -598,6 +619,7 @@ reboot_register()
 device_info_register()
 flash_upload_register()
 flash_download_app_register()
+flash_download_app_noverify_register()
 flash_download_cfg_register()
 flash_download_patch_register()
 flash_download_image_register()
