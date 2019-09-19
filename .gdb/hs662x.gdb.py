@@ -109,6 +109,8 @@ def flash_prepare_and_show():
     print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
     print('FlashExt: {} {}KB (0x{:06X})'.format(flash_name_ext, flash_size_ext/1024, flash_id_ext))
 
+    if flash_size==0 and flash_size_ext==0:
+        raise gdb.GdbError('No valid Flash!')
 
 def flash_finish():
     gdb.execute('file', to_string=True)
