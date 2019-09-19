@@ -257,6 +257,7 @@ fi
 if [[ -n "$test_server" ]]; then
     i=0
     for s in ${urls[@]}; do
+        s="${s//\/*}"
         ping -c 1 -W 2 "$s" > /dev/null
         if [[ "$?" == "0" ]]; then
             echo -e "-${i}x  ${s}\tpass"
