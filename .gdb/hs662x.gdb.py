@@ -22,6 +22,7 @@ import os
 ######################################################################
 flash_size = 1024*512
 flash_sector_size = 1024*4
+debug_file = ''
 
 flash_info_table = {
     0x504013: {'size': 512*1024,  'name': "XD25D40"},
@@ -67,7 +68,21 @@ def chip():
         return CHIP_HS6621
 
 
+def flash_finish():
+    gdb.execute('file {}'.format(debug_file), to_string=True)
+
+
 def flash_prepare_and_show():
+    # save user debug file
+    # Symbols from "/home/lenovo/work.pro/ble/trunk/rwble/a.axf".
+    global debug_file
+    file_info = gdb.execute('info files', to_string=True)
+    begin = file_info.find('Symbols from "')
+    if begin != -1:
+        debug_file = file_info[begin+14:file_info.find('".')]
+    else:
+        debug_file = ''
+
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
@@ -110,10 +125,8 @@ def flash_prepare_and_show():
     print('FlashExt: {} {}KB (0x{:06X})'.format(flash_name_ext, flash_size_ext/1024, flash_id_ext))
 
     if flash_size==0 and flash_size_ext==0:
+        flash_finish()
         raise gdb.GdbError('No valid Flash!')
-
-def flash_finish():
-    gdb.execute('file', to_string=True)
 
 
 def mem32_read(addr):
