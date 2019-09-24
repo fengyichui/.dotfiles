@@ -4,8 +4,12 @@ endif
 let g:loaded_nerdtree_autoload = 1
 
 let s:rootNERDTreePath = resolve(expand("<sfile>:p:h:h"))
+"FUNCTION: nerdtree#version(...) {{{1
+"  If any value is given as an argument, the entire line of text from the
+"  change log is shown for the current version; otherwise, only the version
+"  number is shown.
 function! nerdtree#version(...)
-    return '5.3.1'
+    return '6.0.0'
     let l:changelog = readfile(join([s:rootNERDTreePath, "CHANGELOG.md"], nerdtree#slash()))
     let l:text = 'Unknown'
     let l:line = 0
@@ -23,6 +27,7 @@ endfunction
 " SECTION: General Functions {{{1
 "============================================================
 
+"FUNCTION: nerdtree#slash() {{{2
 function! nerdtree#slash()
 
     if nerdtree#runningWindows()
@@ -50,7 +55,6 @@ function! nerdtree#and(x,y)
             if (l:x % 2) && (l:y % 2)
                 let l:result += float2nr(pow(2, l:n))
             endif
-            echomsg l:x . ", " . l:y . " => " l:result
             let l:x = float2nr(l:x / 2)
             let l:y = float2nr(l:y / 2)
             let l:n += 1
