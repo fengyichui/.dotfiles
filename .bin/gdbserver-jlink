@@ -1,5 +1,6 @@
 #!/bin/bash
 
+restartfile="/tmp/RESTART-JLinkGDBServer"
 device="Cortex-M3"
 speed="auto"
 rtos=""
@@ -17,6 +18,10 @@ do
             exit 0
             ;;
 
+        -f|--force) force_startup=1 ;;
+        -r|--restart) restartit=1 ;;
+        -p|--port) port=1 ;;
+
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
         --freertos) rtos="-rtos GDBServer/RTOSPlugin_FreeRTOS" ;;
         --chibios)  rtos="-rtos GDBServer/RTOSPlugin_ChibiOS" ;;
@@ -31,10 +36,21 @@ do
     esac
 done
 
-# check process
-if [[ $(pgrep -i JLinkGDBServer) ]] ; then
-    echo "JLinkGDBServer is already running!"
+# restart
+if [[ -n "$restartit" ]]; then
+    touch "$restartfile"
     exit
+fi
+
+# check process
+if [[ -n "$force_startup" ]]; then
+    jlinkpid=$(pgrep -i JLinkGDBServer)
+    if [[ -n "$jlinkpid" ]]; then
+        echo "JLinkGDBServer is already running! Kill It!"
+        kill $jlinkpid
+        wait $jlinkpid
+        echo ""
+    fi
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
@@ -53,5 +69,28 @@ elif [[ "$OSTYPE" =~ "linux" ]]; then
     fi
 fi
 
-$gdbserver $params
+# run
+$gdbserver $params &
+jlinkpid=$!
+
+# catch interrupt
+trap "kill $jlinkpid 2>/dev/null; wait $jlinkpid 2>/dev/null; exit" HUP INT QUIT ABRT TERM
+
+# check restart
+rm -f "$restartfile"
+while true; do
+    if [[ -f "$restartfile" ]]; then
+        rm -f "$restartfile"
+        echo -e "\n\n\e[31mRestart JLinkGDBServer!\e[0m\n\n"
+
+        kill $jlinkpid
+        wait $jlinkpid
+        sleep 0.1
+
+        $gdbserver $params &
+        jlinkpid=$!
+    fi
+
+    sleep 0.1
+done
 
