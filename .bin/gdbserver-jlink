@@ -31,6 +31,12 @@ do
     esac
 done
 
+# check process
+if [[ $(pgrep -i JLinkGDBServer) ]] ; then
+    echo "JLinkGDBServer is already running!"
+    exit
+fi
+
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
 params="-device $device -speed $speed -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout $rtos"  #-select usb=20151001
 
