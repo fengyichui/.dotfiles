@@ -25,12 +25,8 @@ disable_wdt
 mon exec EnableLowPowerHandlingMode
 end
 
-define reconnect
-mon interface JTAG
-connect
-mon interface SWD
-mon speed 6000
-connect
+define jlink-restart
+shell gdbserver-jlink -r
 end
 
 define rc
