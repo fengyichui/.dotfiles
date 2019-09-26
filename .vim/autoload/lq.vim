@@ -957,7 +957,7 @@ function! lq#OpenDir(is_cwd)
 endfunction
 
 " Append string to reg 'o'
-let @o = "<leader>a: append data to reg 'o', <leader>O: show, :let @o='': clear\n\n"
+let @o = "<leader>o: append data to reg 'o', <leader>O: show, :let @o='': clear\n\n"
 function! lq#Append2RegO(string, addreturn)
     let @o .= a:string
     if a:addreturn
