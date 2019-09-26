@@ -1,40 +1,57 @@
 #!/bin/bash
 
-restartfile="/tmp/RESTART-JLinkGDBServer"
 device="Cortex-M3"
 speed="auto"
+port="2331"
 rtos=""
+select=""
+
+function usage ()
+{
+    cat <<EOF
+GDB Server with SEGGER JLink
+Options:
+  -f|--force        Force start JLink GDB server (Kill running server)
+  -r|--restart      Restart JLink GDB server
+  -p|--port=*       Listen port (2331)
+  -d|--device=*     Device (Cortex-M3)
+  -s|--speed=*      Speed kB/s (auto)
+  -u|--usb=*        Specifies USB SerialNo to connect
+  -i|--ip=*         Specifies IP address to connect
+  -h|--help         Show this help
+  --embos           Use RTOS Plugin: embOS
+  --freertos        Use RTOS Plugin: FreeRTOS
+  --chibios         Use RTOS Plugin: ChibiOS
+
+Supported Devices: https://www.segger.com/jlink_supported_devices.html
+EOF
+
+    exit 0
+}
 
 # Parse argument
 for i in "$@"
 do
     case $i in
-        -h|--help)
-            echo "gdbserver with jLink"
-            echo "  gdbserver-jlink:           device=$device, speed=$speed"
-            echo "  gdbserver-jlink Cortex-M4: device=Cortex-M4, speed=$speed"
-            echo "  gdbserver-jlink 2000:      device=$device, speed=2000kHz"
-            echo "Supported Devices: https://www.segger.com/jlink_supported_devices.html"
-            exit 0
-            ;;
-
         -f|--force) force_startup=1 ;;
         -r|--restart) restartit=1 ;;
-        -p|--port) port=1 ;;
+        -p=*|--port=*) port="${i#*=}" ;;
+        -d=*|--device=*) device="${i#*=}" ;;
+        -s=*|--speed=*) speed="${i#*=}" ;;
+        -u=*|--usb=*) select="-select usb=${i#*=}" ;;
+        -i=*|--ip=*) select="-select ip=${i#*=}" ;;
 
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
         --freertos) rtos="-rtos GDBServer/RTOSPlugin_FreeRTOS" ;;
         --chibios)  rtos="-rtos GDBServer/RTOSPlugin_ChibiOS" ;;
 
-        *)
-            if [[ "$(echo $i | awk '/^[0-9]+$/')" == "$i" ]]; then
-                speed="$i"
-            else
-                device="$i"
-            fi
-            ;;
+        -h|--help) usage ;;
+        *) usage ;;
     esac
 done
+
+# restart file
+restartfile="/tmp/RESTART-JLinkGDBServer-$port"
 
 # restart
 if [[ -n "$restartit" ]]; then
@@ -54,7 +71,7 @@ if [[ -n "$force_startup" ]]; then
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
-params="-device $device -speed $speed -port 2331 -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout $rtos"  #-select usb=20151001
+params="-device $device -speed $speed -port $port $select -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout $rtos"
 
 # Segger Jlink GDB Server
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
@@ -69,28 +86,37 @@ elif [[ "$OSTYPE" =~ "linux" ]]; then
     fi
 fi
 
+# clean
+function cleanexit ()
+{
+    kill $jlinkpid 2>/dev/null
+    wait $jlinkpid 2>/dev/null
+    echo -e "\nExit!"
+    exit 0
+}
+
 # run
 $gdbserver $params &
 jlinkpid=$!
 
 # catch interrupt
-trap "kill $jlinkpid 2>/dev/null; wait $jlinkpid 2>/dev/null; exit" HUP INT QUIT ABRT TERM
+trap "cleanexit" HUP INT QUIT ABRT TERM
 
 # check restart
 rm -f "$restartfile"
 while true; do
     if [[ -f "$restartfile" ]]; then
         rm -f "$restartfile"
-        echo -e "\n\n\e[31mRestart JLinkGDBServer!\e[0m\n\n"
+        echo -e "\n\n\e[31mRestart JLinkGDBServer!\e[0m\n"
 
         kill $jlinkpid
         wait $jlinkpid
-        sleep 0.1
+        sleep 0.2
 
         $gdbserver $params &
         jlinkpid=$!
     fi
 
-    sleep 0.1
+    sleep 0.2
 done
 
