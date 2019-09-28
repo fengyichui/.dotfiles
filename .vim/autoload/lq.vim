@@ -314,10 +314,20 @@ function! lq#ColumnOp(...)
     endfor
 endfunction
 
+function! lq#ToHumanDesc(str)
+    let l:desc = a:str
+    let l:desc = substitute(l:desc, '\C\([A-Z][a-z]\)', '\=tolower("_" . submatch(1))', 'g') " AbcDefGhiJHL -> abc_def_ghiJHL
+    let l:desc = substitute(l:desc, '\C\([A-Z]\+\)', {m -> '_' . m[1]}, 'g') " abc_def_ghiJKL -> abc_def_ghi_JHL
+    let l:desc = substitute(l:desc, '_', ' ', 'g') " abc_def_ghi_JHL -> abc def ghi JHL
+    let l:desc = substitute(l:desc, '\s\+', ' ', 'g')
+    let l:desc = substitute(l:desc, '^ ', '', 'g')
+    return l:desc
+endfunction
+
 function! lq#MakeDoxygenComment()
     let l:MakeDoxygenComment_briefTag="@brief "
     let l:MakeDoxygenComment_paramTag="@param[in] "
-    let l:MakeDoxygenComment_returnTag="@return "
+    let l:MakeDoxygenComment_returnTag="@return"
     let l:MakeDoxygenComment_blockHeader=""
     let l:MakeDoxygenComment_blockFooter=""
 
@@ -369,13 +379,8 @@ function! lq#MakeDoxygenComment()
 
     mark d
     let l:funcDesc = expand("<cword>")
-    let l:funcDesc = substitute(l:funcDesc, '\C\([A-Z][a-z]\)', '\=tolower("_" . submatch(1))', 'g') " AbcDefGhiJHL -> abc_def_ghiJHL
-    let l:funcDesc = substitute(l:funcDesc, '\C\([A-Z]\+\)', {m -> '_' . m[1]}, 'g') " abc_def_ghiJKL -> abc_def_ghi_JHL
-    let l:funcDesc = substitute(l:funcDesc, '_', ' ', 'g') " abc_def_ghi_JHL -> abc def ghi JHL
-    let l:funcDesc = substitute(l:funcDesc, '\s\+', ' ', 'g')
-    let l:funcDesc = substitute(l:funcDesc, '^ ', '', 'g')
     exec "normal! {"
-    exec "normal! o/**" . l:MakeDoxygenComment_blockHeader ."\<cr>" . l:MakeDoxygenComment_briefTag . ' ' . l:funcDesc
+    exec "normal! o/**" . l:MakeDoxygenComment_blockHeader ."\<cr>" . l:MakeDoxygenComment_briefTag . ' ' . lq#ToHumanDesc(l:funcDesc)
     let l:synopsisLine=line(".")
     let l:synopsisCol=col(".")
     let l:nextParamLine=l:synopsisLine+2
@@ -394,7 +399,7 @@ function! lq#MakeDoxygenComment()
             let l:bFoundParam=1
             let l:param=matchstr(l:line,l:identifierRegex,l:startPos)
             exec l:nextParamLine
-            exec "normal! O" . l:MakeDoxygenComment_paramTag . l:param . "  "
+            exec "normal! O" . l:MakeDoxygenComment_paramTag . l:param . "  " . lq#ToHumanDesc(l:param)
             let l:nextParamLine=l:nextParamLine+1
 
             exec "normal! `d"
