@@ -351,6 +351,22 @@ function! lq#MakeDoxygenComment()
         return
     endif
 
+    " return void
+    let l:bVoidReturn = match(l:line, '\<void\>')
+    if l:bVoidReturn >= 0 && l:bVoidReturn < l:startPos
+        let l:bVoidReturn = 1
+    else
+        let l:bVoidReturn = 0
+    endif
+
+    " param void
+    let l:bVoidParam = match(l:line, '(\s*void\s*)', l:startPos)
+    if l:bVoidParam >= 0
+        let l:bVoidParam = 1
+    else
+        let l:bVoidParam = 0
+    endif
+
     mark d
     let l:funcDesc = expand("<cword>")
     let l:funcDesc = substitute(l:funcDesc, '\C\([A-Z][a-z]\)', '\=tolower("_" . submatch(1))', 'g') " AbcDefGhiJHL -> abc_def_ghiJHL
@@ -363,16 +379,19 @@ function! lq#MakeDoxygenComment()
     let l:synopsisLine=line(".")
     let l:synopsisCol=col(".")
     let l:nextParamLine=l:synopsisLine+2
-    exec "normal! a\<cr>\<cr>\<cr>\<cr>\<cr>" . l:MakeDoxygenComment_returnTag . "\<cr>\<bs>" . l:MakeDoxygenComment_blockFooter . "*/"
+    if l:bVoidReturn
+        exec "normal! a\<cr>\<cr>\<cr>\<cr>\<bs>" . l:MakeDoxygenComment_blockFooter . "*/"
+    else
+        exec "normal! a\<cr>\<cr>\<cr>\<cr>\<cr>" . l:MakeDoxygenComment_returnTag . "\<cr>\<bs>" . l:MakeDoxygenComment_blockFooter . "*/"
+    endif
     exec "normal! `d"
 
-    let l:foundParam=0
-    let l:bVoid = match(l:line, '(\s*void\s*)', l:startPos)
-    if l:bVoid < 0
+    let l:bFoundParam=0
+    if !l:bVoidParam
         let l:identifierRegex='\i\+\([ \t\[\]]*[,)]\)\@='
         let l:matchIndex=match(l:line,l:identifierRegex,l:startPos)
         while (l:matchIndex >= 0)
-            let l:foundParam=1
+            let l:bFoundParam=1
             let l:param=matchstr(l:line,l:identifierRegex,l:startPos)
             exec l:nextParamLine
             exec "normal! O" . l:MakeDoxygenComment_paramTag . l:param . "  "
@@ -386,7 +405,10 @@ function! lq#MakeDoxygenComment()
 
     exec l:nextParamLine
     exec "normal! dj"
-    if (l:foundParam < 1)
+    if !l:bFoundParam
+        if l:bVoidReturn
+            exec "normal! k"
+        endif
         exec "normal! dd"
     endif
     exec l:synopsisLine
