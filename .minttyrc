@@ -35,52 +35,11 @@ Scrollbar=none
 # Fix on v3.0.1
 #SuppressDEC=12
 
-# Solarized colorscheme
-#ForegroundColour=131,148,150
-#BackgroundColour=0,43,54
-#CursorColour=220,50,47
-#Black=7,54,66
-#BoldBlack=0,43,54
-#Red=220,50,47
-#BoldRed=203,75,22
-#Green=133,153,0
-#BoldGreen=88,110,117
-#Yellow=181,137,0
-#BoldYellow=101,123,131
-#Blue=38,139,210
-#BoldBlue=131,148,150
-#Magenta=211,54,130
-#BoldMagenta=108,113,196
-#Cyan=42,161,152
-#BoldCyan=147,161,161
-#White=238,232,213
-#BoldWhite=253,246,227
-
-# Flat colorscheme
-#ForegroundColour=236,240,241
-#BackgroundColour=24,24,24
-#CursorColour=211,84,0
-#BoldBlack=52,73,94
-#Black=44,62,80
-#BoldRed=231,76,60
-#Red=192,57,43
-#BoldGreen=46,204,113
-#Green=39,174,96
-#BoldYellow=241,196,15
-#Yellow=243,156,18
-#BoldBlue=52,152,219
-#Blue=41,128,185
-#BoldMagenta=155,89,182
-#Magenta=142,68,173
-#BoldCyan=26,188,156
-#Cyan=122,160,133
-#BoldWhite=236,240,241
-#White=189,195,199
-
 # Monokai colorscheme
 ForegroundColour=248,248,242
 BackgroundColour=28,28,28
 CursorColour=253,157,79
+IMECursorColour=39,174,96
 Black=39,40,34
 BoldBlack=117,113,94
 Red=249,38,114
