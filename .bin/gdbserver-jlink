@@ -60,6 +60,8 @@ pidfile="/tmp/JLinkGDBServer-PID-$port"
 # restart
 if [[ -n "$restartit" ]]; then
     if [[ -f "$scriptrunningfile" ]]; then
+        echo -n "JLinkGDBServer Restarting... "
+
         rm -rf "$exerunningfile"
         touch "$restartfile"
 
@@ -75,20 +77,20 @@ if [[ -n "$restartit" ]]; then
                 # check flag from log file
                 if [[ -f "$logfile" ]]; then
                     if grep -q 'Waiting for GDB connection' "$logfile"; then
-                        echo "JLinkGDBServer is Ready"
+                        echo "OK"
                         exit 0
                     fi
                 fi
                 # check JLinkGDBServer exit
                 if [[ ! -f "$exerunningfile" ]]; then
-                    echo "JLinkGDBServer can't Connect to Target"
+                    echo "Fail"
                     exit -1
                 fi
             fi
 
             # check timeout
             if (($timeout>30)); then
-                echo "Restart JLinkGDBServer Timeout"
+                echo "Timeout"
                 exit 0
             fi
 
