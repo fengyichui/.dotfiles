@@ -135,7 +135,7 @@ function cleanexit ()
 {
     kill $jlinkpid 2>/dev/null
     wait $jlinkpid 2>/dev/null
-    rm -f "$scriptrunningfile"
+    rm -rf "$restartfile" "$scriptrunningfile" "$exerunningfile" "$logfile" "$pidfile"
     echo -e "\n\e[31mScript Exit\e[0m"
     exit 0
 }
