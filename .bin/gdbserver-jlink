@@ -51,12 +51,54 @@ do
 done
 
 # restart file
-restartfile="/tmp/RESTART-JLinkGDBServer-$port"
+restartfile="/tmp/JLinkGDBServer-RESTART-$port"
+scriptrunningfile="/tmp/JLinkGDBServer-SCRIPT-RUNNING-$port"
+exerunningfile="/tmp/JLinkGDBServer-EXE-RUNNING-$port"
+logfile="/tmp/JLinkGDBServer-LOG-$port"
+pidfile="/tmp/JLinkGDBServer-PID-$port"
 
 # restart
 if [[ -n "$restartit" ]]; then
-    touch "$restartfile"
-    exit
+    if [[ -f "$scriptrunningfile" ]]; then
+        rm -rf "$exerunningfile"
+        touch "$restartfile"
+
+        exerunning=0
+        timeout=0
+        while true; do
+            if [[ "$exerunning" == "0" ]]; then
+                # check JLinkGDBServer running
+                if [[ -f "$exerunningfile" ]]; then
+                    exerunning=1
+                fi
+            else
+                # check flag from log file
+                if [[ -f "$logfile" ]]; then
+                    if grep -q 'Waiting for GDB connection' "$logfile"; then
+                        echo "JLinkGDBServer is Ready"
+                        exit 0
+                    fi
+                fi
+                # check JLinkGDBServer exit
+                if [[ ! -f "$exerunningfile" ]]; then
+                    echo "JLinkGDBServer can't Connect to Target"
+                    exit -1
+                fi
+            fi
+
+            # check timeout
+            if (($timeout>30)); then
+                echo "Restart JLinkGDBServer Timeout"
+                exit 0
+            fi
+
+            timeout=$(($timeout + 1))
+            sleep 0.2
+        done
+    else
+        echo "JLinkGDBServer Script Not Running"
+        exit -1
+    fi
 fi
 
 # check process
@@ -91,30 +133,48 @@ function cleanexit ()
 {
     kill $jlinkpid 2>/dev/null
     wait $jlinkpid 2>/dev/null
-    echo -e "\nExit!"
+    rm -f "$scriptrunningfile"
+    echo -e "\n\e[31mScript Exit\e[0m"
     exit 0
 }
 
 # run
-$gdbserver $params &
-jlinkpid=$!
+( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $logfile &
+jlinkpid=$(<$pidfile)
+touch "$exerunningfile"
 
 # catch interrupt
 trap "cleanexit" HUP INT QUIT ABRT TERM
 
 # check restart
+touch "$scriptrunningfile"
 rm -f "$restartfile"
 while true; do
+    # check restart flag
     if [[ -f "$restartfile" ]]; then
         rm -f "$restartfile"
-        echo -e "\n\n\e[31mRestart JLinkGDBServer!\e[0m\n"
+        echo -e "\n\e[31mRestart JLinkGDBServer!\e[0m\n"
 
-        kill $jlinkpid
-        wait $jlinkpid
-        sleep 0.2
+        # kill it
+        if [[ -n "$jlinkpid" ]]; then
+            kill $jlinkpid 2>/dev/null
+            wait $jlinkpid 2>/dev/null
+            sleep 0.2
+        fi
 
-        $gdbserver $params &
-        jlinkpid=$!
+        # restart
+        ( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $logfile &
+        jlinkpid=$(<$pidfile)
+        touch "$exerunningfile"
+    fi
+
+    # check JLinkGDBServer exit
+    if [[ -n "$jlinkpid" ]]; then
+        if ! ps -p $jlinkpid >/dev/null; then
+            echo -e "\n\e[31mJLinkGDBServer Exit\e[0m\n"
+            jlinkpid=""
+            rm -rf "$exerunningfile"
+        fi
     fi
 
     sleep 0.2
