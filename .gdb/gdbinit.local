@@ -32,8 +32,8 @@ shell gdbserver-jlink --restart
 end
 
 define reconnect
+ignore-errors kill
 jlink-restart
-shell sleep 2
 connect
 end
 
