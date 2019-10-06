@@ -11,12 +11,12 @@ source ~/.dotfiles/.gdb/dashboard.gdb
 end
 
 define connect2local
-ignore-errors kill
+ignore-all kill
 target remote localhost:2331
 end
 
 define connect2remote
-ignore-errors kill
+ignore-all kill
 target remote 192.168.2.66:2331
 end
 
@@ -24,7 +24,7 @@ define connect
 #connect2remote
 connect2local
 disable_wdt
-mon exec EnableLowPowerHandlingMode
+ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink-restart
@@ -32,7 +32,7 @@ shell gdbserver-jlink --restart
 end
 
 define reconnect
-ignore-errors kill
+ignore-all kill
 jlink-restart
 connect
 end
