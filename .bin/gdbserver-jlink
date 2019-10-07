@@ -120,7 +120,7 @@ fi
 
 # check running
 if [[ -f "$scriptrunningfile" ]]; then
-    echo -n "JLinkGDBServer Script is running! "
+    echo -n "JLinkGDBServer Script is already running! "
     if [[ -n "$force_startup" || -n "$stopit" ]]; then
         echo -n "Killing it... "
         touch "$scriptexitfile"
@@ -157,7 +157,7 @@ fi
 
 # daemon
 if [[ -n "$daemonmode" ]]; then
-    echo "Daemon Running"
+    echo "JLinkGDBServer Script run as Daemon"
     (nohup $0 $@ >$daemonlogfile 2>&1 </dev/null &) &
     exit
 fi
@@ -186,7 +186,7 @@ function cleanexit ()
         wait $jlinkpid 2>/dev/null
     fi
     rm -rf ${fileprefix}*
-    echo -e "\n\e[31mScript Exit\e[0m"
+    echo -e "\n\e[31mJLinkGDBServer Script Exit\e[0m"
     exit 0
 }
 
@@ -205,7 +205,7 @@ while true; do
     # check restart flag
     if [[ -f "$restartfile" ]]; then
         rm -f "$restartfile"
-        echo -e "\n\e[31mRestart JLinkGDBServer!\e[0m"
+        echo -e "\n\e[31mJLinkGDBServer EXE Restart\e[0m"
 
         # kill it
         if [[ -n "$jlinkpid" ]]; then
@@ -223,7 +223,7 @@ while true; do
     # check JLinkGDBServer exit
     if [[ -n "$jlinkpid" ]]; then
         if ! ps -p $jlinkpid >/dev/null; then
-            echo -e "\n\e[31mJLinkGDBServer Exit\e[0m"
+            echo -e "\n\e[31mJLinkGDBServer EXE Exit\e[0m"
             jlinkpid=""
             rm -rf "$exerunningfile"
         fi
