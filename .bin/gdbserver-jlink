@@ -11,8 +11,11 @@ function usage ()
     cat <<EOF
 GDB Server with SEGGER JLink
 Options:
-  -f|--force        Force start JLink GDB server (Kill running server)
-  -r|--restart      Restart JLink GDB server
+  -F|--force        Force start JLink GDB server (Kill running server)
+  -R|--restart      Restart JLink GDB server
+  -S|--stop         Stop JLink GDB server
+  -D|--daemon       Daemon mode (must be 1st option)
+  -C|--clean        Clean all temp files
   -p|--port=*       Listen port (2331)
   -d|--device=*     Device (Cortex-M3)
   -s|--speed=*      Speed kB/s (auto)
@@ -33,8 +36,11 @@ EOF
 for i in "$@"
 do
     case $i in
-        -f|--force) force_startup=1 ;;
-        -r|--restart) restartit=1 ;;
+        -F|--force) force_startup=1 ;;
+        -R|--restart) restartit=1 ;;
+        -S|--stop) stopit=1 ;;
+        -D|--daemon) if [[ "$i" == "$1" ]]; then daemonmode=1; shift; fi ;;
+        -C|--clean) cleanit=1 ;;
         -p=*|--port=*) port="${i#*=}" ;;
         -d=*|--device=*) device="${i#*=}" ;;
         -s=*|--speed=*) speed="${i#*=}" ;;
@@ -50,13 +56,21 @@ do
     esac
 done
 
-# restart file
-restartfile="/tmp/JLinkGDBServer-RESTART-$port"
-scriptrunningfile="/tmp/JLinkGDBServer-SCRIPT-RUNNING-$port"
-scriptexitfile="/tmp/JLinkGDBServer-SCRIPT-EXIT-$port"
-exerunningfile="/tmp/JLinkGDBServer-EXE-RUNNING-$port"
-logfile="/tmp/JLinkGDBServer-LOG-$port"
-pidfile="/tmp/JLinkGDBServer-PID-$port"
+# ctrl file
+fileprefix="/tmp/JLinkGDBServer-$port"
+restartfile="$fileprefix-RESTART"
+scriptrunningfile="$fileprefix-SCRIPT-RUNNING"
+scriptexitfile="$fileprefix-SCRIPT-EXIT"
+exerunningfile="$fileprefix-EXE-RUNNING"
+jlinklogfile="$fileprefix-LOG-JLINK"
+pidfile="$fileprefix-PID"
+daemonlogfile="$fileprefix-LOG-DAEMON.nohup"
+
+# clean temp file
+if [[ -n "$cleanit" ]]; then
+    rm -rf ${fileprefix}*
+    exit 0
+fi
 
 # restart
 if [[ -n "$restartit" ]]; then
@@ -76,8 +90,8 @@ if [[ -n "$restartit" ]]; then
                 fi
             else
                 # check flag from log file
-                if [[ -f "$logfile" ]]; then
-                    if grep -q 'Waiting for GDB connection' "$logfile"; then
+                if [[ -f "$jlinklogfile" ]]; then
+                    if grep -q 'Waiting for GDB connection' "$jlinklogfile"; then
                         echo "OK"
                         exit 0
                     fi
@@ -106,8 +120,8 @@ fi
 
 # check running
 if [[ -f "$scriptrunningfile" ]]; then
-    echo "JLinkGDBServer Script is already running!"
-    if [[ -n "$force_startup" ]]; then
+    echo -n "JLinkGDBServer Script is running! "
+    if [[ -n "$force_startup" || -n "$stopit" ]]; then
         echo -n "Killing it... "
         touch "$scriptexitfile"
 
@@ -116,7 +130,11 @@ if [[ -f "$scriptrunningfile" ]]; then
         while true; do
             if [[ ! -f "$scriptrunningfile" ]]; then
                 echo "OK"
-                break
+                if [[ -n "$stopit" ]]; then
+                    exit 0
+                else
+                    break
+                fi
             fi
 
             # check timeout
@@ -129,9 +147,19 @@ if [[ -f "$scriptrunningfile" ]]; then
             sleep 0.2
         done
     else
-        echo "Please use '-f|--force' to force running"
+        echo ""
         exit -1
     fi
+
+elif [[ -n "$stopit" ]]; then
+    exit 0
+fi
+
+# daemon
+if [[ -n "$daemonmode" ]]; then
+    echo "Daemon Running"
+    (nohup $0 $@ >$daemonlogfile 2>&1 </dev/null &) &
+    exit
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
@@ -157,13 +185,13 @@ function cleanexit ()
         kill $jlinkpid 2>/dev/null
         wait $jlinkpid 2>/dev/null
     fi
-    rm -rf "$restartfile" "$scriptrunningfile" "$scriptexitfile" "$exerunningfile" "$logfile" "$pidfile"
+    rm -rf ${fileprefix}*
     echo -e "\n\e[31mScript Exit\e[0m"
     exit 0
 }
 
 # run
-( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $logfile &
+( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $jlinklogfile &
 jlinkpid=$(<$pidfile)
 touch "$exerunningfile"
 
@@ -187,7 +215,7 @@ while true; do
         fi
 
         # restart
-        ( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $logfile &
+        ( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $jlinklogfile &
         jlinkpid=$(<$pidfile)
         touch "$exerunningfile"
     fi
