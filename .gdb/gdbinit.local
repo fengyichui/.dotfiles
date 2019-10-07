@@ -31,6 +31,14 @@ define jlink-restart
 shell gdbserver-jlink --restart
 end
 
+define jlink-start
+shell gdbserver-jlink --daemon
+end
+
+define jlink-stop
+shell gdbserver-jlink --stop
+end
+
 define reconnect
 ignore-all kill
 jlink-restart
