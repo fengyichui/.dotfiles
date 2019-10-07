@@ -66,6 +66,63 @@ jlinklogfile="$fileprefix-LOG-JLINK"
 pidfile="$fileprefix-PID"
 daemonlogfile="$fileprefix-LOG-DAEMON.nohup"
 
+# check start status
+function check_jlinkgdbserver_start_status ()
+{
+    exerunning=0
+    timeout=0
+    while true; do
+        if [[ "$exerunning" == "0" ]]; then
+            # check JLinkGDBServer running
+            if [[ -f "$exerunningfile" ]]; then
+                exerunning=1
+            fi
+        else
+            # check flag from log file
+            if [[ -f "$jlinklogfile" ]]; then
+                if grep -q 'Waiting for GDB connection' "$jlinklogfile"; then
+                    echo "OK"
+                    return 0
+                fi
+            fi
+            # check JLinkGDBServer exit
+            if [[ ! -f "$exerunningfile" ]]; then
+                echo "FAIL"
+                return -1
+            fi
+        fi
+
+        # check timeout
+        if (($timeout>30)); then
+            echo "Timeout"
+            return -1
+        fi
+
+        timeout=$(($timeout + 1))
+        sleep 0.2
+    done
+}
+
+function check_jlinkgdbserver_stop_status ()
+{
+    timeout=0
+    while true; do
+        if [[ ! -f "$scriptrunningfile" ]]; then
+            echo "OK"
+            return 0
+        fi
+
+        # check timeout
+        if (($timeout>30)); then
+            echo "Timeout"
+            return -1
+        fi
+
+        timeout=$(($timeout + 1))
+        sleep 0.2
+    done
+}
+
 # clean temp file
 if [[ -n "$cleanit" ]]; then
     rm -rf ${fileprefix}*
@@ -80,38 +137,8 @@ if [[ -n "$restartit" ]]; then
         rm -rf "$exerunningfile"
         touch "$restartfile"
 
-        exerunning=0
-        timeout=0
-        while true; do
-            if [[ "$exerunning" == "0" ]]; then
-                # check JLinkGDBServer running
-                if [[ -f "$exerunningfile" ]]; then
-                    exerunning=1
-                fi
-            else
-                # check flag from log file
-                if [[ -f "$jlinklogfile" ]]; then
-                    if grep -q 'Waiting for GDB connection' "$jlinklogfile"; then
-                        echo "OK"
-                        exit 0
-                    fi
-                fi
-                # check JLinkGDBServer exit
-                if [[ ! -f "$exerunningfile" ]]; then
-                    echo "Fail"
-                    exit -1
-                fi
-            fi
-
-            # check timeout
-            if (($timeout>30)); then
-                echo "Timeout"
-                exit -1
-            fi
-
-            timeout=$(($timeout + 1))
-            sleep 0.2
-        done
+        check_jlinkgdbserver_start_status
+        exit $?
     else
         echo "JLinkGDBServer Script is not running"
         exit -1
@@ -126,40 +153,31 @@ if [[ -f "$scriptrunningfile" ]]; then
         touch "$scriptexitfile"
 
         # check result
-        timeout=0
-        while true; do
-            if [[ ! -f "$scriptrunningfile" ]]; then
-                echo "OK"
-                if [[ -n "$stopit" ]]; then
-                    exit 0
-                else
-                    break
-                fi
+        check_jlinkgdbserver_stop_status
+        if [[ "$?" == "0" ]]; then
+            if [[ -n "$stopit" ]]; then
+                exit 0
             fi
-
-            # check timeout
-            if (($timeout>30)); then
-                echo "Timeout"
-                exit -1
-            fi
-
-            timeout=$(($timeout + 1))
-            sleep 0.2
-        done
+        else
+            exit -1
+        fi
     else
         echo ""
         exit -1
     fi
 
 elif [[ -n "$stopit" ]]; then
+    echo "JLinkGDBServer Script is not running"
     exit 0
 fi
 
 # daemon
 if [[ -n "$daemonmode" ]]; then
-    echo "JLinkGDBServer Script run as Daemon"
+    echo -n "JLinkGDBServer Script run as Daemon... "
     (nohup $0 $@ >$daemonlogfile 2>&1 </dev/null &) &
-    exit
+
+    check_jlinkgdbserver_start_status
+    exit $?
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
