@@ -28,11 +28,7 @@ ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink
-shell gdbserver-jlink --daemon --speed=10000
-end
-
-define jlink-restart
-shell gdbserver-jlink --restart
+shell gdbserver-jlink -X --speed=10000
 end
 
 define jlink-stop
@@ -41,7 +37,7 @@ end
 
 define reconnect
 ignore-all kill
-jlink-restart
+jlink
 connect
 end
 
