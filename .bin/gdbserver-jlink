@@ -11,10 +11,12 @@ function usage ()
     cat <<EOF
 GDB Server with SEGGER JLink
 Options:
-  -F|--force        Force start JLink GDB server (Kill running server)
+  -F|--force        Force start JLink GDB server (May kill running server)
   -R|--restart      Restart JLink GDB server
   -S|--stop         Stop JLink GDB server
   -D|--daemon       Daemon mode (must be 1st option)
+  -X                If no server running, start new server as daemon,
+                    Otherwise restart it. Same: --daemon --restart --force
   -C|--clean        Clean all temp files
   -p|--port=*       Listen port (2331)
   -d|--device=*     Device (Cortex-M3)
@@ -36,10 +38,11 @@ EOF
 for i in "$@"
 do
     case $i in
-        -F|--force) force_startup=1 ;;
+        -F|--force) forceit=1 ;;
         -R|--restart) restartit=1 ;;
         -S|--stop) stopit=1 ;;
         -D|--daemon) if [[ "$i" == "$1" ]]; then daemonmode=1; shift; fi ;;
+        -X)          if [[ "$i" == "$1" ]]; then daemonmode=1; forceit=1; restartit=1; shift; fi ;;
         -C|--clean) cleanit=1 ;;
         -p=*|--port=*) port="${i#*=}" ;;
         -d=*|--device=*) device="${i#*=}" ;;
@@ -147,14 +150,16 @@ if [[ -n "$restartit" ]]; then
         exit $?
     else
         echo "JLinkGDBServer Script is not running"
-        exit -1
+        if [[ -z "$forceit" ]]; then
+            exit -1
+        fi
     fi
 fi
 
 # check running
 if [[ -f "$scriptrunningfile" ]]; then
     echo -n "JLinkGDBServer Script is already running! "
-    if [[ -n "$force_startup" || -n "$stopit" ]]; then
+    if [[ -n "$forceit" || -n "$stopit" ]]; then
         echo -n "Killing it... "
         touch "$scriptexitfile"
 
