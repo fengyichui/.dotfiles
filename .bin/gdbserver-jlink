@@ -63,7 +63,7 @@ scriptrunningfile="$fileprefix-SCRIPT-RUNNING"
 scriptexitfile="$fileprefix-SCRIPT-EXIT"
 exerunningfile="$fileprefix-EXE-RUNNING"
 jlinklogfile="$fileprefix-LOG-JLINK"
-pidfile="$fileprefix-PID"
+jlinkpidfile="$fileprefix-PID-JLINK"
 
 # check start status
 function check_jlinkgdbserver_start_status ()
@@ -121,6 +121,11 @@ function check_jlinkgdbserver_stop_status ()
         sleep 0.2
     done
 }
+
+# check script whether is running
+if ! ps -p $(<$scriptrunningfile) >/dev/null 2>&1; then
+    rm -rf ${fileprefix}*
+fi
 
 # clean temp file
 if [[ -n "$cleanit" ]]; then
@@ -208,15 +213,15 @@ function cleanexit ()
 }
 
 # run
-( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $jlinklogfile &
-jlinkpid=$(<$pidfile)
+( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile | tee $jlinklogfile &
+jlinkpid=$(<$jlinkpidfile)
 touch "$exerunningfile"
 
 # catch interrupt
 trap "cleanexit" HUP INT QUIT ABRT TERM
 
 # check restart
-touch "$scriptrunningfile"
+echo "$$" >"$scriptrunningfile"
 rm -f "$restartfile"
 while true; do
     # check restart flag
@@ -232,8 +237,8 @@ while true; do
         fi
 
         # restart
-        ( $gdbserver $params & echo $! >&3 ) 3>$pidfile | tee $jlinklogfile &
-        jlinkpid=$(<$pidfile)
+        ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile | tee $jlinklogfile &
+        jlinkpid=$(<$jlinkpidfile)
         touch "$exerunningfile"
     fi
 
