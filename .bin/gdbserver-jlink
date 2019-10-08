@@ -64,7 +64,6 @@ scriptexitfile="$fileprefix-SCRIPT-EXIT"
 exerunningfile="$fileprefix-EXE-RUNNING"
 jlinklogfile="$fileprefix-LOG-JLINK"
 pidfile="$fileprefix-PID"
-daemonlogfile="$fileprefix-LOG-DAEMON.nohup"
 
 # check start status
 function check_jlinkgdbserver_start_status ()
@@ -174,7 +173,7 @@ fi
 # daemon
 if [[ -n "$daemonmode" ]]; then
     echo -n "JLinkGDBServer Script run as Daemon... "
-    (nohup $0 $@ >$daemonlogfile 2>&1 </dev/null &) &
+    (nohup $0 $@ >/dev/null 2>&1 </dev/null &) &
 
     check_jlinkgdbserver_start_status
     exit $?
