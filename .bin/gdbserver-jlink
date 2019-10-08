@@ -173,7 +173,7 @@ fi
 # daemon
 if [[ -n "$daemonmode" ]]; then
     echo -n "JLinkGDBServer Script run as Daemon... "
-    (nohup $0 $@ >/dev/null 2>&1 </dev/null &) &
+    setsid $0 $@ >/dev/null 2>&1 &
 
     check_jlinkgdbserver_start_status
     exit $?
