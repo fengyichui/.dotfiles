@@ -28,11 +28,7 @@ ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink
-set $speed = "auto"
-if $argc > 0
-set $speed = $arg0
-end
-shell gdbserver-jlink --daemon --speed=$speed
+shell gdbserver-jlink --daemon --speed=10000
 end
 
 define jlink-restart
