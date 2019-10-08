@@ -1,8 +1,8 @@
-" vim: et sw=2 sts=2
+" vim: et sw=2 sts=2 fdm=marker
 
 scriptencoding utf-8
 
-" Function: #escape {{{1
+" #escape {{{1
 function! sy#util#escape(path) abort
   if exists('+shellslash')
     let old_ssl = &shellslash
@@ -22,7 +22,7 @@ function! sy#util#escape(path) abort
   return path
 endfunction
 
-" Function: #refresh_windows {{{1
+" #refresh_windows {{{1
 function! sy#util#refresh_windows() abort
   if exists('*win_getid')
     let winid = win_getid()
@@ -41,7 +41,7 @@ function! sy#util#refresh_windows() abort
   endif
 endfunction
 
-" Function: #hunk_text_object {{{1
+" #hunk_text_object {{{1
 function! sy#util#hunk_text_object(emptylines) abort
   execute sy#util#return_if_no_changes()
 
@@ -67,7 +67,7 @@ function! sy#util#hunk_text_object(emptylines) abort
   endif
 endfunction
 
-" Function: #shell_redirect {{{1
+" #shell_redirect {{{1
 function! sy#util#shell_redirect(path) abort
   " if shellredir contains a %s it is replaced with the path
   " otherwise, just append it (from :help shellredir:
@@ -81,7 +81,7 @@ function! sy#util#shell_redirect(path) abort
   endif
 endfunction
 
-" Function: #chdir {{{1
+" #chdir {{{1
 function! sy#util#chdir() abort
   let chdir = haslocaldir()
         \ ? 'lcd'
@@ -89,7 +89,7 @@ function! sy#util#chdir() abort
   return [getcwd(), chdir]
 endfunction
 
-" Function: #has_changes {{{1
+" #return_if_no_changes {{{1
 function! sy#util#return_if_no_changes() abort
   if !exists('b:sy') || empty(b:sy.hunks)
     echomsg 'signify: There are no changes.'
@@ -98,7 +98,7 @@ function! sy#util#return_if_no_changes() abort
   return ''
 endfunction
 
-" Function: #execute {{{1
+" #execute {{{1
 function! sy#util#execute(cmd) abort
   let lang = v:lang
   redir => output
@@ -110,7 +110,7 @@ endfunction
 
 let s:popup_window = 0
 
-" Function: #popup_close {{{1
+" #popup_close {{{1
 function! sy#util#popup_close() abort
   if s:popup_window
     call nvim_win_close(s:popup_window, 1)
@@ -118,12 +118,23 @@ function! sy#util#popup_close() abort
   endif
 endfunction
 
-" Function: #popup_create {{{1
+" #popup_create {{{1
 function! sy#util#popup_create(hunkdiff) abort
-  let max_height = winheight('%') - winline()
-  let height = len(filter(a:hunkdiff, {_,v -> !empty(v)}))
-  let height = (height > max_height) ? max_height : height
-  let offset = s:offset()
+  let offset      = s:offset()
+  let winline     = winline()
+  let min_height  = 6
+  let max_height  = winheight('%') - winline
+  let diff_height = len(a:hunkdiff)
+  let height      = min([diff_height, max_height])
+
+  if diff_height > max_height && max_height < min_height
+    let max_scroll = min_height - max_height
+    let scroll     = min([max_scroll, diff_height - max_height])
+    " Old versions don't have feedkeys(..., 'x')
+    execute 'normal!' scroll.''
+    let winline -= scroll
+    let height  += scroll
+  endif
 
   if exists('*nvim_open_win')
     call sy#util#popup_close()
@@ -132,7 +143,7 @@ function! sy#util#popup_create(hunkdiff) abort
     call nvim_buf_set_lines(buf, 0, -1, 0, a:hunkdiff)
     let s:popup_window = nvim_open_win(buf, v:false, {
           \ 'relative': 'win',
-          \ 'row': winline(),
+          \ 'row': winline,
           \ 'col': offset - 1,
           \ 'width': winwidth('%') - offset + 1,
           \ 'height': height,
@@ -161,7 +172,7 @@ function! sy#util#popup_create(hunkdiff) abort
   return 1
 endfunction
 
-" Function: s:offset {{{1
+" s:offset {{{1
 function! s:offset() abort
   let offset = &foldcolumn
   let offset += 2  " FIXME: Find better way to calculate the sign column width.

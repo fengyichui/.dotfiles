@@ -1,8 +1,8 @@
-" vim: et sw=2 sts=2
+" vim: et sw=2 sts=2 fdm=marker
 
 scriptencoding utf-8
 
-" Function: #detect {{{1
+" #detect {{{1
 function! sy#repo#detect() abort
   for vcs in s:vcs_list
     let b:sy.detecting += 1
@@ -10,23 +10,23 @@ function! sy#repo#detect() abort
   endfor
 endfunction
 
-" Function: s:callback_nvim_stdout{{{1
+" s:callback_nvim_stdout{{{1
 function! s:callback_nvim_stdout(_job_id, data, _event) dict abort
   let self.stdoutbuf[-1] .= a:data[0]
   call extend(self.stdoutbuf, a:data[1:])
 endfunction
 
-" Function: s:callback_nvim_exit {{{1
+" s:callback_nvim_exit {{{1
 function! s:callback_nvim_exit(_job_id, exitval, _event) dict abort
   return s:handle_diff(self, a:exitval)
 endfunction
 
-" Function: s:callback_vim_stdout {{{1
+" s:callback_vim_stdout {{{1
 function! s:callback_vim_stdout(_job_id, data) dict abort
   let self.stdoutbuf += [a:data]
 endfunction
 
-" Function: s:callback_vim_close {{{1
+" s:callback_vim_close {{{1
 function! s:callback_vim_close(channel) dict abort
   let job = ch_getjob(a:channel)
   while 1
@@ -39,69 +39,40 @@ function! s:callback_vim_close(channel) dict abort
   return s:handle_diff(self, exitval)
 endfunction
 
-" Function: sy#get_diff {{{1
+" sy#get_diff {{{1
 function! sy#repo#get_diff(vcs, func) abort
   call sy#verbose('sy#repo#get_diff()', a:vcs)
   let job_id = get(b:, 'sy_job_id_'.a:vcs)
   let [cmd, options] = s:initialize_job(a:vcs)
   let options.func = a:func
 
-  " Neovim
   if has('nvim')
     if job_id
       silent! call jobstop(job_id)
     endif
-
-    let [cwd, chdir] = sy#util#chdir()
-    call sy#verbose(['CMD: '. string(cmd), 'CMD DIR:  '. b:sy.info.dir, 'ORIG DIR: '. cwd], a:vcs)
-
-    try
-      execute chdir fnameescape(b:sy.info.dir)
-    catch
-      echohl ErrorMsg
-      echomsg 'signify: Changing directory failed: '. b:sy.info.dir
-      echohl NONE
-      return
-    endtry
     let b:sy_job_id_{a:vcs} = jobstart(cmd, extend(options, {
+          \ 'cwd':       b:sy.info.dir,
           \ 'on_stdout': function('s:callback_nvim_stdout'),
           \ 'on_exit':   function('s:callback_nvim_exit'),
           \ }))
-    execute chdir fnameescape(cwd)
-
-  " Newer Vim
-  elseif has('patch-7.4.1967')
+  elseif has('patch-8.0.902')
     if type(job_id) != type(0)
       silent! call job_stop(job_id)
     endif
-
-    let [cwd, chdir] = sy#util#chdir()
-    call sy#verbose(['CMD: '. string(cmd), 'CMD DIR:  '. b:sy.info.dir, 'ORIG DIR: '. cwd], a:vcs)
-
-    try
-      execute chdir fnameescape(b:sy.info.dir)
-    catch
-      echohl ErrorMsg
-      echomsg 'signify: Changing directory failed: '. b:sy.info.dir
-      echohl NONE
-      return
-    endtry
     let opts = {
+          \ 'cwd':      b:sy.info.dir,
           \ 'in_io':    'null',
           \ 'out_cb':   function('s:callback_vim_stdout', options),
           \ 'close_cb': function('s:callback_vim_close', options),
           \ }
     let b:sy_job_id_{a:vcs} = job_start(cmd, opts)
-    execute chdir fnameescape(cwd)
-
-  " Older Vim
   else
     let options.stdoutbuf = split(s:run(a:vcs), '\n')
     call s:handle_diff(options, v:shell_error)
   endif
 endfunction
 
-" Function: s:handle_diff {{{1
+" s:handle_diff {{{1
 function! s:handle_diff(options, exitval) abort
   call sy#verbose('s:handle_diff()', a:options.vcs)
 
@@ -114,6 +85,10 @@ function! s:handle_diff(options, exitval) abort
     return
   elseif empty(sy.vcs) && sy.active
     let sy.detecting -= 1
+  endif
+
+  if (&fenc != &enc) && has('iconv')
+    call map(a:options.stdoutbuf, 'iconv(v:val, &fenc, &enc)')
   endif
 
   let [found_diff, diff] = s:check_diff_{a:options.vcs}(a:exitval, a:options.stdoutbuf)
@@ -129,42 +104,42 @@ function! s:handle_diff(options, exitval) abort
   call setbufvar(a:options.bufnr, 'sy_job_id_'.a:options.vcs, 0)
 endfunction
 
-" Function: s:check_diff_git {{{1
+" s:check_diff_git {{{1
 function! s:check_diff_git(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_yadm {{{1
+" s:check_diff_yadm {{{1
 function! s:check_diff_yadm(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_hg {{{1
+" s:check_diff_hg {{{1
 function! s:check_diff_hg(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_svn {{{1
+" s:check_diff_svn {{{1
 function! s:check_diff_svn(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_bzr {{{1
+" s:check_diff_bzr {{{1
 function! s:check_diff_bzr(exitval, diff) abort
   return (a:exitval =~ '[012]') ? [1, a:diff] : [0, []]
 endfunction
 
-" Function: s:check_diff_darcs {{{1
+" s:check_diff_darcs {{{1
 function! s:check_diff_darcs(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_fossil {{{1
+" s:check_diff_fossil {{{1
 function! s:check_diff_fossil(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_cvs {{{1
+" s:check_diff_cvs {{{1
 function! s:check_diff_cvs(exitval, diff) abort
   let [found_diff, diff] = [0, []]
   if a:exitval == 1
@@ -180,32 +155,32 @@ function! s:check_diff_cvs(exitval, diff) abort
   return [found_diff, diff]
 endfunction
 
-" Function: s:check_diff_rcs {{{1
+" s:check_diff_rcs {{{1
 function! s:check_diff_rcs(exitval, diff) abort
   return (a:exitval == 2) ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_accurev {{{1
+" s:check_diff_accurev {{{1
 function! s:check_diff_accurev(exitval, diff) abort
   return (a:exitval >= 2) ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_perforce {{{1
+" s:check_diff_perforce {{{1
 function! s:check_diff_perforce(exitval, diff) abort
   return a:exitval ? [0, []] : [1, a:diff]
 endfunction
 
-" Function: s:check_diff_tfs {{{1
+" s:check_diff_tfs {{{1
 function! s:check_diff_tfs(exitval, diff) abort
   return a:exitval ? [0, []] : [1, s:strip_context(a:diff)]
 endfunction
 
-" Function: #get_stats {{{1
+" #get_stats {{{1
 function! sy#repo#get_stats() abort
   return exists('b:sy') ? b:sy.stats : [-1, -1, -1]
 endfunction
 
-" Function: #debug_detection {{{1
+" #debug_detection {{{1
 function! sy#repo#debug_detection()
   if !exists('b:sy')
     echomsg 'signify: I cannot detect any changes!'
@@ -231,7 +206,7 @@ function! sy#repo#debug_detection()
   endfor
 endfunction
 
-" Function: #diffmode {{{1
+" #diffmode {{{1
 function! sy#repo#diffmode(do_tab) abort
   execute sy#util#return_if_no_changes()
 
@@ -253,7 +228,7 @@ function! sy#repo#diffmode(do_tab) abort
   try
     execute chdir fnameescape(b:sy.info.dir)
     leftabove vnew
-    if has('iconv')
+    if (fenc != &enc) && has('iconv')
       silent put =iconv(system(cmd), fenc, &enc)
     else
       silent put =system(cmd)
@@ -269,48 +244,23 @@ function! sy#repo#diffmode(do_tab) abort
   normal! ]czt
 endfunction
 
-" Function: #preview_hunk {{{1
-function! sy#repo#preview_hunk() abort
-  if exists('b:sy') && !empty(b:sy.updated_by)
-    call sy#repo#get_diff(b:sy.updated_by, function('s:preview_hunk'))
-  endif
-endfunction
-
-function! s:preview_hunk(_sy, vcs, diff) abort
-  call sy#verbose('s:preview_hunk()', a:vcs)
-
-  let in_hunk = 0
+" s:extract_current_hunk {{{1
+function! s:extract_current_hunk(diff) abort
+  let header = ''
   let hunk = []
 
   for line in a:diff
-    if in_hunk
-      if line[:2] == '@@ '
+    if header != ''
+      if line[:2] == '@@ ' || empty(line)
         break
       endif
       call add(hunk, line)
     elseif line[:2] == '@@ ' && s:is_cur_line_in_hunk(line)
-      let in_hunk = 1
+      let header = line
     endif
   endfor
 
-  if !in_hunk
-    return
-  endif
-
-  if sy#util#popup_create(hunk)
-    return
-  endif
-
-  silent! wincmd P
-  if !&previewwindow
-    noautocmd botright new
-  endif
-  call setline(1, hunk)
-  silent! %foldopen!
-  setlocal previewwindow filetype=diff buftype=nofile bufhidden=delete
-  " With :noautocmd wincmd p, the first line of the preview window would show
-  " the 'cursorline', although it's not focused. Use feedkeys() instead.
-  noautocmd call feedkeys("\<c-w>p", 'nt')
+  return [header, hunk]
 endfunction
 
 function! s:is_cur_line_in_hunk(hunkline) abort
@@ -335,7 +285,84 @@ function! s:is_cur_line_in_hunk(hunkline) abort
   return 0
 endfunction
 
-" Function: s:initialize_job {{{1
+" #preview_hunk {{{1
+function! sy#repo#preview_hunk() abort
+  if exists('b:sy') && !empty(b:sy.updated_by)
+    call sy#repo#get_diff(b:sy.updated_by, function('s:preview_hunk'))
+  endif
+endfunction
+
+function! s:preview_hunk(_sy, vcs, diff) abort
+  call sy#verbose('s:preview_hunk()', a:vcs)
+
+  let [_, hunk] = s:extract_current_hunk(a:diff)
+  if empty(hunk)
+    return
+  endif
+
+  if sy#util#popup_create(hunk)
+    return
+  endif
+
+  silent! wincmd P
+  if !&previewwindow
+    noautocmd botright new
+  endif
+  call setline(1, hunk)
+  silent! %foldopen!
+  setlocal previewwindow filetype=diff buftype=nofile bufhidden=delete
+  " With :noautocmd wincmd p, the first line of the preview window would show
+  " the 'cursorline', although it's not focused. Use feedkeys() instead.
+  noautocmd call feedkeys("\<c-w>p", 'nt')
+endfunction
+
+" #undo_hunk {{{1
+function! sy#repo#undo_hunk() abort
+  if exists('b:sy') && !empty(b:sy.updated_by)
+    call sy#repo#get_diff(b:sy.updated_by, function('s:undo_hunk'))
+  endif
+endfunction
+
+function! s:undo_hunk(_sy, vcs, diff) abort
+  call sy#verbose('s:undo_hunk()', a:vcs)
+
+  let [header, hunk] = s:extract_current_hunk(a:diff)
+  if empty(hunk)
+    return
+  endif
+
+  let [_old_line, new_line, _old_count, _new_count] = sy#sign#parse_hunk(header)
+
+  for line in hunk
+    echom new_line
+    echom line
+    let op = line[0]
+    let text = line[1:]
+    if op == ' '
+      if text != getline(new_line)
+        echoerr 'Could not apply context hunk for undo. Try saving the buffer first.'
+        return
+      endif
+      let new_line += 1
+    elseif op == '-'
+      call append(new_line-1, text)
+      let new_line += 1
+    elseif op == '+'
+      if text != getline(new_line)
+        echom text
+        echom getline(new_line)
+        echoerr 'Could not apply addition hunk for undo. Try saving the buffer first.'
+        return
+      endif
+      execute new_line 'delete _'
+    else
+      echoer 'Unknown diff operation ' . line
+      return
+    endif
+  endfor
+endfunction
+
+" s:initialize_job {{{1
 function! s:initialize_job(vcs) abort
   let vcs_cmd = s:expand_cmd(a:vcs, g:signify_vcs_cmds)
   if has('win32')
@@ -361,12 +388,12 @@ function! s:initialize_job(vcs) abort
   return [cmd, options]
 endfunction
 
-" Function: s:get_vcs_path {{{1
+" s:get_vcs_path {{{1
 function! s:get_vcs_path(vcs) abort
   return (a:vcs =~# '\v(git|cvs|accurev|tfs|yadm)') ? b:sy.info.file : b:sy.info.path
 endfunction
 
-" Function: s:expand_cmd {{{1
+" s:expand_cmd {{{1
 function! s:expand_cmd(vcs, vcs_cmds) abort
   let cmd = a:vcs_cmds[a:vcs]
   let cmd = s:replace(cmd, '%f', s:get_vcs_path(a:vcs))
@@ -375,7 +402,7 @@ function! s:expand_cmd(vcs, vcs_cmds) abort
   return cmd
 endfunction
 
-" Function: s:run {{{1
+" s:run {{{1
 function! s:run(vcs)
   let [cwd, chdir] = sy#util#chdir()
   try
@@ -391,13 +418,13 @@ function! s:run(vcs)
   endtry
 endfunction
 
-" Function: s:replace {{{1
+" s:replace {{{1
 function! s:replace(cmd, pat, sub)
   let parts = split(a:cmd, a:pat, 1)
   return join(parts, a:sub)
 endfunction
 
-" Function: s:strip_context {{{1
+" s:strip_context {{{1
 function! s:strip_context(context)
   let diff = []
   let hunk = []
@@ -473,6 +500,7 @@ function! s:strip_context(context)
   endif
   return diff
 endfunction
+" 1}}}
 
 " Variables {{{1
 let s:difftool = get(g:, 'signify_difftool', 'diff')
@@ -536,6 +564,7 @@ let s:default_vcs_cmds_diffmode = {
       \ 'fossil':   'fossil cat %f',
       \ 'cvs':      'cvs up -p -- %f 2>%n',
       \ 'perforce': 'p4 print %f',
+      \ 'tfs':      'tf view -version:W -noprompt %f',
       \ }
 
 if exists('g:signify_vcs_cmds')

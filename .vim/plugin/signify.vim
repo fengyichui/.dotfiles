@@ -1,4 +1,4 @@
-" vim: et sw=2 sts=2
+" vim: et sw=2 sts=2 fdm=marker
 
 scriptencoding utf-8
 
@@ -6,11 +6,11 @@ if exists('g:loaded_signify') || !has('signs') || &compatible
   finish
 endif
 
-" Init: values {{{1
+" Variables {{{1
 let g:loaded_signify = 1
 let g:signify_locked = 0
 
-" Init: autocmds {{{1
+" Autocmds {{{1
 augroup signify
   autocmd!
 
@@ -22,8 +22,12 @@ augroup signify
 
   autocmd BufWritePost * call sy#start()
 
-  if get(g:, 'signify_realtime') && has('patch-7.4.1967')
+  if get(g:, 'signify_realtime') && (has('nvim') || has('patch-8.0.902'))
     autocmd WinEnter * call sy#start()
+    autocmd ShellCmdPost * call sy#start()
+    if exists('##VimResume')
+      autocmd VimResume * call sy#start()
+    endif
     if get(g:, 'signify_update_on_bufenter')
       autocmd BufEnter * nested call s:save()
     else
@@ -60,20 +64,20 @@ augroup signify
   endif
 augroup END
 
-" Init: commands {{{1
-
+" Commands {{{1
 command! -nargs=0 -bar       SignifyList            call sy#debug#list_active_buffers()
 command! -nargs=0 -bar       SignifyDebug           call sy#repo#debug_detection()
 command! -nargs=0 -bar -bang SignifyFold            call sy#fold#dispatch(<bang>1)
 command! -nargs=0 -bar -bang SignifyDiff            call sy#repo#diffmode(<bang>1)
-command! -nargs=0 -bar       SignifyDiffPreview     call sy#repo#preview_hunk()
+command! -nargs=0 -bar       SignifyHunkPreview     call sy#repo#preview_hunk()
+command! -nargs=0 -bar       SignifyHunkUndo        call sy#repo#undo_hunk()
 command! -nargs=0 -bar       SignifyRefresh         call sy#util#refresh_windows()
 command! -nargs=0 -bar       SignifyEnable          call sy#enable()
 command! -nargs=0 -bar       SignifyDisable         call sy#disable()
 command! -nargs=0 -bar       SignifyToggle          call sy#toggle()
 command! -nargs=0 -bar       SignifyToggleHighlight call sy#highlight#line_toggle()
 
-" Init: mappings {{{1
+" Mappings {{{1
 let s:cpoptions = &cpoptions
 set cpoptions+=B
 
@@ -106,14 +110,15 @@ xnoremap <silent> <plug>(signify-motion-outer-visual)  :<c-u>call sy#util#hunk_t
 
 let &cpoptions = s:cpoptions
 unlet s:cpoptions
+" 1}}}
 
-" Function: save {{{1
-
+" s:save {{{1
 function! s:save()
   if exists('b:sy') && b:sy.active && &modified && &modifiable && ! &readonly
     write
   endif
 endfunction
+" 1}}}
 
 if exists('#User#SignifySetup')
   doautocmd <nomodeline> User SignifySetup
