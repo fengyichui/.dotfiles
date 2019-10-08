@@ -27,12 +27,16 @@ disable_wdt
 ignore-all mon exec EnableLowPowerHandlingMode
 end
 
-define jlink-restart
-shell gdbserver-jlink --restart
+define jlink
+set $speed = "auto"
+if $argc > 0
+set $speed = $arg0
+end
+shell gdbserver-jlink --daemon --speed=$speed
 end
 
-define jlink-start
-shell gdbserver-jlink --daemon
+define jlink-restart
+shell gdbserver-jlink --restart
 end
 
 define jlink-stop

@@ -123,8 +123,10 @@ function check_jlinkgdbserver_stop_status ()
 }
 
 # check script whether is running
-if ! ps -p $(<$scriptrunningfile) >/dev/null 2>&1; then
-    rm -rf ${fileprefix}*
+if [[ -f "$scriptrunningfile" ]]; then
+    if ! ps -p $(<$scriptrunningfile) >/dev/null 2>&1; then
+        rm -rf ${fileprefix}*
+    fi
 fi
 
 # clean temp file
