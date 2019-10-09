@@ -891,6 +891,22 @@ document dump_reg_armcm
 Dump cortex-M0/M1/M3/M4 register information
 end
 
+
+define ll
+    if $argc == 0
+    set $ls = 20
+    else
+    set $ls = $arg0
+    end
+    set listsize $ls
+    list *$pc
+    set listsize 10
+end
+document ll
+Syntax: ll <listsize>
+| Like list
+end
+
 # __________________END USER COMMAND_________________
 #
 
