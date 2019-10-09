@@ -11,7 +11,7 @@ __fzfcmd() {
 __fsel() {
     (git ls-files 2>/dev/null || \
      find -L . \( -path '*/\.*' -o -fstype 'dev' -o -fstype 'proc' \) -prune -o -type f -print -o -type d -print -o -type l -print 2>/dev/null | sed 1d | cut -b3-) \
-        | $(__fzfcmd) -m | while read item; do
+        | TERM=screen-256color $(__fzfcmd) -m | while read item; do
     echo -n "${(q)item} "
   done
   echo
@@ -26,7 +26,7 @@ bindkey '^T' fzf-file-widget
 
 # CTRL-G - Paste the selected git status file path(s) into the command line
 __gsel() {
-  (git status --short ./ 2>/dev/null || echo "M NOT-A-GIT-REPOSITORY") | awk '{print $2}' | $(__fzfcmd) -m | while read item; do
+  (git status --short ./ 2>/dev/null || echo "M NOT-A-GIT-REPOSITORY") | awk '{print $2}' | TERM=screen-256color $(__fzfcmd) -m | while read item; do
     echo -n "${(q)item} "
   done
   echo
@@ -43,7 +43,7 @@ bindkey '^G' fzf-git-widget
 fzf-cd-widget() {
   local cmd="${FZF_ALT_C_COMMAND:-"command find -L . \\( -path '*/\\.*' -o -fstype 'dev' -o -fstype 'proc' \\) -prune \
     -o -type d -print 2> /dev/null | sed 1d | cut -b3-"}"
-  cd "${$(eval "$cmd" | $(__fzfcmd) +m):-.}"
+  cd "${$(eval "$cmd" | TERM=screen-256color $(__fzfcmd) +m):-.}"
   zle reset-prompt
 }
 zle     -N    fzf-cd-widget
@@ -52,7 +52,7 @@ bindkey '\ec' fzf-cd-widget
 # CTRL-R - Paste the selected command from history into the command line
 fzf-history-widget() {
   local selected num
-  selected=( $(fc -l 1 | $(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r ${=FZF_CTRL_R_OPTS} -q "${LBUFFER//$/\\$}") )
+  selected=( $(fc -l 1 | TERM=screen-256color $(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r ${=FZF_CTRL_R_OPTS} -q "${LBUFFER//$/\\$}") )
   if [ -n "$selected" ]; then
     num=$selected[1]
     if [ -n "$num" ]; then
