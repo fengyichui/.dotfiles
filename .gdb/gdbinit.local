@@ -28,11 +28,11 @@ ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink
-ignore-exceptions shell gdbserver-jlink -X --speed=10000
+shell gdbserver-jlink -X --speed=10000
 end
 
 define jlink-stop
-ignore-exceptions shell gdbserver-jlink --stop
+shell gdbserver-jlink --stop
 end
 
 define reconnect
