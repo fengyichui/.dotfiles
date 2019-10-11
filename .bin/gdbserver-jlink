@@ -73,6 +73,7 @@ function check_jlinkgdbserver_start_status ()
 {
     exerunning=0
     timeout=0
+    chkpower=0
     while true; do
         if [[ "$exerunning" == "0" ]]; then
             # check JLinkGDBServer running
@@ -86,6 +87,14 @@ function check_jlinkgdbserver_start_status ()
                     echo "OK"
                     return 0
                 fi
+                # checking power
+                if [[ "$chkpower" == "0" ]]; then
+                    chkpowernum="$(awk '/Checking target voltage/' "$jlinklogfile" | wc -l)"
+                    if (($chkpowernum>3)); then
+                        echo -n "(No Power?) "
+                        chkpower=1
+                    fi
+                fi
             fi
             # check JLinkGDBServer exit
             if [[ ! -f "$exerunningfile" ]]; then
@@ -95,9 +104,11 @@ function check_jlinkgdbserver_start_status ()
         fi
 
         # check timeout
-        if (($timeout>30)); then
-            echo "Timeout"
-            return -1
+        if [[ "$chkpower" == "0" ]]; then
+            if (($timeout>30)); then
+                echo "Timeout"
+                return -1
+            fi
         fi
 
         timeout=$(($timeout + 1))
