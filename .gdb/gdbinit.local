@@ -28,11 +28,11 @@ ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink
-shell gdbserver-jlink -X --speed=10000
+ignore-exceptions shell gdbserver-jlink -X --speed=10000
 end
 
 define jlink-stop
-shell gdbserver-jlink --stop
+ignore-exceptions shell gdbserver-jlink --stop
 end
 
 define reconnect
@@ -60,6 +60,16 @@ mon reset 1
 c
 end
 
+define rc2
+remap2flash
+# 1st-rst: halt cpu
+mon reset 1
+load
+# 2nd-rst: make MSP valid
+mon reset 1
+c
+end
+
 define rrc
 if $argc >= 1
 file
@@ -75,12 +85,6 @@ document rrc
 Syntax: rcc [1]
 | HS662x rom reset-load-continue
 | 1: do makekeil
-end
-
-define rst
-set *0=0
-set *4=0
-mon reset 2
 end
 
 # vim: ft=gdb

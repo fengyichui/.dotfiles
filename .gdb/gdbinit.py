@@ -195,6 +195,21 @@ This is primarily useful in scripts."""
         except Exception as e:
             print(e)
 
+# ignore errors and its exceptions
+class ignore_exceptions_command (gdb.Command):
+    """Execute a single command, ignoring all errors and exceptions output.
+Only one-line commands are supported.
+This is primarily useful in scripts."""
+
+    def __init__ (self):
+        super (self.__class__, self).__init__ ("ignore-exceptions", gdb.COMMAND_OBSCURE, gdb.COMPLETE_COMMAND)
+
+    def invoke (self, arg, from_tty):
+        try:
+            gdb.execute (arg, from_tty)
+        except:
+            pass
+
 # ignore all error and output
 class ignore_all_command (gdb.Command):
     """Execute a single command, ignoring all errors and output.
@@ -220,6 +235,7 @@ loop_memery_change_register()
 restore_dump_reg_register()
 restore_dump_memery_register()
 ignore_errors_command()
+ignore_exceptions_command()
 ignore_all_command()
 
 # @} #
