@@ -55,6 +55,8 @@ PATCH_MAX_SIZE           = 2 * flash_sector_size
 CHIP_HS6620             = 0x6620
 CHIP_HS6621             = 0x6621
 
+ONCE_OP_SIZE            = 32*1024
+
 ######################################################################
 # FUNCTIONS
 ######################################################################
@@ -109,7 +111,7 @@ def flash_prepare_and_show():
         flash_name_ext = 'None'
     else:
         flash_size_ext = 1 << (flash_id_ext&0xff)
-        flash_size_ext = 'Unknown'
+        flash_name_ext = 'Unknown'
     # Inside
     flash_id = int(gdb.parse_and_eval('sf_readId(0)'))
     if flash_id in flash_info_table:
@@ -187,14 +189,13 @@ def flash_download_part(part_type, file_path, is_verify=True):
     print("  Program...")
     gdb.execute('set $res=Init(0, 6000000, {})'.format(int(part_type)))
     gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
-    program_size = 32*1024
     addr = 0
     while addr < file_size:
         left = file_size - addr
-        len = left if left<program_size else program_size
+        len = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
         gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
         gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, len, buffer))
-        addr += program_size
+        addr += ONCE_OP_SIZE
     gdb.execute('set $res=UnInit({})'.format(int(part_type)))
 
     # Verify
@@ -327,12 +328,14 @@ class flash_upload_register(gdb.Command):
 
         # Read flash data
         print("  uploading... [{}]".format(flash_file))
-        read_buffer = int(gdb.parse_and_eval('m_buffer').cast(gdb.lookup_type('int')))
+        buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
         addr = 0
         while addr < flash_size:
-            gdb.execute('set $res=flash_read(m_buffer, {}, {})'.format(addr, flash_sector_size))
-            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(read_buffer, read_buffer+flash_sector_size))
-            addr += flash_sector_size
+            left = flash_size - addr
+            len = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+            gdb.execute('set $res=flash_read({}, {}, {})'.format(buffer, addr, len))
+            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+len))
+            addr += ONCE_OP_SIZE
             flash_image += open('/tmp/hs662x_upload.tmp', 'rb').read()
 
         open(flash_file, 'wb').write(flash_image)
