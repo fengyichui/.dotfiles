@@ -327,16 +327,18 @@ class flash_upload_register(gdb.Command):
             flash_file = args
 
         # Read flash data
-        print("  uploading... [{}]".format(flash_file))
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
         addr = 0
         while addr < flash_size:
+            print "  uploading... {:d}% [{}]\r".format(100*addr/flash_size, flash_file),
+            sys.stdout.flush()
             left = flash_size - addr
             len = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
             gdb.execute('set $res=flash_read({}, {}, {})'.format(buffer, addr, len))
             gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+len))
             addr += ONCE_OP_SIZE
             flash_image += open('/tmp/hs662x_upload.tmp', 'rb').read()
+        print "  uploading... {:d}% [{}]".format(100*addr/flash_size, flash_file)
 
         open(flash_file, 'wb').write(flash_image)
 
