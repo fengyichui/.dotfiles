@@ -164,6 +164,18 @@ def mem32_write(addr, value):
     gdb.execute('set *{}={}'.format(addr, value))
 
 
+def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, param=()):
+        addr = 0
+        while addr < size:
+            print "{} {:d}%\r".format(prompt, 100*addr/size),
+            sys.stdout.flush()
+            left = size - addr
+            length = left if left<once_op_size else once_op_size
+            callback(addr, length, param)
+            addr += length
+        print "{} 100%".format(prompt)
+
+
 def flash_download_part(part_type, file_path, is_verify=True):
 
     # Prepare
@@ -199,61 +211,43 @@ def flash_download_part(part_type, file_path, is_verify=True):
     buf = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
     # Erase
-    print("  Erase...")
+    print "  Erase...\r",
     gdb.execute('set $res=Init(0, 6000000, 1)')
     gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
-#    addr = 0
-#    while addr < erase_size:
-#        gdb.execute('set $res=EraseSector({})'.format(addr))
-#        addr += flash_sector_size
-    gdb.execute('set $res=EraseSectorEx({},{})'.format(0, erase_size))
+    def flash_erase_handler(addr, length, param):
+        num = (length+flash_sector_size-1) / flash_sector_size
+        gdb.execute('set $res=EraseSectorEx({},{})'.format(addr, num))
+    loop_do_show_progress("  Erase...", erase_size, flash_erase_handler, param=())
     gdb.execute('set $res=UnInit(1)')
 
     # Program
-    print("  Program...")
+    print "  Program...\r",
     gdb.execute('set $res=Init(0, 6000000, {})'.format(int(part_type)))
     gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
-    addr = 0
-    while addr < file_size:
-        left = file_size - addr
-        leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-        gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+leng), to_string=True)
-        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, leng, buf))
-        addr += ONCE_OP_SIZE
+    def flash_program_handler(addr, length, (file_path,buf)):
+        gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+length), to_string=True)
+        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, length, buf))
+    loop_do_show_progress("  Program...", file_size, flash_program_handler, param=(file_path,buf))
     gdb.execute('set $res=UnInit({})'.format(int(part_type)))
 
     # Verify
     if is_verify:
-        print("  Verify...")
+        print "  Verify...\r",
         gdb.execute('set $res=Init(0, 6000000, 3)')
         gdb.execute('set $res=ImageInfoReset({})'.format(flash_base_addr))
-        addr = 0
-        while addr < file_size:
-            left = file_size - addr
-            leng = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+leng), to_string=True)
-            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, leng, buf))
+        def flash_verify_handler(addr, length, (file_path,buf)):
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+length), to_string=True)
+            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, length, buf))
             res = int(gdb.parse_and_eval('$res').cast(gdb.lookup_type('int')))
-            if res != addr + leng:
-                raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+leng))
-            addr += flash_sector_size
+            if res != addr + length:
+                raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+length))
+        loop_do_show_progress("  Verify...", file_size, flash_verify_handler, param=(file_path,buf))
         gdb.execute('set $res=UnInit(3)')
 
     # Finish
     print("Finish")
     flash_finish()
 
-
-def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, param=()):
-        addr = 0
-        while addr < size:
-            print "{} {:d}%\r".format(prompt, 100*addr/size),
-            sys.stdout.flush()
-            left = size - addr
-            length = left if left<once_op_size else once_op_size
-            callback(addr, length, param)
-            addr += length
-        print "{} 100%".format(prompt)
 
 ######################################################################
 # CLASS
