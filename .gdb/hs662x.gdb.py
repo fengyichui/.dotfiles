@@ -165,6 +165,7 @@ def mem32_write(addr, value):
 
 
 def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, param=()):
+        before_time = time.time()
         addr = 0
         while addr < size:
             print "{} {:d}%\r".format(prompt, 100*addr/size),
@@ -173,7 +174,7 @@ def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, par
             length = left if left<once_op_size else once_op_size
             callback(addr, length, param)
             addr += length
-        print "{} 100%".format(prompt)
+        print "{} 100% ({:.1f}s)".format(prompt, time.time()-before_time)
 
 
 def flash_download_part(part_type, file_path, is_verify=True):
