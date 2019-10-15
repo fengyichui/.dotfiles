@@ -216,9 +216,9 @@ def flash_download_part(part_type, file_path, is_verify=True):
     addr = 0
     while addr < file_size:
         left = file_size - addr
-        len = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-        gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
-        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, len, buffer))
+        leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+        gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
+        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, leng, buffer))
         addr += ONCE_OP_SIZE
     gdb.execute('set $res=UnInit({})'.format(int(part_type)))
 
@@ -230,12 +230,12 @@ def flash_download_part(part_type, file_path, is_verify=True):
         addr = 0
         while addr < file_size:
             left = file_size - addr
-            len = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+len), to_string=True)
-            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, len, buffer))
+            leng = left if left<flash_sector_size else flash_sector_size
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
+            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, leng, buffer))
             res = int(gdb.parse_and_eval('$res').cast(gdb.lookup_type('int')))
-            if res != addr + len:
-                raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+len))
+            if res != addr + leng:
+                raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+leng))
             addr += flash_sector_size
         gdb.execute('set $res=UnInit(3)')
 
@@ -331,6 +331,7 @@ class device_info_register(gdb.Command):
 class flash_upload_register(gdb.Command):
 
     """HS662x upload from flash
+    Usage: flash_upload <flash_image.bin>
     """
 
     def __init__(self):
@@ -350,19 +351,22 @@ class flash_upload_register(gdb.Command):
         else:
             flash_file = args
 
-        # Read flash data
+        # get buffer
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+
+        # Read
         addr = 0
-        while addr < flash_size:
-            print "  uploading... {:d}% [{}]\r".format(100*addr/flash_size, flash_file),
+        size = flash_size
+        while addr < size:
+            print "  Upload... {:d}% [{}]\r".format(100*addr/size, flash_file),
             sys.stdout.flush()
-            left = flash_size - addr
-            len = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-            gdb.execute('set $res=flash_read({}, {}, {})'.format(buffer, addr, len))
-            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+len))
+            left = size - addr
+            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+            gdb.execute('set $res=flash_read({}, {}, {})'.format(buffer, addr, leng))
+            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+leng))
             addr += ONCE_OP_SIZE
             flash_image += open('/tmp/hs662x_upload.tmp', 'rb').read()
-        print "  uploading... 100% [{}]".format(flash_file)
+        print "  Upload... 100% [{}]".format(flash_file)
 
         open(flash_file, 'wb').write(flash_image)
 
@@ -375,6 +379,7 @@ class flash_upload_register(gdb.Command):
 class flash_download_image_register(gdb.Command):
 
     """HS662x download ALL image to flash
+    Usage: flash_download_image <flash_image.bin> <flash_addr>
     """
 
     def __init__(self):
@@ -406,19 +411,76 @@ class flash_download_image_register(gdb.Command):
         buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
         # Erase
-        print("  Erase...")
-        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(flash_addr, file_size)) # last is CPFT data
+        addr = 0
+        size = file_size
+        while addr < size:
+            print "  Erase... {:d}%\r".format(100*addr/size),
+            sys.stdout.flush()
+            left = size - addr
+            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(flash_addr+addr, leng)) # last is CPFT data
+            addr += leng
+        print "  Erase... 100%"
 
         # Program
-        print("  Program...")
-        i = 0
-        while flash_addr < flash_addr_end:
-            left = file_size - i
-            len = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-i, i, i+len), to_string=True)
-            gdb.execute('set $res=flash_write({}, {}, {})'.format(flash_addr, buffer, len))
-            i += flash_sector_size
-            flash_addr += flash_sector_size
+        addr = 0
+        size = file_size
+        while addr < size:
+            print "  Program... {:d}%\r".format(100*addr/size),
+            sys.stdout.flush()
+            left = size - addr
+            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
+            gdb.execute('set $res=flash_write({}, {}, {})'.format(flash_addr+addr, buffer, leng))
+            addr += leng
+        print "  Program... 100%"
+
+        # Finish
+        print("Finish")
+        flash_finish()
+
+
+# erase
+class flash_erase_register(gdb.Command):
+
+    """HS662x flash erase
+    flash_erase <begin_kB> <length_kB>
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("flash_erase", gdb.COMMAND_USER)
+
+    def invoke(self, args, from_tty):
+
+        # Prepare
+        flash_prepare_and_show()
+
+        # param
+        argv = gdb.string_to_argv(args)
+        if len(argv) == 0:
+            begin = 0
+            length = flash_size - flash_sector_size # last is CPFT data
+        elif len(argv) == 2:
+            begin = int(argv[0]) * 1024
+            length = int(argv[1]) * 1024
+        else:
+            raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
+
+        # Info
+        print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
+
+        # Erase
+        addr = 0
+        size = length
+        while addr < size:
+            print "  Erase... {:d}%\r".format(100*addr/size),
+            sys.stdout.flush()
+            left = size - addr
+            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
+            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin+addr, leng)) # last is CPFT data
+            addr += leng
+        print "  Erase... 100%"
+
 
         # Finish
         print("Finish")
@@ -506,43 +568,6 @@ class flash_download_patch_register(gdb.Command):
         # Download
         flash_download_part(FLASH_PART_PATCH, file_path)
 
-
-# erase
-class flash_erase_register(gdb.Command):
-
-    """HS662x flash erase
-    flash_erase <begin_kB> <length_kB>
-    """
-
-    def __init__(self):
-        super(self.__class__, self).__init__("flash_erase", gdb.COMMAND_USER)
-
-    def invoke(self, args, from_tty):
-
-        # Prepare
-        flash_prepare_and_show()
-
-        # param
-        argv = gdb.string_to_argv(args)
-        if len(argv) == 0:
-            begin = 0
-            length = flash_size - flash_sector_size # last is CPFT data
-        elif len(argv) == 2:
-            begin = int(argv[0]) * 1024
-            length = int(argv[1]) * 1024
-        else:
-            raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
-
-        # Info
-        print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
-
-        # Erase
-        print("  Erase...")
-        gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin, length))
-
-        # Finish
-        print("Finish")
-        flash_finish()
 
 # issue reappear
 class issue_reappear_register(gdb.Command):
