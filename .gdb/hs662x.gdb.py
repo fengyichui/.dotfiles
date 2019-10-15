@@ -196,7 +196,7 @@ def flash_download_part(part_type, file_path, is_verify=True):
     print('{}: {:.1f}kB (0x{:08X} in flash)'.format(file_path, file_size/1024.0, flash_base_addr))
 
     # get buffer
-    buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+    buf = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
     # Erase
     print("  Erase...")
@@ -217,8 +217,8 @@ def flash_download_part(part_type, file_path, is_verify=True):
     while addr < file_size:
         left = file_size - addr
         leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-        gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
-        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, leng, buffer))
+        gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+leng), to_string=True)
+        gdb.execute('set $res=ProgramPage({}, {}, {})'.format(addr, leng, buf))
         addr += ONCE_OP_SIZE
     gdb.execute('set $res=UnInit({})'.format(int(part_type)))
 
@@ -231,8 +231,8 @@ def flash_download_part(part_type, file_path, is_verify=True):
         while addr < file_size:
             left = file_size - addr
             leng = left if left<flash_sector_size else flash_sector_size
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
-            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, leng, buffer))
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+leng), to_string=True)
+            gdb.execute('set $res=Verify({}, {}, {})'.format(addr, leng, buf))
             res = int(gdb.parse_and_eval('$res').cast(gdb.lookup_type('int')))
             if res != addr + leng:
                 raise gdb.GdbError('  Verify FAIL: 0x{:08X}!=0x{:08X}'.format(res, addr+leng))
@@ -243,6 +243,17 @@ def flash_download_part(part_type, file_path, is_verify=True):
     print("Finish")
     flash_finish()
 
+
+def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, param=()):
+        addr = 0
+        while addr < size:
+            print "{} {:d}%\r".format(prompt, 100*addr/size),
+            sys.stdout.flush()
+            left = size - addr
+            length = left if left<once_op_size else once_op_size
+            callback(addr, length, param)
+            addr += length
+        print "{} 100%".format(prompt)
 
 ######################################################################
 # CLASS
@@ -343,7 +354,7 @@ class flash_upload_register(gdb.Command):
         flash_prepare_and_show()
 
         # flash image data
-        flash_image = b''
+        flash_image = [b'']
 
         # Get file name
         if args == '':
@@ -351,24 +362,17 @@ class flash_upload_register(gdb.Command):
         else:
             flash_file = args
 
-        # get buffer
-        buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+        # get buf
+        buf = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
         # Read
-        addr = 0
-        size = flash_size
-        while addr < size:
-            print "  Upload... {:d}% [{}]\r".format(100*addr/size, flash_file),
-            sys.stdout.flush()
-            left = size - addr
-            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-            gdb.execute('set $res=flash_read({}, {}, {})'.format(buffer, addr, leng))
-            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+leng))
-            addr += ONCE_OP_SIZE
-            flash_image += open('/tmp/hs662x_upload.tmp', 'rb').read()
-        print "  Upload... 100% [{}]".format(flash_file)
+        def flash_read_handler(addr, length, (buf, flash_image)):
+            gdb.execute('set $res=flash_read({}, {}, {})'.format(buf, addr, length))
+            gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buf, buf+length))
+            flash_image[0] += open('/tmp/hs662x_upload.tmp', 'rb').read()
+        loop_do_show_progress("  Upload...", flash_size, flash_read_handler, param=(buf,flash_image))
 
-        open(flash_file, 'wb').write(flash_image)
+        open(flash_file, 'wb').write(flash_image[0])
 
         # Finish
         print("Finish")
@@ -408,32 +412,18 @@ class flash_download_image_register(gdb.Command):
         print('{}: {}kB -> 0x{:X}'.format(file_path, file_size/1024, flash_addr))
 
         # get buffer
-        buffer = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
+        buf = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
 
         # Erase
-        addr = 0
-        size = file_size
-        while addr < size:
-            print "  Erase... {:d}%\r".format(100*addr/size),
-            sys.stdout.flush()
-            left = size - addr
-            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(flash_addr+addr, leng)) # last is CPFT data
-            addr += leng
-        print "  Erase... 100%"
+        def flash_erase_handler(addr, length, (flash_addr)):
+            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(flash_addr+addr, length))
+        loop_do_show_progress("  Erase...", file_size, flash_erase_handler, param=(flash_addr))
 
         # Program
-        addr = 0
-        size = file_size
-        while addr < size:
-            print "  Program... {:d}%\r".format(100*addr/size),
-            sys.stdout.flush()
-            left = size - addr
-            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-            gdb.execute('restore {} binary {} {} {}'.format(file_path, buffer-addr, addr, addr+leng), to_string=True)
-            gdb.execute('set $res=flash_write({}, {}, {})'.format(flash_addr+addr, buffer, leng))
-            addr += leng
-        print "  Program... 100%"
+        def flash_program_handler(addr, length, (file_path, flash_addr, buf)):
+            gdb.execute('restore {} binary {} {} {}'.format(file_path, buf-addr, addr, addr+length), to_string=True)
+            gdb.execute('set $res=flash_write({}, {}, {})'.format(flash_addr+addr, buf, length))
+        loop_do_show_progress("  Program...", file_size, flash_program_handler, param=(file_path,flash_addr,buf))
 
         # Finish
         print("Finish")
@@ -470,17 +460,9 @@ class flash_erase_register(gdb.Command):
         print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
 
         # Erase
-        addr = 0
-        size = length
-        while addr < size:
-            print "  Erase... {:d}%\r".format(100*addr/size),
-            sys.stdout.flush()
-            left = size - addr
-            leng = left if left<ONCE_OP_SIZE else ONCE_OP_SIZE
-            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin+addr, leng)) # last is CPFT data
-            addr += leng
-        print "  Erase... 100%"
-
+        def flash_erase_handler(addr, length, (begin)):
+            gdb.execute('set $res=flash_erase({}, {}, 0)'.format(begin+addr, length))
+        loop_do_show_progress("  Erase...", length, flash_erase_handler, param=(begin))
 
         # Finish
         print("Finish")
