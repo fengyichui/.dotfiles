@@ -87,6 +87,10 @@ function check_jlinkgdbserver_start_status ()
                     echo "OK"
                     return 0
                 fi
+                if grep -q 'Failed to open listener port' "$jlinklogfile"; then
+                    echo "FAIL (Can't open listener port)"
+                    return -1
+                fi
                 # checking power
                 if [[ "$chkpower" == "0" ]]; then
                     chkpowernum="$(awk '/Checking target voltage/' "$jlinklogfile" | wc -l)"
