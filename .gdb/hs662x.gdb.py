@@ -24,20 +24,40 @@ flash_size = 1024*512
 flash_sector_size = 1024*4
 debug_file = ''
 
-flash_info_table = {
-    0x504013: {'size': 512*1024,  'name': "XD25D40"},
-    0x514013: {'size': 512*1024,  'name': "MD25D40"},
-    0x514014: {'size': 1024*1024, 'name': "MD25D80"},
-    0xC84015: {'size': 2048*1024, 'name': "GD25Q16B"},
-    0xC84016: {'size': 4096*1024, 'name': "GD25Q32B"},
-    0xEF4015: {'size': 2048*1024, 'name': "W25Q16B"},
-    0xE04013: {'size': 512*1024,  'name': "BY25Q40A"},
-    0xE04014: {'size': 1024*1024, 'name': "PN25F08"},
-    0x5E4014: {'size': 1024*1024, 'name': "PN25F08B"},
-    0x1C3113: {'size': 512*1024,  'name': "PN25F04C"},
-    0x684013: {'size': 512*1024,  'name': "BY25D40"},
-    0x856013: {'size': 512*1024,  'name': "P25R40H"},
-    0x856014: {'size': 1024*1024, 'name': "P25R80H"},
+flash_vendor_table = {
+    0x85: 'PUYA',            # Puya
+    0xE0: 'BOYA_0',          # Boya
+    0x68: 'BOYA_1',          # Boya
+    0x52: 'ALLIANCE',        # Alliance Semiconductor
+    0x01: 'AMD',             # AMD
+    0x37: 'AMIC',            # AMIC
+    0x1F: 'ATMEL',           # Atmel (now used by Adesto)
+    0xAD: 'BRIGHT',          # Bright Microelectronics
+    0x31: 'CATALYST',        # Catalyst
+    0x8C: 'ESMT',            # Elite Semiconductor Memory Technology (ESMT) / EFST Elite Flash Storage
+    0x1C: 'EON',             # EON, missing 0x7F prefix
+    0x4A: 'EXCEL',           # ESI, missing 0x7F prefix
+    0xF8: 'FIDELIX',         # Fidelix
+    0x04: 'FUJITSU',         # Fujitsu
+    0xC8: 'GIGADEVICE',      # GigaDevice
+    0x50: 'GIGADEVICE_XD',   # GigaDevice
+    0x51: 'GIGADEVICE_MD',   # GigaDevice
+    0xAD: 'HYUNDAI',         # Hyundai
+    0x1F: 'IMT',             # Integrated Memory Technologies
+    0x89: 'INTEL',           # Intel
+    0xD5: 'ISSI',            # ISSI Integrated Silicon Solutions, see also PMC
+    0xC2: 'MACRONIX',        # Macronix (MX)
+    0xD5: 'NANTRONICS',      # Nantronics, missing prefix
+    0x9D: 'PMC',             # PMC, missing 0x7F prefix
+    0x62: 'SANYO',           # Sanyo
+    0xB0: 'SHARP',           # Sharp
+    0x01: 'SPANSION',        # Spansion, same ID as AMD
+    0xBF: 'SST',             # SST
+    0x20: 'ST',              # ST / SGS/Thomson / Numonyx (later acquired by Micron)
+    0x40: 'SYNCMOS_MVC',     # SyncMOS (SM) and Mosel Vitelic Corporation (MVC)
+    0x97: 'TI',              # Texas Instruments
+    0xEF: 'WINBOND_NEX',     # Winbond (ex Nexcom) serial flashes
+    0xDA: 'WINBOND',         # Winbond
 }
 
 FLASH_PART_APP           = 2
@@ -103,28 +123,32 @@ def flash_prepare_and_show():
     global flash_size
     # Ext
     flash_id_ext = int(gdb.parse_and_eval('sf_readId(1)'))
-    if flash_id_ext in flash_info_table:
-        flash_size_ext = flash_info_table[flash_id_ext]['size']
-        flash_name_ext = flash_info_table[flash_id_ext]['name']
-    elif flash_id_ext==0x0 or flash_id_ext==0xFFFFFF:
+    if flash_id_ext==0x0 or flash_id_ext==0xFFFFFF:
         flash_size_ext = 0
-        flash_name_ext = 'None'
+        flash_vendor_ext = 'None'
     else:
-        flash_size_ext = 1 << (flash_id_ext&0xff)
-        flash_name_ext = 'Unknown'
+        flash_vendor_id_ext = (flash_id_ext >> 16) & 0xff
+        flash_size_id_ext   = (flash_id_ext >> 0 ) & 0xff
+        flash_size_ext = 1 << flash_size_id_ext
+        if flash_vendor_id_ext in flash_vendor_table:
+            flash_vendor_ext = flash_vendor_table[flash_vendor_id_ext]
+        else:
+            flash_vendor_ext = 'Unknown'
     # Inside
     flash_id = int(gdb.parse_and_eval('sf_readId(0)'))
-    if flash_id in flash_info_table:
-        flash_size = flash_info_table[flash_id]['size']
-        flash_name = flash_info_table[flash_id]['name']
-    elif flash_id==0x0 or flash_id==0xFFFFFF:
+    if flash_id==0x0 or flash_id==0xFFFFFF:
         flash_size = 0
-        flash_name = 'None'
+        flash_vendor = 'None'
     else:
-        flash_size = 1 << (flash_id&0xff)
-        flash_name = 'Unknown'
-    print('Flash: {} {}KB (0x{:06X})'.format(flash_name, flash_size/1024, flash_id))
-    print('FlashExt: {} {}KB (0x{:06X})'.format(flash_name_ext, flash_size_ext/1024, flash_id_ext))
+        flash_vendor_id = (flash_id >> 16) & 0xff
+        flash_size_id   = (flash_id >> 0 ) & 0xff
+        flash_size = 1 << flash_size_id
+        if flash_vendor_id in flash_vendor_table:
+            flash_vendor = flash_vendor_table[flash_vendor_id]
+        else:
+            flash_vendor = 'Unknown'
+    print('Flash: {} {}KB (0x{:06X})'.format(flash_vendor, flash_size/1024, flash_id))
+    print('FlashExt: {} {}KB (0x{:06X})'.format(flash_vendor_ext, flash_size_ext/1024, flash_id_ext))
 
     if flash_size==0 and flash_size_ext==0:
         flash_finish()
@@ -338,7 +362,7 @@ class flash_upload_register(gdb.Command):
             gdb.execute('dump memory /tmp/hs662x_upload.tmp {} {}'.format(buffer, buffer+len))
             addr += ONCE_OP_SIZE
             flash_image += open('/tmp/hs662x_upload.tmp', 'rb').read()
-        print "  uploading... {:d}% [{}]".format(100*addr/flash_size, flash_file)
+        print "  uploading... 100% [{}]".format(flash_file)
 
         open(flash_file, 'wb').write(flash_image)
 
