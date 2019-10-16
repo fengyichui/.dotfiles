@@ -640,7 +640,7 @@ class issue_reappear_register(gdb.Command):
         print(  "--------")
         for i in range(13):
             try:
-                print('r{}\t"{}"'.format(i, gdb.parse_and_eval('(char *)$r{}'.format(i)).string()))
+                print('r{}\t{}'.format(i, gdb.parse_and_eval('(char *)$r{}'.format(i))))
             except:
                 pass
 
