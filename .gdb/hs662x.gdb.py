@@ -636,21 +636,13 @@ class issue_reappear_register(gdb.Command):
         print(  "-----------")
         gdb.execute('x/16i $pc-16')
 
-        print("\nRegister")
+        print("\nRegister String")
         print(  "--------")
-        print("r0    {}".format(gdb.parse_and_eval('(char *)$r0')))
-        print("r1    {}".format(gdb.parse_and_eval('(char *)$r1')))
-        print("r2    {}".format(gdb.parse_and_eval('(char *)$r2')))
-        print("r3    {}".format(gdb.parse_and_eval('(char *)$r3')))
-        print("r4    {}".format(gdb.parse_and_eval('(char *)$r4')))
-        print("r5    {}".format(gdb.parse_and_eval('(char *)$r5')))
-        print("r6    {}".format(gdb.parse_and_eval('(char *)$r6')))
-        print("r7    {}".format(gdb.parse_and_eval('(char *)$r7')))
-        print("r8    {}".format(gdb.parse_and_eval('(char *)$r8')))
-        print("r9    {}".format(gdb.parse_and_eval('(char *)$r9')))
-        print("r10   {}".format(gdb.parse_and_eval('(char *)$r10')))
-        print("r11   {}".format(gdb.parse_and_eval('(char *)$r11')))
-        print("r12   {}".format(gdb.parse_and_eval('(char *)$r12')))
+        for i in range(13):
+            try:
+                print('r{}\t"{}"'.format(i, gdb.parse_and_eval('(char *)$r{}'.format(i)).string()))
+            except:
+                pass
 
         print("\nBacktrace")
         print(  "---------")
