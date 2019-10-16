@@ -98,6 +98,12 @@ alias men='tldr'
 #             Function              #
 #####################################
 
+# workaround windows exe output
+winexe ()
+{
+    $@ | iconv -f GBK -t UTF8 | tr -d '\r'
+}
+
 # translate
 translate ()
 {
@@ -515,6 +521,47 @@ explainshell ()
 {
     chrome 'https://www.explainshell.com/explain?cmd='$(urlencode "$1") &!
 }
+
+# net info from port or exe name
+net-port ()
+{
+    _port=$1
+    _nets=$(winexe netstat -aon | awk "\$2 ~ /:$_port\$/")
+    if [[ -n "$_nets" ]]; then
+        tasklists=$(winexe tasklist)
+        while read _net; do
+            _proto=$(awk '{print $1}' <<< $_net)
+            _localaddr=$(awk '{print $2}' <<< $_net)
+            _foreignaddr=$(awk '{print $3}' <<< $_net)
+            _state=$(awk '{print $4}' <<< $_net)
+            _pid=$(awk '{print $NF}' <<< $_net)
+            _exe=$(awk "/\<$_pid\>/{print \$1}" <<< $tasklists)
+            echo "$_exe($_pid): $_proto $_localaddr → $_foreignaddr $_state"
+        done <<<$_nets
+    fi
+}
+net-exe ()
+{
+    _exe=$1
+    _pids=$(winexe tasklist | awk "/\<$_exe\>/{print \$2}")
+    if [[ -n "$_pids" ]]; then
+        _netstats=$(winexe netstat -aon)
+        while read _pid; do
+            _nets="$(awk "\$NF ~ /^$_pid\$/" <<< $_netstats)"
+            if [[ -n "$_nets" ]]; then
+                while read _net; do
+                    _proto=$(awk '{print $1}' <<< $_net)
+                    _localaddr=$(awk '{print $2}' <<< $_net)
+                    _foreignaddr=$(awk '{print $3}' <<< $_net)
+                    _state=$(awk '{print $4}' <<< $_net)
+                    [[ "$_state" == "$_pid" ]] && _state=""
+                    echo "$_exe($_pid): $_proto $_localaddr → $_foreignaddr $_state"
+                done <<<$_nets
+            fi
+        done <<<$_pids
+    fi
+}
+
 
 #####################################
 #             Export                #
