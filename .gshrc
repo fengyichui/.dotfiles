@@ -523,45 +523,50 @@ explainshell ()
 }
 
 # net info from port or exe name
-net-port ()
+netinfo ()
 {
-    _port=$1
-    _nets=$(winexe netstat -aon | awk "\$2 ~ /:$_port\$/")
-    if [[ -n "$_nets" ]]; then
-        tasklists=$(winexe tasklist)
-        while read _net; do
-            _proto=$(awk '{print $1}' <<< $_net)
-            _localaddr=$(awk '{print $2}' <<< $_net)
-            _foreignaddr=$(awk '{print $3}' <<< $_net)
-            _state=$(awk '{print $4}' <<< $_net)
-            _pid=$(awk '{print $NF}' <<< $_net)
-            _exe=$(awk "/\<$_pid\>/{print \$1}" <<< $tasklists)
-            echo "$_exe($_pid): $_proto $_localaddr → $_foreignaddr $_state"
-        done <<<$_nets
-    fi
-}
-net-exe ()
-{
-    _exe=$1
-    _pids=$(winexe tasklist | awk "/\<$_exe\>/{print \$2}")
-    if [[ -n "$_pids" ]]; then
+    if [[ -n "$1" ]]; then
+        _tasklists=$(winexe tasklist)
         _netstats=$(winexe netstat -aon)
-        while read _pid; do
-            _nets="$(awk "\$NF ~ /^$_pid\$/" <<< $_netstats)"
+        if [[ "$(awk '/^[0-9]+$/' <<< $1)" == "$1" ]]; then
+            # check local port
+            _port=$1
+            _nets=$(awk "\$2 ~ /:$_port\$/" <<< $_netstats)
             if [[ -n "$_nets" ]]; then
                 while read _net; do
                     _proto=$(awk '{print $1}' <<< $_net)
                     _localaddr=$(awk '{print $2}' <<< $_net)
                     _foreignaddr=$(awk '{print $3}' <<< $_net)
                     _state=$(awk '{print $4}' <<< $_net)
-                    [[ "$_state" == "$_pid" ]] && _state=""
+                    _pid=$(awk '{print $NF}' <<< $_net)
+                    _exe=$(awk "/\<$_pid\>/{print \$1}" <<< $_tasklists)
                     echo "$_exe($_pid): $_proto $_localaddr → $_foreignaddr $_state"
                 done <<<$_nets
             fi
-        done <<<$_pids
+        else
+            # check exe name
+            _exe=$1
+            _pids=$(awk "/\<$_exe\>/{print \$2}" <<< $_tasklists)
+            if [[ -n "$_pids" ]]; then
+                while read _pid; do
+                    _nets="$(awk "\$NF ~ /^$_pid\$/" <<< $_netstats)"
+                    if [[ -n "$_nets" ]]; then
+                        while read _net; do
+                            _proto=$(awk '{print $1}' <<< $_net)
+                            _localaddr=$(awk '{print $2}' <<< $_net)
+                            _foreignaddr=$(awk '{print $3}' <<< $_net)
+                            _state=$(awk '{print $4}' <<< $_net)
+                            [[ "$_state" == "$_pid" ]] && _state=""
+                            echo "$_exe($_pid): $_proto $_localaddr → $_foreignaddr $_state"
+                        done <<<$_nets
+                    fi
+                done <<<$_pids
+            fi
+        fi
+    else
+        echo "Usage: netinfo <local-port> <exe-name>"
     fi
 }
-
 
 #####################################
 #             Export                #
