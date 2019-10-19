@@ -58,6 +58,7 @@ flash_vendor_table = {
     0x97: 'TI',              # Texas Instruments
     0xEF: 'WINBOND_NEX',     # Winbond (ex Nexcom) serial flashes
     0xDA: 'WINBOND',         # Winbond
+    0x0B: 'XTX',             # http://www.xtxtech.com/
 }
 
 FLASH_PART_APP           = 2
