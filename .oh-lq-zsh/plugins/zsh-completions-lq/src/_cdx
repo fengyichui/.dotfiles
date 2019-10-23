@@ -3,7 +3,7 @@
 function __cdx_dirs ()
 {
   if [[ -f ~/.cdx ]]; then
-    _wanted files expl "files" compadd -Q -- $(cat ~/.cdx)
+    _wanted files expl "files" compadd -Q -- $(grep -v '^\s*#' ~/.cdx)
   fi
 }
 
