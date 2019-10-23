@@ -98,6 +98,12 @@ alias men='tldr'
 #             Function              #
 #####################################
 
+# cdx for ~/.cdx complletions
+cdx ()
+{
+    cd $@
+}
+
 # workaround windows exe output
 winexe ()
 {
