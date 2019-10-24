@@ -565,6 +565,12 @@ netinfo ()
         fi
     else
         echo "Usage: netinfo <local-port> <exe-name>"
+        winexe netsh interface ipv4 show excludedportrange protocol=tcp
+        echo "Excluded port may be is excluded by Hyper-V"
+        echo "Try:"
+        echo "  $ dism.exe /Online /Disable-Feature:Microsoft-Hyper-V (which will required a couple of restarts)"
+        echo "  $ netsh int ipv4 add excludedportrange protocol=tcp startport=$_port numberofports=1"
+        echo "  $ dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All (which will required a couple of restarts)"
     fi
 }
 
