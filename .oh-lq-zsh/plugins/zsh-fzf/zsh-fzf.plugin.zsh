@@ -66,7 +66,7 @@ bindkey '^R' fzf-history-widget
 
 # CTRL-X - favorite in ~/.f
 __favorite() {
-  (grep -v '^\s*#' ~/.f 2>/dev/null || echo "# No '~/.f' file") | $(__fzfcmd) -m | while read item; do
+  (grep -v '^\s*#\|^\s*$' ~/.f 2>/dev/null || echo "# No '~/.f' file") | $(__fzfcmd) -m | while read item; do
     echo -n "${item} "
   done
   echo
