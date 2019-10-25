@@ -1,0 +1,19 @@
+#compdef cdf
+
+function __cd_favorite ()
+{
+  if [[ -f ~/.f ]]; then
+    _wanted files expl "files" compadd -Q -- $(grep -v '^\s*#\|^\s*$' ~/.f)
+  fi
+}
+
+_arguments -C \
+  ': :__cd_favorite'
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et

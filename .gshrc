@@ -98,6 +98,12 @@ alias men='tldr'
 #             Function              #
 #####################################
 
+# cdf for ~/.f complletions
+cdf ()
+{
+    cd $@
+}
+
 # workaround windows exe output
 winexe ()
 {
