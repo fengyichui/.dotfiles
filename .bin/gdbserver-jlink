@@ -87,10 +87,6 @@ function check_jlinkgdbserver_start_status ()
                     echo "OK"
                     return 0
                 fi
-                if grep -q 'Failed to open listener port' "$jlinklogfile"; then
-                    echo "FAIL (Can't open listener port)"
-                    return -1
-                fi
                 # checking power
                 if [[ "$chkpower" == "0" ]]; then
                     chkpowernum="$(awk '/Checking target voltage/' "$jlinklogfile" | wc -l)"
@@ -102,6 +98,17 @@ function check_jlinkgdbserver_start_status ()
             fi
             # check JLinkGDBServer exit
             if [[ ! -f "$exerunningfile" ]]; then
+                # check exit reason
+                if [[ -f "$jlinklogfile" ]]; then
+                    if grep -q 'Failed to open listener port' "$jlinklogfile"; then
+                        echo "FAIL (Can't open listener port)"
+                        return -1
+                    fi
+                    if grep -q 'Could not connect to J-Link' "$jlinklogfile"; then
+                        echo "FAIL (No J-link)"
+                        return -1
+                    fi
+                fi
                 echo "FAIL"
                 return -1
             fi
@@ -138,6 +145,22 @@ function check_jlinkgdbserver_stop_status ()
         timeout=$(($timeout + 1))
         sleep 0.2
     done
+}
+
+function check_jlinkgdbserver_exit_code ()
+{
+    declare -A jlinkgdbserver_exit_codes_table
+    jlinkgdbserver_exit_codes_table=(
+        [0]="No error" \
+        [-1]="Unknown error" \
+        [-2]="Failed to open listener port" \
+        [-3]="Could not connect to target" \
+        [-4]="Failed to accept a connection from GDB" \
+        [-5]="Failed to parse the command line options" \
+        [-6]="Unknown or no device name set" \
+        [-7]="Failed to connect to J-Link" \
+    )
+    echo ${jlinkgdbserver_exit_codes_table[$1]}
 }
 
 # check script whether is running
@@ -235,7 +258,7 @@ function cleanexit ()
 }
 
 # run
-( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile | tee $jlinklogfile &
+( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile 2>&1 | tee $jlinklogfile &
 jlinkpid=$(<$jlinkpidfile)
 touch "$exerunningfile"
 
@@ -259,7 +282,7 @@ while true; do
         fi
 
         # restart
-        ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile | tee $jlinklogfile &
+        ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile 2>&1 | tee $jlinklogfile &
         jlinkpid=$(<$jlinkpidfile)
         touch "$exerunningfile"
     fi
