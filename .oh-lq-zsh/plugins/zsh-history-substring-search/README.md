@@ -17,6 +17,27 @@ Requirements
 
 * [ZSH](http://zsh.sourceforge.net) 4.3 or newer
 
+Install
+------------------------------------------------------------------------------
+
+Using the [Homebrew]( https://brew.sh ) package manager:
+
+    brew install zsh-history-substring-search
+    echo 'source /usr/local/share/zsh-history-substring-search/zsh-history-substring-search.zsh' >> ~/.zshrc
+
+Using [Oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh):
+
+1. Clone this repository in oh-my-zsh's plugins directory:
+
+        git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
+
+2. Activate the plugin in `~/.zshrc`:
+
+        plugins=( [plugins...] history-substring-search)
+
+3. Source `~/.zshrc`  to take changes into account:
+
+        source ~/.zshrc
 
 Usage
 ------------------------------------------------------------------------------
@@ -35,24 +56,32 @@ Usage
 
     Users typically bind their UP and DOWN arrow keys to this script, thus:
     * Run `cat -v` in your favorite terminal emulator to observe key codes.
+      (**NOTE:** In some cases, `cat -v` shows the wrong key codes.  If the
+      key codes shown by `cat -v` don't work for you, press `<C-v><UP>` and
+      `<C-v><DOWN>` at your ZSH command line prompt for correct key codes.)
     * Press the UP arrow key and observe what is printed in your terminal.
     * Press the DOWN arrow key and observe what is printed in your terminal.
     * Press the Control and C keys simultaneously to terminate the `cat -v`.
     * Use your observations from the previous steps to create key bindings.
       For example, if you observed `^[[A` for UP and `^[[B` for DOWN, then:
 
-            bindkey '^[[A' history-substring-search-up
-            bindkey '^[[B' history-substring-search-down
+          bindkey '^[[A' history-substring-search-up
+          bindkey '^[[B' history-substring-search-down
 
-    You might also want to bind the Control-P/N keys for use in EMACS mode:
+      However, if the observed values don't work, you can try using terminfo:
 
-        bindkey -M emacs '^P' history-substring-search-up
-        bindkey -M emacs '^N' history-substring-search-down
+          bindkey "$terminfo[kcuu1]" history-substring-search-up
+          bindkey "$terminfo[kcud1]" history-substring-search-down
 
-    You might also want to bind the `k` and `j` keys for use in VI mode:
+      You might also want to bind the Control-P/N keys for use in EMACS mode:
 
-        bindkey -M vicmd 'k' history-substring-search-up
-        bindkey -M vicmd 'j' history-substring-search-down
+          bindkey -M emacs '^P' history-substring-search-up
+          bindkey -M emacs '^N' history-substring-search-down
+
+      You might also want to bind the `k` and `j` keys for use in VI mode:
+
+          bindkey -M vicmd 'k' history-substring-search-up
+          bindkey -M vicmd 'j' history-substring-search-down
 
 3.  Type any part of any previous command and then:
 
@@ -106,6 +135,11 @@ default values only after having loaded this script into your ZSH session.
   causes this script to perform a case-insensitive search. See the "Globbing
   Flags" section in the zshexpn(1) man page to learn about the kinds of
   values you may assign to this variable.
+
+* `HISTORY_SUBSTRING_SEARCH_FUZZY` is a global variable that defines
+  how the command history will be searched for your query. If set to a non-empty
+  value, causes this script to perform a fuzzy search by words, matching in
+  given order e.g. `ab c` will match `*ab*c*`
 
 * `HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE` is a global variable that defines
   whether all search results returned are _unique_. If set to a non-empty
