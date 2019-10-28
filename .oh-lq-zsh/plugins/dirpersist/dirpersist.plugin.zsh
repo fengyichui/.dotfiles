@@ -10,7 +10,8 @@ typeset -gaU PERSISTENT_DIRSTACK
 if [[ -f ${DIRSTACKFILE} ]] && [[ ${#dirstack[*]} -eq 0 ]] ; then
   # Enabling NULL_GLOB via (N) weeds out any non-existing
   # directories from the saved dir-stack file.
-  dirstack=( ${(f)"$(< $DIRSTACKFILE)"}(N) )
+#  dirstack=( ${(f)"$(< $DIRSTACKFILE)"}(N) )
+  dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
   # save
   PERSISTENT_DIRSTACK=( "${dirstack[@]}" )
   # "cd -" won't work after login by just setting $OLDPWD, so
@@ -23,6 +24,6 @@ function chpwd_dirpersist ()
   (( $DIRSTACKSIZE <= 0 )) && return
   [[ -z $DIRSTACKFILE ]] && return
   [[ $PWD == $HOME ]] && return # remove HOME dir
-  PERSISTENT_DIRSTACK=( $PWD "${(@)PERSISTENT_DIRSTACK[1,$DIRSTACKSIZE]}" )
+  PERSISTENT_DIRSTACK=( $PWD "${(@)PERSISTENT_DIRSTACK[1,$DIRSTACKSIZE-1]}" )
   builtin print -l ${PERSISTENT_DIRSTACK} >! ${DIRSTACKFILE}
 }
