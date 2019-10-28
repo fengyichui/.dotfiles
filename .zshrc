@@ -110,7 +110,6 @@ source $ZSH_CUSTOM/plugins/zsh-completions-lq/zsh-completions-lq.plugin.zsh
 plugins=(
     vi-mode
     extract
-    dircycle
     zsh-fzf
     pip
     zsh-syntax-highlighting
