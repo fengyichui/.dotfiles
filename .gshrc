@@ -94,6 +94,9 @@ alias trans='translate'
 # like man
 alias men='tldr'
 
+# markdown
+alias mk='typora'
+
 #####################################
 #             Function              #
 #####################################
