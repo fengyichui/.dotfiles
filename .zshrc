@@ -112,6 +112,7 @@ plugins=(
     extract
     zsh-fzf
     pip
+    dirpersist
     zsh-syntax-highlighting
     zsh-history-substring-search
 )
