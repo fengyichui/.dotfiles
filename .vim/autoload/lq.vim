@@ -990,5 +990,12 @@ function! lq#Append2RegO(string, addreturn)
     if a:addreturn
         let @o .= "\n"
     endif
+    if len(a:string) > 47
+        let l:string = a:string[:46] . " ..."
+    else
+        let l:string = a:string
+    endif
+    redraw
+    echo "Appended to register 'o': " . l:string
 endfunction
 
