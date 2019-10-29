@@ -15,7 +15,7 @@ if [[ -f ${DIRSTACKFILE} ]] && [[ ${#dirstack[*]} -eq 0 ]] ; then
   # save
   PERSISTENT_DIRSTACK=( "${dirstack[@]}" )
   # "cd -" won't work after login by just setting $OLDPWD, so
-  [[ -d $dirstack[1] ]] && cd -q $dirstack[1] && cd -q $OLDPWD
+#  [[ -d $dirstack[1] ]] && cd -q $dirstack[1] && cd -q $OLDPWD
 fi
 
 chpwd_functions+=(chpwd_dirpersist)
@@ -24,6 +24,6 @@ function chpwd_dirpersist ()
   (( $DIRSTACKSIZE <= 0 )) && return
   [[ -z $DIRSTACKFILE ]] && return
   [[ $PWD == $HOME ]] && return # remove HOME dir
-  PERSISTENT_DIRSTACK=( $PWD "${(@)PERSISTENT_DIRSTACK[1,$DIRSTACKSIZE-1]}" )
+  PERSISTENT_DIRSTACK=( $PWD "${(@)PERSISTENT_DIRSTACK[1,$DIRSTACKSIZE]}" )
   builtin print -l ${PERSISTENT_DIRSTACK} >! ${DIRSTACKFILE}
 }
