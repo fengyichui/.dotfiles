@@ -170,13 +170,16 @@
     # usage: `git whatadded --foo.c`
     whatadded = log --follow --diff-filter=A --find-renames=40%
 
+    # submodule foreach do something
+    sdo = submodule foreach --recursive
+
     # All
     cloneall = !git clone --recursive
     cloneall1 = !git clone --depth=1 --recursive
     pullall = !git pull && git submodule update --recursive
-    stall = !git status --short --ignored && git submodule foreach --recursive git status --short --ignored
-    cleanall = !git clean -dxf && git submodule foreach --recursive git clean -dxf
-    dall = !( git --no-pager d --color=always && git submodule foreach --recursive git --no-pager d --color=always ) | less
+    stall = !git status --short --ignored && git sdo git status --short --ignored
+    cleanall = !git clean -dxf && git sdo git clean -dxf
+    dall = !( git --no-pager d --color=always && git sdo git --no-pager d --color=always ) | less
 
 [gui]
     fontui = -family \"DejaVu Sans\" -size 11 -weight normal -slant roman -underline 0 -overstrike 0
