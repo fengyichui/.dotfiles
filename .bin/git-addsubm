@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# save super directory
+currentDir=$(pwd)
+# get all the git repos inside (except .) and format them the way git does
+gitDirs=$(find -type d -name ".git" | sed -e 's|.git$||' -e 's|./||' -e 's|/$||' | grep -v "^$")
+
+# foreach git dir
+for repo in ${gitDirs[@]}; do
+    cd $repo
+    # get the remote url for each submodule
+    fetchUrl=$(git remote -v | awk '/fetch/ {print $2}')
+    # for my purposes repos without remotes are useless
+    # but you may have a different use case
+    if [[ -z $fetchUrl ]]; then fetchUrl="./$repo"; fi
+
+    cd $currentDir
+    # make sure it isn't tracked as a submodule already
+    git submodule add $fetchUrl $repo
+done
+
