@@ -107,6 +107,12 @@ cdf ()
     cd $@
 }
 
+# keil mdk
+mdk ()
+{
+    UV4 $@
+}
+
 # workaround windows exe output
 winexe ()
 {
