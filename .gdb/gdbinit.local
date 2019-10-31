@@ -41,6 +41,16 @@ jlink
 connect
 end
 
+define reconnect_hs6621
+reconnect
+mon device hs6621
+end
+
+define reconnect_hs6621c
+reconnect
+mon device hs6621c
+end
+
 define rc
 # 1st-rst: halt cpu
 mon reset 1
@@ -61,12 +71,16 @@ c
 end
 
 define rc2
-remap2flash
+#remap2flash
 # 1st-rst: halt cpu
 mon reset 1
 load
 # 2nd-rst: make MSP valid
 mon reset 1
+# invalid cache and set new sp and pc
+set *0xE0042020 = 1
+set $sp = *0x50003000
+set $pc = *0x50003004
 c
 end
 
