@@ -44,11 +44,13 @@ end
 define reconnect_hs6621
 reconnect
 mon device hs6621
+ignore-all mon exec SetAllowFlashCache = 0
 end
 
 define reconnect_hs6621c
 reconnect
 mon device hs6621c
+ignore-all mon exec SetAllowFlashCache = 0
 end
 
 define rc
@@ -74,11 +76,12 @@ define rc2
 #remap2flash
 # 1st-rst: halt cpu
 mon reset 1
-load
-# 2nd-rst: make MSP valid
-mon reset 1
-# invalid cache and set new sp and pc
+# Invalidate cache
 set *0xE0042020 = 1
+ignore-all mon exec InvalidateCache
+# load
+load
+# set new sp and pc
 set $sp = *0x50003000
 set $pc = *0x50003004
 c
