@@ -1,4 +1,4 @@
-#compdef mdk
+#compdef makekeil
 
 _arguments -C \
   ': :_files -g "*.uvproj"'

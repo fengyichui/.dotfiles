@@ -107,8 +107,8 @@ cdf ()
     cd $@
 }
 
-# keil mdk
-mdk ()
+# keil
+keil ()
 {
     HOME="$(cygpath -D -m)/../" UV4 $@
 }
