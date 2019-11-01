@@ -110,7 +110,7 @@ cdf ()
 # keil mdk
 mdk ()
 {
-    UV4 $@
+    HOME="$(cygpath -D -m)/../" UV4 $@
 }
 
 # workaround windows exe output
