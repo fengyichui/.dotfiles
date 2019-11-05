@@ -5,9 +5,14 @@
 # Usage:
 #
 #  <command> | clipcopy    - copies stdin to clipboard
+#  clipcopy <files>         - copies a file's contents to clipboard
+#  clipcopy -f <files>      - copies a file (not contents) to clipboard
 #
-#  clipcopy <file>         - copies a file's contents to clipboard
-#
+
+if [[ "$1" == '-f' ]]; then
+    copyfile=1
+    shift
+fi
 
 file=$1
 
@@ -22,7 +27,12 @@ elif [[ $OSTYPE == cygwin* ]]; then
     if [[ -z "$file" ]]; then
         cat > /dev/clipboard
     else
-        cat "$file" > /dev/clipboard
+        if [[ -n "$copyfile" ]]; then
+            # https://github.com/rostok/file2clip.git
+            file2clip "$@" < /dev/null
+        else
+            cat "$@" > /dev/clipboard
+        fi
     fi
 
 elif [[ $OSTYPE == linux-android ]]; then
