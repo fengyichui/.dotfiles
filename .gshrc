@@ -110,7 +110,7 @@ cdf ()
 # keil
 keil ()
 {
-    HOME="$(cygpath -D -m)/../" UV4 $@
+    HOME="$(cygpath -D -m)/../" daemon UV4 $@
 }
 
 # workaround windows exe output
