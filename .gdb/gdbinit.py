@@ -89,7 +89,7 @@ class loop_command_register(gdb.Command):
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("loop_command", gdb.COMMAND_USER)
+        super(self.__class__, self).__init__("loop_command", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
 
     def invoke(self, args, from_tty):
 
@@ -181,7 +181,7 @@ class restore_dump_memery_register(gdb.Command):
             gdb.execute(cmd)
 
 # ignore errors
-class ignore_errors_command (gdb.Command):
+class ignore_errors_command_register (gdb.Command):
     """Execute a single command, ignoring all errors.
 Only one-line commands are supported.
 This is primarily useful in scripts."""
@@ -196,7 +196,7 @@ This is primarily useful in scripts."""
             print(e)
 
 # ignore errors and its exceptions
-class ignore_exceptions_command (gdb.Command):
+class ignore_exceptions_command_register (gdb.Command):
     """Execute a single command, ignoring all errors and exceptions output.
 Only one-line commands are supported.
 This is primarily useful in scripts."""
@@ -211,7 +211,7 @@ This is primarily useful in scripts."""
             pass
 
 # ignore all error and output
-class ignore_all_command (gdb.Command):
+class ignore_all_command_register (gdb.Command):
     """Execute a single command, ignoring all errors and output.
 Only one-line commands are supported.
 This is primarily useful in scripts."""
@@ -225,8 +225,84 @@ This is primarily useful in scripts."""
         except:
             pass
 
+
+# less command
+class less_command_register(gdb.Command):
+
+    """less command
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("less", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
+
+    def invoke(self, args, from_tty):
+        os.popen("less","w").write(gdb.execute(args, to_string=True))
+
+
+# log command
+class log_command_register(gdb.Command):
+
+    """log command
+    log <gdb.log> command
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("log", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
+
+    def invoke(self, args, from_tty):
+        argv = gdb.string_to_argv(args)
+        if len(argv) == 0:
+            raise gdb.GdbError('No command!')
+        else:
+            if re.match(r'^.+\.log$', argv[0]):
+                if len(argv) == 1:
+                    raise gdb.GdbError('No command!')
+                logfile = argv[0]
+                cmdpos = 1
+            else:
+                logfile = 'gdb.log'
+                cmdpos = 0
+            command = ''.join(str(a)+' ' for a in argv[cmdpos:])
+            gdb.execute("log-begin " + logfile, from_tty)
+            gdb.execute(command, from_tty)
+            gdb.execute("log-end", from_tty)
+
+
+# log begin command
+class log_begin_register(gdb.Command):
+
+    """log begin command
+    log-begin <gdb.log>
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("log-begin", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
+
+    def invoke(self, args, from_tty):
+        # End old log
+        gdb.execute("log-end", from_tty, to_string=True)
+        # Start new log
+        gdb.execute("set logging file {}".format('gdb.log' if args=='' else args), from_tty)
+        gdb.execute("set logging overwrite on", from_tty)
+        gdb.execute("set logging on", from_tty)
+
+
+# log end command
+class log_end_register(gdb.Command):
+
+    """log end command
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("log-end", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
+
+    def invoke(self, args, from_tty):
+        gdb.execute("set logging off", from_tty)
+        gdb.execute("set logging overwrite off", from_tty)
+
+
 ######################################################################
-# CLASS
+# Register
 ######################################################################
 
 # register
@@ -234,9 +310,13 @@ loop_command_register()
 loop_memery_change_register()
 restore_dump_reg_register()
 restore_dump_memery_register()
-ignore_errors_command()
-ignore_exceptions_command()
-ignore_all_command()
+ignore_errors_command_register()
+ignore_exceptions_command_register()
+ignore_all_command_register()
+less_command_register()
+log_command_register()
+log_begin_register()
+log_end_register()
 
 # @} #
 
