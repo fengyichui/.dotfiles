@@ -453,6 +453,14 @@ f-hex2dis-arm-thumb ()
 {
     arm-none-eabi-objdump -D -b ihex -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}
 }
+f-addr2func-arm ()
+{
+    if [[ -f $1 && -f $2 ]] ; then
+        cat $2 | xargs arm-none-eabi-addr2line -p -f -e $1 | awk '{if(a!=$0){print $0; a=$0;}}'
+    else
+        arm-none-eabi-addr2line -p -f -e $1 $2 | awk '{if(a!=$0){print $0; a=$0;}}'
+    fi
+}
 
 # ffmpeg
 mpg ()
