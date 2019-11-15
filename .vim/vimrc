@@ -792,7 +792,7 @@ let g:ale_sign_warning = 'x'
 
 "Maximizer
 let g:maximizer_restore_on_winleave = 1
-let g:maximizer_default_mapping_key = '<A-o>'
+let g:maximizer_default_mapping_key = '<A-z>'
 let g:maximizer_set_mapping_with_bang = 1
 
 " Startify
