@@ -430,6 +430,7 @@ function! s:UpdateMark()
 	" define variables if they don't exist
 	call s:InitMarkVariables()
 
+  try "liqiang+: prevent error message when 'make c code after mark'
 	let i = 1
 	while i <= g:MW_CYCLE_MAX
 		exe "syntax clear MarkWord" . i
@@ -481,6 +482,8 @@ function! s:UpdateMark()
 		endif
 		let i = i + 1
 	endwhile
+  catch
+  endtry
 endfunction
 
 " return the mark string under the cursor
