@@ -17,7 +17,7 @@ Options:
   -D|--daemon       Daemon mode (must be 1st option)
   -X                If no server running, start new server as daemon,
                     Otherwise restart it. Same: --daemon --restart --force
-  -C|--clean        Clean all temp files
+  -C|--clean        Clean all temp files and Kill all running JLinkGDBServer
   -p|--port=*       Listen port (2331)
   -d|--device=*     Device (Cortex-M3)
   -s|--speed=*      Speed kB/s (auto)
@@ -170,9 +170,10 @@ if [[ -f "$scriptrunningfile" ]]; then
     fi
 fi
 
-# clean temp file
+# clean temp file and kill all running JLinkGDBServer
 if [[ -n "$cleanit" ]]; then
     rm -rf ${fileprefix}*
+    pkill -9 -e -i JLinkGDBServer
     exit 0
 fi
 
