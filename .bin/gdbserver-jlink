@@ -67,6 +67,7 @@ scriptexitfile="$fileprefix-SCRIPT-EXIT"
 exerunningfile="$fileprefix-EXE-RUNNING"
 jlinklogfile="$fileprefix-LOG-JLINK"
 jlinkpidfile="$fileprefix-PID-JLINK"
+jlinkname="JLinkGDBServer@$port"
 
 # check start status
 function check_jlinkgdbserver_start_status ()
@@ -180,7 +181,7 @@ fi
 # restart
 if [[ -n "$restartit" ]]; then
     if [[ -f "$scriptrunningfile" ]]; then
-        echo -n "JLinkGDBServer restarting... "
+        echo -n "$jlinkname restarting... "
 
         rm -rf "$exerunningfile"
         touch "$restartfile"
@@ -188,7 +189,7 @@ if [[ -n "$restartit" ]]; then
         check_jlinkgdbserver_start_status
         exit $?
     else
-        echo "JLinkGDBServer Script is not running"
+        echo "$jlinkname Script is not running"
         if [[ -z "$forceit" ]]; then
             exit -1
         fi
@@ -197,7 +198,7 @@ fi
 
 # check running
 if [[ -f "$scriptrunningfile" ]]; then
-    echo -n "JLinkGDBServer Script is already running! "
+    echo -n "$jlinkname Script is already running! "
     if [[ -n "$forceit" || -n "$stopit" ]]; then
         echo -n "Killing it... "
         touch "$scriptexitfile"
@@ -217,13 +218,13 @@ if [[ -f "$scriptrunningfile" ]]; then
     fi
 
 elif [[ -n "$stopit" ]]; then
-    echo "JLinkGDBServer Script is not running"
+    echo "$jlinkname Script is not running"
     exit 0
 fi
 
 # daemon
 if [[ -n "$daemonmode" ]]; then
-    echo -n "JLinkGDBServer Script run as Daemon... "
+    echo -n "$jlinkname Script run as Daemon... "
     setsid $0 $@ >/dev/null 2>&1 &
 
     check_jlinkgdbserver_start_status
@@ -254,7 +255,7 @@ function cleanexit ()
         wait $jlinkpid 2>/dev/null
     fi
     rm -rf ${fileprefix}*
-    echo -e "\n\e[31mJLinkGDBServer Script Exit\e[0m"
+    echo -e "\n\e[31m$jlinkname Script Exit\e[0m"
     exit 0
 }
 
@@ -273,7 +274,7 @@ while true; do
     # check restart flag
     if [[ -f "$restartfile" ]]; then
         rm -f "$restartfile"
-        echo -e "\n\e[31mJLinkGDBServer EXE Restart\e[0m"
+        echo -e "\n\e[31m$jlinkname EXE Restart\e[0m"
 
         # kill it
         if [[ -n "$jlinkpid" ]]; then
@@ -291,7 +292,7 @@ while true; do
     # check JLinkGDBServer exit
     if [[ -n "$jlinkpid" ]]; then
         if ! ps -p $jlinkpid >/dev/null; then
-            echo -e "\n\e[31mJLinkGDBServer EXE Exit\e[0m"
+            echo -e "\n\e[31m$jlinkname EXE Exit\e[0m"
             jlinkpid=""
             rm -rf "$exerunningfile"
         fi
