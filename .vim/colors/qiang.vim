@@ -292,7 +292,7 @@ hi StatusLine       guifg=#c0c0c0           guibg=#660066           gui=none
 hi StatusLine       ctermfg=7               ctermbg=53              cterm=none
 " status line for non-current windows
 hi StatusLineNC     guifg=#000000           guibg=#c0c0c0           gui=none
-hi StatusLineNC     ctermfg=16               ctermbg=7               cterm=none
+hi StatusLineNC     ctermfg=16              ctermbg=247             cterm=none
 " User1
 hi User1            guifg=#FFFFFF           guibg=#EE0000           gui=none
 hi User1            ctermfg=15              ctermbg=9               cterm=none
