@@ -113,6 +113,18 @@ keil ()
     HOME="$(cygpath -D -m)/../" daemon UV4 $@
 }
 
+# set windows code page as 437 (English)
+wincpEN ()
+{
+    cmd /c chcp 437 >/dev/null
+}
+
+# set windows code page as 936 (Simplified Chinese)
+wincpCH ()
+{
+    cmd /c chcp 936 >/dev/null
+}
+
 # workaround windows exe output
 winexe ()
 {
@@ -548,6 +560,7 @@ explainshell ()
 # net info from port or exe name
 netinfo ()
 {
+    wincpEN
     if [[ -n "$1" ]]; then
         _tasklists=$(winexe tasklist)
         _netstats=$(winexe netstat -aon)
@@ -587,6 +600,8 @@ netinfo ()
             fi
         fi
     else
+        winexe netstat -aon -p tcp
+        echo
         echo "Usage: netinfo <local-port> <exe-name>"
         winexe netsh interface ipv4 show excludedportrange protocol=tcp
         echo "Excluded port may be is excluded by Hyper-V"
