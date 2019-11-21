@@ -64,8 +64,8 @@
     # Controls which diff tool is used by git-difftool
     tool = vimdiff
 
-    # Use "patience diff" algorithm when generating patches.
-    algorithm = patience
+    # This algorithm extends the patience algorithm to "support low-occurrence common elements".
+    algorithm = histogram
 
     # Uses a prefix pair that is different from the standard "a/" and "b/"
     # (i)ndex, (w)ork, (c)ommit, (o)bject
