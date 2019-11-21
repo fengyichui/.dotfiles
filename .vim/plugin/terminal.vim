@@ -222,7 +222,8 @@ let s:tmux_vim_focus_losting_lock = '/tmp/tmux_vim_focus_losting'
 function! s:tmux_focus_gained()
     if s:tmux_is_running
         " When gain focus, vim can't handle normal-mode cursor sharp
-        if mode() == 'n'
+        let mode = mode()
+        if mode=~'^n' || mode=~'^c'
             " Check locking
             let timeout = 50
             while timeout > 0
