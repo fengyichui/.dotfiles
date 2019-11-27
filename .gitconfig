@@ -27,11 +27,10 @@
     # considered "unusual" any more.
     quotepath = false
 
-[pager]
+    # pager
     # diff-highlight: https://github.com/git/git/tree/master/contrib/diff-highlight
-    log = diff-highlight | less
-    show = diff-highlight | less
-    diff = diff-highlight | less
+    # diff-so-fancy: https://github.com/so-fancy/diff-so-fancy
+    pager = diff-so-fancy | less # diff-highlight
 
 [color]
     branch = auto
@@ -41,21 +40,31 @@
     ui = auto
 
 [color "diff"]
-    meta = yellow bold
-    frag = magenta
-    func = cyan
+    meta = 11 #yellow bold
+    frag = magenta bold
+    func = cyan bold
     commit = yellow
     old = red
     new = green
     whitespace = red reverse
 
 [color "diff-highlight"]
-    oldHighlight = ul
-    oldReset = noul
-    #oldNormal = red
-    #oldHighlight = red 52
-    #newNormal = green
-    #newHighlight = green 22
+    # oldHighlight = ul
+    # oldReset = noul
+    oldNormal = red
+    oldHighlight = red 52
+    newNormal = green
+    newHighlight = green 22
+
+[diff-so-fancy]
+    # Should the first block of an empty line be colored
+    markEmptyLines = false
+    # Simplify git header chunks to a more human readable format
+    changeHunkIndicators = true
+    # Should the pesky + or - at line-start be removed
+    stripLeadingSymbols = false
+    # By default, the separator for the file header uses Unicode line-drawing characters
+    useUnicodeRuler = true
 
 [push]
     default = simple
