@@ -266,6 +266,7 @@ class disable_wdt_register(gdb.Command):
 
     def invoke(self, args, from_tty):
         gdb.execute('set *0x400e0024 |= 1<<27')
+        print("WDT is disabled")
 
 
 # remap to RAM
@@ -281,9 +282,11 @@ class remap2ram_register(gdb.Command):
         if chip() == CHIP_HS6620:
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 6')
+            print("Remapped to RAM (HS6620)")
         else:
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 2')
+            print("Remapped to RAM (HS6621)")
 
 
 # remap to ROM
@@ -299,9 +302,11 @@ class remap2rom_register(gdb.Command):
         if chip() == CHIP_HS6620:
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 5')
+            print("Remapped to ROM (HS6620)")
         else:
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 1')
+            print("Remapped to ROM (HS6621)")
 
 
 # reboot
