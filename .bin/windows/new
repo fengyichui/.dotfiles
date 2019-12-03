@@ -6,26 +6,23 @@
 # Only for cygwin
 #
 
+# default window mode is normal
 window=''
 
+# check $PATH
+if [[ "$PATH" != /bin:* ]]; then
+    PATH="/bin:$PATH"
+fi
+
 # parse params
-case "$1" in
-    -n)
-        shift
-        export NOTMUX=1
-        ;;
-    -m)
-        shift
-        window='--window max'
-        ;;
-    -nm)
-        shift
-        export NOTMUX=1
-        window='--window max'
-        ;;
-    *)
-        ;;
-esac
+for i in "$@"; do
+    case "$i" in
+        -n) export NOTMUX=1; shift ;;
+        -m) window='--window max'; shift ;;
+        -s) slash=1; shift ;;
+        *)  break ;;
+    esac
+done
 
 # $TMUX env may lead some strange thing
 unset TMUX
@@ -35,10 +32,13 @@ unset TMUX_PANE
 export CHERE_INVOKING=1
 
 # Execute the param
-echo "$@" > /tmp/.init.tmp
+cmds="$@"
+if [[ -n "$slash" ]]; then
+    cmds="${cmds//\\/\\\\}"
+fi
+echo "$cmds" > /tmp/.init.tmp
 
 # Start new window
 cygstart -w --action=open mintty $window --exec "$SHELL" --login -i
 #cmd /C start /I /B "$(cygpath -w -a /bin/mintty)" -
-
 
