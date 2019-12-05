@@ -110,7 +110,16 @@ cdf ()
 # keil
 keil ()
 {
-    HOME="$(cygpath -D -m)/../" daemon UV4 $@
+    file="${@: -1}"
+    if [[ -n "$file" ]]; then
+        if [[ -f "$file" ]]; then
+            HOME="$(cygpath -D -m)/../" daemon UV4 $@
+        else
+            echo "No such project: $file"
+        fi
+    else
+        HOME="$(cygpath -D -m)/../" daemon UV4
+    fi
 }
 
 # set windows code page as 437 (English)
