@@ -12,12 +12,14 @@
 #   $ apt edit-sources
 #   加入：deb [arch=all,aarch64] http://mirrors.tuna.tsinghua.edu.cn/termux stable main
 #         ( [arch=all,aarch64]: aarch64=$(uname -m) )
+#   帮助: https://mirror.tuna.tsinghua.edu.cn/help/termux/
+#sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
 sed -i 's@^\(deb.*stable main\)$@#\1\ndeb [arch=all,'"$(uname -m)"'] http://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
 apt update && apt upgrade
 
 # Storage
 apt install termux-tools
-termux-set-storage
+termux-setup-storage
 
 # clipboard and other feature support
 apt install termux-api
