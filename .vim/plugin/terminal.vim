@@ -102,7 +102,7 @@ let s:cursor_undercurl_e = "\e[4:0m" " Undercurl end
 
 " tmux and xterm check
 if !exists('$TMUX')
-    if &term =~ 'xterm'
+"    if &term =~ 'xterm' " remove $TERM check for SSH
         let &t_ti = s:cursor_normal . &t_ti
         let &t_SI = s:cursor_insert . &t_SI
         let &t_SR = s:cursor_replace . &t_SR
@@ -110,7 +110,7 @@ if !exists('$TMUX')
         let &t_te = &t_te
         let &t_Cs = s:cursor_undercurl_s . &t_Cs
         let &t_Ce = s:cursor_undercurl_e . &t_Ce
-    endif
+"    endif
     finish
 endif
 
