@@ -216,7 +216,7 @@ set formatoptions=tcroqlnj      " Automatic formatting
 set noequalalways               " Don't automatically made the same size after close a window
 set number                      " show line number
 set cursorline                  " highlight current line, But will make screen redrawing slower
-set lazyredraw                  " good performance, But will lead wrong statusline when startup [https://github.com/vim/vim/issues/2211]
+"set lazyredraw                  " good performance, But will lead wrong statusline when startup [https://github.com/vim/vim/issues/2211]
 set cindent                     " use c language indent
 set tabstop=4                   " indent is 4 space
 set shiftwidth=4                " auto indent is 4 space
