@@ -12,9 +12,9 @@ export EDITOR='vim'
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" == "cygwin" ]]; then
-    ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
+    ePATH=$HOME/.bin/windows:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
 else
-    ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
+    ePATH=$HOME/.bin/linux:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
 fi
 if [[ "$PATH" != "$ePATH"* ]]; then
     export PATH=$ePATH:$PATH
