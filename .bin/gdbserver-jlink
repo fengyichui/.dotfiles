@@ -251,7 +251,7 @@ fi
 function cleanexit ()
 {
     if [[ -n "$jlinkpid" ]]; then
-        kill -9 $jlinkpid 2>/dev/null
+        kill $jlinkpid 2>/dev/null
         wait $jlinkpid 2>/dev/null
     fi
     rm -rf ${fileprefix}*
@@ -278,7 +278,7 @@ while true; do
 
         # kill it
         if [[ -n "$jlinkpid" ]]; then
-            kill -9 $jlinkpid 2>/dev/null
+            kill $jlinkpid 2>/dev/null
             wait $jlinkpid 2>/dev/null
             sleep 0.2
         fi
