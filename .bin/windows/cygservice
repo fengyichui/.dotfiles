@@ -1,0 +1,98 @@
+#!/bin/bash
+#
+# cygrunsrv:
+#   --install <svc_name>  Installes a new service named <svc_name>.
+#   --remove <svc_name>   Removes a service named <svc_name>.
+#   --start <svc_name>    Starts a service named <svc_name>.
+#   --stop <svc_name>     Stops a service named <svc_name>.
+#   --query <svc_name>    Queries a service named <svc_name>.
+#   --list [server]       Lists services that have been installed with cygrunsrv.
+#
+#   --path                Application path which is run as a service
+#   --args                command line options
+#   --disp                display name of the service. Defaults to service name.
+#   --desc                service description.
+#   --type                Optional start type of service [auto|manual]
+#   --dep                 name of service that must be started before this new service
+#   --env                 environment strings which are added to the environment, /bin is always added to $PATH
+#
+# Demo service_info
+#   svc_name="frpc_aliyun"
+#   svc_exe_path="$abscygdir/../../../windows/frpc.exe"
+#   svc_exe_args="-c \"$abswindir/../frpc_aliyun_office_tocken.ini\""
+#   svc_display="Frp Client Service (aliyun-ecs)"
+#   svc_desc="A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet"
+#   svc_depend="--dep tcpip"
+#   svc_env="--env HOME=$HOME"
+#   svc_type="auto" # [auto|manual]
+#
+
+# action and path
+action="$1"
+path="$2"
+
+# check
+if [[ -z "$action" ]]; then
+    echo "Usage: cygservice <install|remove|start|stop|query|list> [service_info_path]"
+    exit -1
+fi
+
+# list
+if [[ "$action" == "list" ]]; then
+    cygrunsrv --list --verbose
+    exit 0
+fi
+
+# check path
+if [[ ! -f "$path" ]]; then
+    echo "Not exist: $path"
+    exit -1
+fi
+
+# some var
+abscygdir="$(realpath "$(dirname "$path")")"
+abswindir="$(cygpath -m "$abscygdir")"
+
+# source the path
+source "$path"
+
+# check svc name
+if [[ -z "$svc_name" ]]; then
+    echo "No 'svc_name'!"
+    exit -1
+fi
+
+# check exe path
+if [[ ! -f "$svc_exe_path" ]]; then
+    echo "The exe path is not exist: $svc_exe_path"
+    exit -1
+fi
+
+if [[ "$action" == "install" ]]; then
+    # check
+    if cygrunsrv --query "$svc_name" >/dev/null 2>&1 ; then
+        echo "This service is already installed: $svc_name"
+        exit 0
+    fi
+    # install and start
+    cygrunsrv --install "$svc_name" --path "$svc_exe_path" --args "$svc_exe_args" --disp "$svc_display" --desc "$svc_desc" --type "$svc_type" $svc_env $svc_depend
+    cygrunsrv --query "$svc_name" -V
+    cygrunsrv --start "$svc_name"
+    exit 0
+fi
+
+# query
+if [[ "$action" == "query" ]]; then
+    cygrunsrv --query "$svc_name" -V
+    exit 0
+fi
+
+# check
+if ! cygrunsrv --query "$svc_name" >/dev/null 2>&1 ; then
+    echo "This service is not installed: $svc_name"
+    exit 0
+fi
+
+# remove/start/stop
+cygrunsrv --$action "$svc_name"
+
