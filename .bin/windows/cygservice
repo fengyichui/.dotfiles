@@ -33,7 +33,7 @@ path="$2"
 
 # check
 if [[ -z "$action" ]]; then
-    echo "Usage: cygservice <install|remove|start|stop|query|list> [service_info_path]"
+    echo "Usage: cygservice <install|remove|start|stop|restart|query|list> [service_info_path]"
     exit -1
 fi
 
@@ -90,6 +90,14 @@ fi
 # check
 if ! cygrunsrv --query "$svc_name" >/dev/null 2>&1 ; then
     echo "This service is not installed: $svc_name"
+    exit 0
+fi
+
+# restart
+if [[ "$action" == "restart" ]]; then
+    cygrunsrv --stop "$svc_name"
+    sleep 0.5
+    cygrunsrv --start "$svc_name"
     exit 0
 fi
 
