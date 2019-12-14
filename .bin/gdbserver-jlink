@@ -183,6 +183,7 @@ if [[ -n "$restartit" ]]; then
     if [[ -f "$scriptrunningfile" ]]; then
         echo -n "$jlinkname restarting... "
 
+        rm -rf "$jlinklogfile"
         rm -rf "$exerunningfile"
         touch "$restartfile"
 
