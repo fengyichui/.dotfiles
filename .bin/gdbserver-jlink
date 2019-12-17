@@ -91,7 +91,7 @@ function check_jlinkgdbserver_start_status ()
                 # checking power
                 if [[ "$chkpower" == "0" ]]; then
                     chkpowernum="$(awk '/Checking target voltage/' "$jlinklogfile" | wc -l)"
-                    if (($chkpowernum>3)); then
+                    if ((chkpowernum>3)); then
                         echo -n "(No Power?) "
                         chkpower=1
                     fi
@@ -103,27 +103,27 @@ function check_jlinkgdbserver_start_status ()
                 if [[ -f "$jlinklogfile" ]]; then
                     if grep -q 'Failed to open listener port' "$jlinklogfile"; then
                         echo "FAIL (Can't open listener port)"
-                        return -1
+                        return 1
                     fi
                     if grep -q 'Could not connect to J-Link' "$jlinklogfile"; then
                         echo "FAIL (No J-link)"
-                        return -1
+                        return 1
                     fi
                 fi
                 echo "FAIL"
-                return -1
+                return 1
             fi
         fi
 
         # check timeout
         if [[ "$chkpower" == "0" ]]; then
-            if (($timeout>30)); then
+            if ((timeout>30)); then
                 echo "Timeout"
-                return -1
+                return 1
             fi
         fi
 
-        timeout=$(($timeout + 1))
+        timeout=$((timeout + 1))
         sleep 0.2
     done
 }
@@ -138,12 +138,12 @@ function check_jlinkgdbserver_stop_status ()
         fi
 
         # check timeout
-        if (($timeout>30)); then
+        if ((timeout>30)); then
             echo "Timeout"
-            return -1
+            return 1
         fi
 
-        timeout=$(($timeout + 1))
+        timeout=$((timeout + 1))
         sleep 0.2
     done
 }
@@ -166,7 +166,7 @@ function check_jlinkgdbserver_exit_code ()
 
 # check script whether is running
 if [[ -f "$scriptrunningfile" ]]; then
-    if ! ps -p $(<$scriptrunningfile) >/dev/null 2>&1; then
+    if ! ps -p "$(<"$scriptrunningfile")" >/dev/null 2>&1; then
         rm -rf ${fileprefix}*
     fi
 fi
@@ -192,7 +192,7 @@ if [[ -n "$restartit" ]]; then
     else
         echo "$jlinkname Script is not running"
         if [[ -z "$forceit" ]]; then
-            exit -1
+            exit 1
         fi
     fi
 fi
@@ -211,11 +211,11 @@ if [[ -f "$scriptrunningfile" ]]; then
                 exit 0
             fi
         else
-            exit -1
+            exit 1
         fi
     else
         echo ""
-        exit -1
+        exit 1
     fi
 
 elif [[ -n "$stopit" ]]; then
@@ -226,7 +226,7 @@ fi
 # daemon
 if [[ -n "$daemonmode" ]]; then
     echo -n "$jlinkname Script run as Daemon... "
-    setsid $0 $@ >/dev/null 2>&1 &
+    setsid $0 "$@" >/dev/null 2>&1 &
 
     check_jlinkgdbserver_start_status
     exit $?
