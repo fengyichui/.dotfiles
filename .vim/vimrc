@@ -744,6 +744,8 @@ command! -nargs=* -complete=file Makekeil  set makeprg=makekeil | compiler! keil
 command! -nargs=* -complete=file Makeiar   set makeprg=makeiar  | compiler! iar  | make <args>
 command! -nargs=* -complete=file Makegcc   set makeprg=make     | compiler! gcc  | make -j <args>
 command! -nargs=* -complete=file Makedox   set makeprg=doxygen  | compiler! gcc  | make <args>
+command!                         Maketags  !ctags -R --fields=+iaSszt --c-kinds=+p --c++-kinds=+p --extra=+q --totals .
+
 
 " X command
 command!       -nargs=* Xcolumn     call lq#ColumnOp(<q-args>)
