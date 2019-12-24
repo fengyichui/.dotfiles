@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# prevent messy code
+export LC_ALL=C
+
 # default params
 timestamp_show=1
 timestamp_from_start=''
