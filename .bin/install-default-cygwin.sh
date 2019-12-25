@@ -3,7 +3,7 @@
 #
 
 # mirror
-apt-cyg --mirror http://mirrors.neusoft.edu.cn/cygwin pathof mirror
+apt-cyg --mirror https://mirrors.tuna.tsinghua.edu.cn/cygwin/ pathof mirror
 
 # software
 apt-cyg -X install gnupg
