@@ -164,6 +164,11 @@ function check_jlinkgdbserver_exit_code ()
     echo ${jlinkgdbserver_exit_codes_table[$1]}
 }
 
+function check_jlinkgdbserver_pid ()
+{
+    echo "$(pgrep -i -f "jlinkgdbserver.* -port $port")"
+}
+
 # check script whether is running
 if [[ -f "$scriptrunningfile" ]]; then
     if ! ps -p "$(<"$scriptrunningfile")" >/dev/null 2>&1; then
@@ -251,10 +256,12 @@ fi
 # clean
 function cleanexit ()
 {
+    jlinkpid="$(check_jlinkgdbserver_pid)"
     if [[ -n "$jlinkpid" ]]; then
         kill $jlinkpid 2>/dev/null
         wait $jlinkpid 2>/dev/null
     fi
+
     rm -rf ${fileprefix}*
     echo -e "\n\e[31m$jlinkname Script Exit\e[0m"
     exit 0
@@ -279,6 +286,15 @@ while true; do
 
         # kill it
         if [[ -n "$jlinkpid" ]]; then
+            kill $jlinkpid 2>/dev/null
+            wait $jlinkpid 2>/dev/null
+            sleep 0.2
+        fi
+
+        # make sure killed
+        jlinkpid="$(check_jlinkgdbserver_pid)"
+        if [[ -n "$jlinkpid" ]]; then
+            echo -e "\n\e[31m$jlinkname can't be killed, Retry!\e[0m"
             kill $jlinkpid 2>/dev/null
             wait $jlinkpid 2>/dev/null
             sleep 0.2
