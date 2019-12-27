@@ -253,15 +253,35 @@ elif [[ "$OSTYPE" =~ "linux" ]]; then
     fi
 fi
 
-# clean
-function cleanexit ()
+# kill jlinkgdbserver
+function kill_jlinkgdbserver ()
 {
-    jlinkpid="$(check_jlinkgdbserver_pid)"
+    # kill it
     if [[ -n "$jlinkpid" ]]; then
         kill $jlinkpid 2>/dev/null
         wait $jlinkpid 2>/dev/null
     fi
 
+    # make sure killed
+    jlinkpid="$(check_jlinkgdbserver_pid)"
+    if [[ -n "$jlinkpid" ]]; then
+        echo -e "\n\e[31m$jlinkname can't be killed, Retry!\e[0m"
+        kill -9 $jlinkpid 2>/dev/null
+        wait $jlinkpid 2>/dev/null
+        sleep 0.2
+
+        # check
+        jlinkpid="$(check_jlinkgdbserver_pid)"
+        if [[ -n "$jlinkpid" ]]; then
+            echo -e "\n\e[31m$jlinkname can't be killed!\e[0m"
+        fi
+    fi
+}
+
+# clean
+function cleanexit ()
+{
+    kill_jlinkgdbserver
     rm -rf ${fileprefix}*
     echo -e "\n\e[31m$jlinkname Script Exit\e[0m"
     exit 0
@@ -284,21 +304,9 @@ while true; do
         rm -f "$restartfile"
         echo -e "\n\e[31m$jlinkname EXE Restart\e[0m"
 
-        # kill it
-        if [[ -n "$jlinkpid" ]]; then
-            kill $jlinkpid 2>/dev/null
-            wait $jlinkpid 2>/dev/null
-            sleep 0.2
-        fi
-
-        # make sure killed
-        jlinkpid="$(check_jlinkgdbserver_pid)"
-        if [[ -n "$jlinkpid" ]]; then
-            echo -e "\n\e[31m$jlinkname can't be killed, Retry!\e[0m"
-            kill $jlinkpid 2>/dev/null
-            wait $jlinkpid 2>/dev/null
-            sleep 0.2
-        fi
+        # kill
+        kill_jlinkgdbserver
+        sleep 0.2
 
         # restart
         ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile 2>&1 | tee $jlinklogfile &
