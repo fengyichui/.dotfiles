@@ -906,6 +906,16 @@ document ll
 Syntax: ll <listsize>
 | Like list
 end
+define lll
+    set listsize 40
+    list *$pc
+    set listsize 10
+end
+define llll
+    set listsize 60
+    list *$pc
+    set listsize 10
+end
 
 # __________________END USER COMMAND_________________
 #
