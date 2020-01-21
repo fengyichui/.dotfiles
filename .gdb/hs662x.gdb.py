@@ -77,6 +77,7 @@ PATCH_MAX_SIZE           = 2 * flash_sector_size
 
 CHIP_HS6620             = 0x6620
 CHIP_HS6621             = 0x6621
+CHIP_HS6622             = 0x6622
 
 ONCE_OP_SIZE            = 32*1024
 
@@ -85,12 +86,17 @@ ONCE_OP_SIZE            = 32*1024
 ######################################################################
 
 def chip():
-    device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int'))) >> 16
-#    print("HS{:04X}".format(device_info))
-    if device_info == 0x6620:
-        return CHIP_HS6620
-    else:
-        return CHIP_HS6621
+    try:
+        device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int'))) >> 16
+        if device_info == 0x6620:
+            return CHIP_HS6620
+        else:
+            return CHIP_HS6621
+    except:
+        pass
+
+    device_info = int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int'))) >> 16
+    return CHIP_HS6621C
 
 
 def flash_finish():
