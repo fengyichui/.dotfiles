@@ -476,6 +476,10 @@ f-elf2dis-keil ()
 {
     fromelf --text -c --output ${2:-${1%.*}.dis} $1
 }
+f-elf2sym ()
+{
+    objdump -x $1
+}
 f-bin2dis-arm-thumb ()
 {
     arm-none-eabi-objdump -D -b binary -m arm -M force-thumb $1 > ${2:-${1%.*}.dis}
