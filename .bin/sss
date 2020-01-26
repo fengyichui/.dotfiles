@@ -147,6 +147,10 @@ do
             gen_chinadns_route=1
             shift
             ;;
+        -L|--subscribe)
+            subscribe=1
+            shift
+            ;;
         *)
             if [[ "$(awk '/^-[0-9]+$/' <<< $i)" == "$i" ]]; then
                 inside_qr_index="${i#*-}"
@@ -165,6 +169,7 @@ do
                 echo "  -t|--test          test all inside proxy server"
                 echo "  -D|--dns           use chinadns"
                 echo "  -R|--gen-route-dns generate new china dns route"
+                echo "  -L|--subscribe     subscribe"
                 echo "  -h|--help          show this help"
                 echo "Example:"
                 echo "  -12"
@@ -189,26 +194,53 @@ finalurl ()
     curl --insecure --progress-bar -A foxfire -w %{url_effective} -I -L "$1" -o /dev/null
 }
 
-free_ss_list ()
+urldecode ()
+{
+    if [[ -t 0 ]]; then
+        urlcode_data="$*"
+    else
+        urlcode_data="$(cat -)"
+    fi
+    python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$urlcode_data"
+}
+
+sss_subscribe ()
 {
     # github is not stable
     while true; do
-        curl --connect-timeout 3 --insecure --progress-bar -A foxfire -L https://raw.githubusercontent.com/dxxzst/Free-SS-SSR/master/README.md > /tmp/free_ss_list
+        curl --connect-timeout 3 --insecure --progress-bar -A foxfire -L https://github.com/ssrsub/ssr/blob/master/ss-sub >/tmp/free_ss_list
         if [[ $? == 0 ]]; then
             break
         fi
     done
-    cat /tmp/free_ss_list | awk '/最新更新日期/' > /tmp/sss_list
-    cat /tmp/free_ss_list | awk '/### SS账号/,/### SSR账号/' | awk -v FS='|' '/^\|[0-9]/{print "sss -s=\""$5":"$4"@"$2":"$3"\""}' >> /tmp/sss_list
-    cat /tmp/sss_list
+
+    cat /tmp/free_ss_list | awk -F '<|>' '/\<blob-code\>/{print $3}' | base64 -d | awk '!/plugin/' | urldecode | awk -F '#@SSRSUB-|-付费' '{print "sss -S=\""$1"\" \t#"$2}'
 }
 
-# list
-#if [[ -z "$noopt" ]]; then
-#    echo "List free ss:" 1>&2
-#    free_ss_list
-#    exit
-#fi
+# subscribe
+if [[ -z "$noopt" || -n "$subscribe" ]]; then
+    dosub=0
+    if [[ -n "$subscribe" ]]; then
+        dosub=1
+    elif [[ -f /tmp/sss_subscribe ]]; then
+        sys_time_s=$(date +%s) 
+        modify_time_s=$(stat -c %Y /tmp/sss_subscribe)
+        diff_hour=$(( ($sys_time_s - $modify_time_s) / 3600 ))
+        if [[ $diff_hour -ge 6 ]]; then
+            dosub=1
+        fi
+    else
+        dosub=1
+    fi
+
+    if [[ $dosub == "1" ]]; then
+        echo "subscribe ..."
+        sss_subscribe >/tmp/sss_subscribe
+    fi
+
+    cat /tmp/sss_subscribe | fzfe
+    exit
+fi
 
 # Chinadns
 if [[ -n "$chinadns" ]]; then
