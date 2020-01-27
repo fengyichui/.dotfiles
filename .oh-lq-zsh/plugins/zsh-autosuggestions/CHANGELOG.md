@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.6.4
+- Fix `vi-forward-char` triggering a bell when using it to accept a suggestion (#488)
+- New configuration option to skip completion suggestions when buffer matches a pattern (#487)
+- New configuration option to ignore history entries matching a pattern (#456)
+
+## v0.6.3
+- Fixed bug moving cursor to end of buffer after accepting suggestion (#453)
+
+## v0.6.2
+- Fixed bug deleting the last character in the buffer in vi mode (#450)
+- Degrade gracefully when user doesn't have `zsh/system` module installed (#447)
+
+## v0.6.1
+- Fixed bug occurring when `_complete` had been aliased (#443)
+
+## v0.6.0
+- Added `completion` suggestion strategy powered by completion system (#111)
+- Allow setting `ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE` to an empty string (#422)
+- Don't fetch suggestions after copy-earlier-word (#439)
+- Allow users to unignore zle-\* widgets (e.g. zle-line-init) (#432)
+
+
 ## v0.5.2
 - Allow disabling automatic widget re-binding for better performance (#418)
 - Fix async suggestions when `SH_WORD_SPLIT` is set
@@ -46,7 +68,7 @@
 - Experimental support for asynchronous suggestions (#170)
 - Fix problems with multi-line suggestions (#225)
 - Optimize case where manually typing in suggestion
-- Avoid wrapping any zle-* widgets (#206)
+- Avoid wrapping any zle-\* widgets (#206)
 - Remove support for deprecated options from v0.0.x
 - Handle history entries that begin with dashes
 - Gracefully handle being sourced multiple times (#126)

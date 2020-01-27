@@ -1,8 +1,8 @@
 # Fish-like fast/unobtrusive autosuggestions for zsh.
 # https://github.com/zsh-users/zsh-autosuggestions
-# v0.5.2
+# v0.6.4
 # Copyright (c) 2013 Thiago de Arruda
-# Copyright (c) 2016-2018 Eric Freese
+# Copyright (c) 2016-2019 Eric Freese
 # 
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -24,16 +24,6 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-
-#--------------------------------------------------------------------#
-# Setup                                                              #
-#--------------------------------------------------------------------#
-
-# Precmd hooks for initializing the library and starting pty's
-autoload -Uz add-zsh-hook
-
-# Asynchronous suggestions are generated in a pty
-zmodload zsh/zpty
 
 #--------------------------------------------------------------------#
 # Global Configuration Variables                                     #
@@ -71,6 +61,7 @@ typeset -g ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX=autosuggest-orig-
 		up-line-or-history
 		down-line-or-history
 		accept-line
+		copy-earlier-word
 	)
 }
 
@@ -119,8 +110,13 @@ typeset -g ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX=autosuggest-orig-
 		which-command
 		yank
 		yank-pop
+		zle-\*
 	)
 }
+
+# Pty name for capturing completions for completion suggestion strategy
+(( ! ${+ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME} )) &&
+typeset -g ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME=zsh_autosuggest_completion_pty
 
 #--------------------------------------------------------------------#
 # Utility Functions                                                  #
@@ -203,7 +199,6 @@ _zsh_autosuggest_bind_widgets() {
 	ignore_widgets=(
 		.\*
 		_\*
-		zle-\*
 		autosuggest-\*
 		$ZSH_AUTOSUGGEST_ORIGINAL_WIDGET_PREFIX\*
 		$ZSH_AUTOSUGGEST_IGNORE_WIDGETS
@@ -323,7 +318,7 @@ _zsh_autosuggest_modify() {
 	emulate -L zsh
 
 	# Don't fetch a new suggestion if there's more input to be read immediately
-	if (( $PENDING > 0 )) || (( $KEYS_QUEUED_COUNT > 0 )); then
+	if (( $PENDING > 0 || $KEYS_QUEUED_COUNT > 0 )); then
 		POSTDISPLAY="$orig_postdisplay"
 		return $retval
 	fi
@@ -352,7 +347,7 @@ _zsh_autosuggest_modify() {
 
 	# Get a new suggestion if the buffer is not empty after modification
 	if (( $#BUFFER > 0 )); then
-		if (( ! ${+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE} )) || (( $#BUFFER <= $ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE )); then
+		if [[ -z "$ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE" ]] || (( $#BUFFER <= $ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE )); then
 			_zsh_autosuggest_fetch
 		fi
 	fi
@@ -386,7 +381,7 @@ _zsh_autosuggest_suggest() {
 
 # Accept the entire suggestion
 _zsh_autosuggest_accept() {
-	local -i max_cursor_pos=$#BUFFER
+	local -i retval max_cursor_pos=$#BUFFER
 
 	# When vicmd keymap is active, the cursor can't move all the way
 	# to the end of the buffer
@@ -394,19 +389,33 @@ _zsh_autosuggest_accept() {
 		max_cursor_pos=$((max_cursor_pos - 1))
 	fi
 
-	# Only accept if the cursor is at the end of the buffer
-	if [[ $CURSOR = $max_cursor_pos ]]; then
-		# Add the suggestion to the buffer
-		BUFFER="$BUFFER$POSTDISPLAY"
-
-		# Remove the suggestion
-		unset POSTDISPLAY
-
-		# Move the cursor to the end of the buffer
-		CURSOR=${#BUFFER}
+	# If we're not in a valid state to accept a suggestion, just run the
+	# original widget and bail out
+	if (( $CURSOR != $max_cursor_pos || !$#POSTDISPLAY )); then
+		_zsh_autosuggest_invoke_original_widget $@
+		return
 	fi
 
+	# Only accept if the cursor is at the end of the buffer
+	# Add the suggestion to the buffer
+	BUFFER="$BUFFER$POSTDISPLAY"
+
+	# Remove the suggestion
+	unset POSTDISPLAY
+
+	# Run the original widget before manually moving the cursor so that the
+	# cursor movement doesn't make the widget do something unexpected
 	_zsh_autosuggest_invoke_original_widget $@
+	retval=$?
+
+	# Move the cursor to the end of the buffer
+	if [[ "$KEYMAP" = "vicmd" ]]; then
+		CURSOR=$(($#BUFFER - 1))
+	else
+		CURSOR=$#BUFFER
+	fi
+
+	return $retval
 }
 
 # Accept the entire suggestion and execute it
@@ -487,6 +496,145 @@ _zsh_autosuggest_partial_accept() {
 }
 
 #--------------------------------------------------------------------#
+# Completion Suggestion Strategy                                     #
+#--------------------------------------------------------------------#
+# Fetches a suggestion from the completion engine
+#
+
+_zsh_autosuggest_capture_postcompletion() {
+	# Always insert the first completion into the buffer
+	compstate[insert]=1
+
+	# Don't list completions
+	unset 'compstate[list]'
+}
+
+_zsh_autosuggest_capture_completion_widget() {
+	# Add a post-completion hook to be called after all completions have been
+	# gathered. The hook can modify compstate to affect what is done with the
+	# gathered completions.
+	local -a +h comppostfuncs
+	comppostfuncs=(_zsh_autosuggest_capture_postcompletion)
+
+	# Only capture completions at the end of the buffer
+	CURSOR=$#BUFFER
+
+	# Run the original widget wrapping `.complete-word` so we don't
+	# recursively try to fetch suggestions, since our pty is forked
+	# after autosuggestions is initialized.
+	zle -- ${(k)widgets[(r)completion:.complete-word:_main_complete]}
+
+	if is-at-least 5.0.3; then
+		# Don't do any cr/lf transformations. We need to do this immediately before
+		# output because if we do it in setup, onlcr will be re-enabled when we enter
+		# vared in the async code path. There is a bug in zpty module in older versions
+		# where the tty is not properly attached to the pty slave, resulting in stty
+		# getting stopped with a SIGTTOU. See zsh-workers thread 31660 and upstream
+		# commit f75904a38
+		stty -onlcr -ocrnl -F /dev/tty
+	fi
+
+	# The completion has been added, print the buffer as the suggestion
+	echo -nE - $'\0'$BUFFER$'\0'
+}
+
+zle -N autosuggest-capture-completion _zsh_autosuggest_capture_completion_widget
+
+_zsh_autosuggest_capture_setup() {
+	autoload -Uz is-at-least
+
+	# There is a bug in zpty module in older zsh versions by which a
+	# zpty that exits will kill all zpty processes that were forked
+	# before it. Here we set up a zsh exit hook to SIGKILL the zpty
+	# process immediately, before it has a chance to kill any other
+	# zpty processes.
+	if ! is-at-least 5.4; then
+		zshexit() {
+			# The zsh builtin `kill` fails sometimes in older versions
+			# https://unix.stackexchange.com/a/477647/156673
+			kill -KILL $$ 2>&- || command kill -KILL $$
+
+			# Block for long enough for the signal to come through
+			sleep 1
+		}
+	fi
+
+	# Try to avoid any suggestions that wouldn't match the prefix
+	zstyle ':completion:*' matcher-list ''
+	zstyle ':completion:*' path-completion false
+	zstyle ':completion:*' max-errors 0 not-numeric
+
+	bindkey '^I' autosuggest-capture-completion
+}
+
+_zsh_autosuggest_capture_completion_sync() {
+	_zsh_autosuggest_capture_setup
+
+	zle autosuggest-capture-completion
+}
+
+_zsh_autosuggest_capture_completion_async() {
+	_zsh_autosuggest_capture_setup
+
+	zmodload zsh/parameter 2>/dev/null || return # For `$functions`
+
+	# Make vared completion work as if for a normal command line
+	# https://stackoverflow.com/a/7057118/154703
+	autoload +X _complete
+	functions[_original_complete]=$functions[_complete]
+	function _complete() {
+		unset 'compstate[vared]'
+		_original_complete "$@"
+	}
+
+	# Open zle with buffer set so we can capture completions for it
+	vared 1
+}
+
+_zsh_autosuggest_strategy_completion() {
+	# Reset options to defaults and enable LOCAL_OPTIONS
+	emulate -L zsh
+
+	# Enable extended glob for completion ignore pattern
+	setopt EXTENDED_GLOB
+
+	typeset -g suggestion
+	local line REPLY
+
+	# Exit if we don't have completions
+	whence compdef >/dev/null || return
+
+	# Exit if we don't have zpty
+	zmodload zsh/zpty 2>/dev/null || return
+
+	# Exit if our search string matches the ignore pattern
+	[[ -n "$ZSH_AUTOSUGGEST_COMPLETION_IGNORE" ]] && [[ "$1" == $~ZSH_AUTOSUGGEST_COMPLETION_IGNORE ]] && return
+
+	# Zle will be inactive if we are in async mode
+	if zle; then
+		zpty $ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME _zsh_autosuggest_capture_completion_sync
+	else
+		zpty $ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME _zsh_autosuggest_capture_completion_async "\$1"
+		zpty -w $ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME $'\t'
+	fi
+
+	{
+		# The completion result is surrounded by null bytes, so read the
+		# content between the first two null bytes.
+		zpty -r $ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME line '*'$'\0''*'$'\0'
+
+		# Extract the suggestion from between the null bytes.  On older
+		# versions of zsh (older than 5.3), we sometimes get extra bytes after
+		# the second null byte, so trim those off the end.
+		# See http://www.zsh.org/mla/workers/2015/msg03290.html
+		suggestion="${${(@0)line}[2]}"
+	} always {
+		# Destroy the pty
+		zpty -d $ZSH_AUTOSUGGEST_COMPLETIONS_PTY_NAME
+	}
+}
+
+#--------------------------------------------------------------------#
 # History Suggestion Strategy                                        #
 #--------------------------------------------------------------------#
 # Suggests the most recent history item that matches the given
@@ -497,7 +645,7 @@ _zsh_autosuggest_strategy_history() {
 	# Reset options to defaults and enable LOCAL_OPTIONS
 	emulate -L zsh
 
-	# Enable globbing flags so that we can use (#m)
+	# Enable globbing flags so that we can use (#m) and (x~y) glob operator
 	setopt EXTENDED_GLOB
 
 	# Escape backslashes and all of the glob operators so we can use
@@ -506,9 +654,16 @@ _zsh_autosuggest_strategy_history() {
 	# TODO: Use (b) flag when we can drop support for zsh older than v5.0.8
 	local prefix="${1//(#m)[\\*?[\]<>()|^~#]/\\$MATCH}"
 
-	# Get the history items that match
+	# Get the history items that match the prefix, excluding those that match
+	# the ignore pattern
+	local pattern="$prefix*"
+	if [[ -n $ZSH_AUTOSUGGEST_HISTORY_IGNORE ]]; then
+		pattern="($pattern)~($ZSH_AUTOSUGGEST_HISTORY_IGNORE)"
+	fi
+
+	# Give the first history item matching the pattern as the suggestion
 	# - (r) subscript flag makes the pattern match on values
-	typeset -g suggestion="${history[(r)${prefix}*]}"
+	typeset -g suggestion="${history[(r)$pattern]}"
 }
 
 #--------------------------------------------------------------------#
@@ -536,16 +691,23 @@ _zsh_autosuggest_strategy_match_prev_cmd() {
 	# Reset options to defaults and enable LOCAL_OPTIONS
 	emulate -L zsh
 
-	# Enable globbing flags so that we can use (#m)
+	# Enable globbing flags so that we can use (#m) and (x~y) glob operator
 	setopt EXTENDED_GLOB
 
 	# TODO: Use (b) flag when we can drop support for zsh older than v5.0.8
 	local prefix="${1//(#m)[\\*?[\]<>()|^~#]/\\$MATCH}"
 
+	# Get the history items that match the prefix, excluding those that match
+	# the ignore pattern
+	local pattern="$prefix*"
+	if [[ -n $ZSH_AUTOSUGGEST_HISTORY_IGNORE ]]; then
+		pattern="($pattern)~($ZSH_AUTOSUGGEST_HISTORY_IGNORE)"
+	fi
+
 	# Get all history event numbers that correspond to history
-	# entries that match pattern $prefix*
+	# entries that match the pattern
 	local history_match_keys
-	history_match_keys=(${(k)history[(R)$prefix*]})
+	history_match_keys=(${(k)history[(R)$~pattern]})
 
 	# By default we use the first history number (most recent history entry)
 	local histkey="${history_match_keys[1]}"
@@ -589,7 +751,10 @@ _zsh_autosuggest_fetch_suggestion() {
 		# Try to get a suggestion from this strategy
 		_zsh_autosuggest_strategy_$strategy "$1"
 
-		# Break once we've found a suggestion
+		# Ensure the suggestion matches the prefix
+		[[ "$suggestion" != "$1"* ]] && unset suggestion
+
+		# Break once we've found a valid suggestion
 		[[ -n "$suggestion" ]] && break
 	done
 }
@@ -598,9 +763,9 @@ _zsh_autosuggest_fetch_suggestion() {
 # Async                                                              #
 #--------------------------------------------------------------------#
 
-zmodload zsh/system
-
 _zsh_autosuggest_async_request() {
+	zmodload zsh/system 2>/dev/null # For `$sysparams`
+
 	typeset -g _ZSH_AUTOSUGGEST_ASYNC_FD _ZSH_AUTOSUGGEST_CHILD_PID
 
 	# If we've got a pending request, cancel it
@@ -609,17 +774,20 @@ _zsh_autosuggest_async_request() {
 		exec {_ZSH_AUTOSUGGEST_ASYNC_FD}<&-
 		zle -F $_ZSH_AUTOSUGGEST_ASYNC_FD
 
-		# Zsh will make a new process group for the child process only if job
-		# control is enabled (MONITOR option)
-		if [[ -o MONITOR ]]; then
-			# Send the signal to the process group to kill any processes that may
-			# have been forked by the suggestion strategy
-			kill -TERM -$_ZSH_AUTOSUGGEST_CHILD_PID 2>/dev/null
-		else
-			# Kill just the child process since it wasn't placed in a new process
-			# group. If the suggestion strategy forked any child processes they may
-			# be orphaned and left behind.
-			kill -TERM $_ZSH_AUTOSUGGEST_CHILD_PID 2>/dev/null
+		# We won't know the pid unless the user has zsh/system module installed
+		if [[ -n "$_ZSH_AUTOSUGGEST_CHILD_PID" ]]; then
+			# Zsh will make a new process group for the child process only if job
+			# control is enabled (MONITOR option)
+			if [[ -o MONITOR ]]; then
+				# Send the signal to the process group to kill any processes that may
+				# have been forked by the suggestion strategy
+				kill -TERM -$_ZSH_AUTOSUGGEST_CHILD_PID 2>/dev/null
+			else
+				# Kill just the child process since it wasn't placed in a new process
+				# group. If the suggestion strategy forked any child processes they may
+				# be orphaned and left behind.
+				kill -TERM $_ZSH_AUTOSUGGEST_CHILD_PID 2>/dev/null
+			fi
 		fi
 	fi
 
@@ -651,9 +819,12 @@ _zsh_autosuggest_async_request() {
 _zsh_autosuggest_async_response() {
 	emulate -L zsh
 
+	local suggestion
+
 	if [[ -z "$2" || "$2" == "hup" ]]; then
 		# Read everything from the fd and give it as a suggestion
-		zle autosuggest-suggest -- "$(cat <&$1)"
+		IFS='' read -rd '' -u $1 suggestion
+		zle autosuggest-suggest -- "$suggestion"
 
 		# Close the fd
 		exec {1}<&-
@@ -683,4 +854,5 @@ _zsh_autosuggest_start() {
 }
 
 # Start the autosuggestion widgets on the next precmd
+autoload -Uz add-zsh-hook
 add-zsh-hook precmd _zsh_autosuggest_start
