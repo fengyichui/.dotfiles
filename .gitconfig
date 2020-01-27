@@ -134,6 +134,7 @@
     d-vimdiff = difftool --tool=vimdiff
     s   = status --short --untracked-files=no
     st  = status --short
+    stt = status --short --ignored
     st2 = status --porcelain=2 --untracked-files=no
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
