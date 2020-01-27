@@ -290,6 +290,7 @@ function cleanexit ()
 # run
 ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile 2>&1 | tee $jlinklogfile &
 jlinkpid=$(<$jlinkpidfile)
+lastloglines=0
 touch "$exerunningfile"
 
 # catch interrupt
@@ -311,6 +312,7 @@ while true; do
         # restart
         ( $gdbserver $params & echo $! >&3 ) 3>$jlinkpidfile 2>&1 | tee $jlinklogfile &
         jlinkpid=$(<$jlinkpidfile)
+        lastloglines=0
         touch "$exerunningfile"
     fi
 
@@ -320,6 +322,17 @@ while true; do
             echo -e "\n\e[31m$jlinkname EXE Exit\e[0m"
             jlinkpid=""
             rm -rf "$exerunningfile"
+        else
+            if [[ -f "$jlinklogfile" ]]; then
+                curloglines="$(wc -l <"$jlinklogfile")"
+                if [[ "$curloglines" != "$lastloglines" ]]; then
+                    logerrmsg="$(tail -n +$((lastloglines+1)) "$jlinklogfile" | grep -i "failed\|error")"
+                    if [[ -n "$logerrmsg" ]]; then
+                        notifu '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
+                    fi
+                    lastloglines="$curloglines"
+                fi
+            fi
         fi
     fi
 
