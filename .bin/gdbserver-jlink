@@ -23,6 +23,7 @@ Options:
   -s|--speed=*      Speed kB/s (auto)
   -u|--usb=*        Specifies USB SerialNo to connect
   -i|--ip=*         Specifies IP address to connect
+  -N|--nonotify     Not notify (pattern)
   -h|--help         Show this help
   --embos           Use RTOS Plugin: embOS
   --freertos        Use RTOS Plugin: FreeRTOS
@@ -49,6 +50,8 @@ do
         -s=*|--speed=*) speed="${i#*=}" ;;
         -u=*|--usb=*) select="-select usb=${i#*=}" ;;
         -i=*|--ip=*) select="-select ip=${i#*=}" ;;
+        -N=*|--nonotify=*) nonotifypattern="${i#*=}" ;;
+        -N|--nonotify) nonotify=1 ;;
 
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
         --freertos) rtos="-rtos GDBServer/RTOSPlugin_FreeRTOS" ;;
@@ -319,10 +322,13 @@ while true; do
     # check JLinkGDBServer exit
     if [[ -n "$jlinkpid" ]]; then
         if ps -p $jlinkpid >/dev/null; then
-            if [[ -f "$jlinklogfile" ]]; then
+            if [[ -z "$nonotify" && -f "$jlinklogfile" ]]; then
                 curloglines="$(wc -l <"$jlinklogfile")"
                 if [[ "$curloglines" != "$lastloglines" ]]; then
                     logerrmsg="$(tail -n +$((lastloglines+1)) "$jlinklogfile" | grep -i "fail\|error")"
+                    if [[ -n "$nonotifypattern" ]]; then
+                        logerrmsg=$(grep -v -i "$nonotifypattern" <<<"$logerrmsg")
+                    fi
                     if [[ -n "$logerrmsg" ]]; then
                         notifu '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
                     fi
