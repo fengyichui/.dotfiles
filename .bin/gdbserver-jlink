@@ -318,21 +318,21 @@ while true; do
 
     # check JLinkGDBServer exit
     if [[ -n "$jlinkpid" ]]; then
-        if ! ps -p $jlinkpid >/dev/null; then
-            echo -e "\n\e[31m$jlinkname EXE Exit\e[0m"
-            jlinkpid=""
-            rm -rf "$exerunningfile"
-        else
+        if ps -p $jlinkpid >/dev/null; then
             if [[ -f "$jlinklogfile" ]]; then
                 curloglines="$(wc -l <"$jlinklogfile")"
                 if [[ "$curloglines" != "$lastloglines" ]]; then
-                    logerrmsg="$(tail -n +$((lastloglines+1)) "$jlinklogfile" | grep -i "failed\|error")"
+                    logerrmsg="$(tail -n +$((lastloglines+1)) "$jlinklogfile" | grep -i "fail\|error")"
                     if [[ -n "$logerrmsg" ]]; then
                         notifu '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
                     fi
                     lastloglines="$curloglines"
                 fi
             fi
+        else
+            echo -e "\n\e[31m$jlinkname EXE Exit\e[0m"
+            jlinkpid=""
+            rm -rf "$exerunningfile"
         fi
     fi
 
