@@ -36,7 +36,7 @@ zsh_highlight__aliases=`builtin alias -Lm '[^+]*'`
 builtin unalias -m '[^+]*'
 
 # Set $0 to the expected value, regardless of functionargzero.
-#0=${(%):-%N}
+0=${(%):-%N}
 #if true; then
   # $0 is reliable
 #  typeset -g ZSH_HIGHLIGHT_VERSION=$(<"${0:A:h}"/.version)
@@ -55,12 +55,12 @@ builtin unalias -m '[^+]*'
 
 # Use workaround for bug in ZSH?
 # zsh-users/zsh@48cadf4 http://www.zsh.org/mla/workers//2017/msg00034.html
-autoload -U is-at-least
-if is-at-least 5.4; then
-  zsh_highlight__pat_static_bug=false
-else
-  zsh_highlight__pat_static_bug=true
-fi
+#autoload -U is-at-least
+#if is-at-least 5.4; then
+zsh_highlight__pat_static_bug=false
+#else
+#  zsh_highlight__pat_static_bug=true
+#fi
 
 # Array declaring active highlighters names.
 typeset -ga ZSH_HIGHLIGHT_HIGHLIGHTERS
