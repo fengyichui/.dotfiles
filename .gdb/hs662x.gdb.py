@@ -77,7 +77,7 @@ PATCH_MAX_SIZE           = 2 * flash_sector_size
 
 CHIP_HS6620             = 0x6620
 CHIP_HS6621             = 0x6621
-CHIP_HS6622             = 0x6622
+CHIP_HS6621C             = 0x6622
 
 ONCE_OP_SIZE            = 32*1024
 
