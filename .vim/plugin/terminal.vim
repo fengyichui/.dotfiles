@@ -218,7 +218,7 @@ endfunction
 
 " FocusGaine
 let s:tmux_is_running = 0
-let s:tmux_vim_focus_losting_lock = '/tmp/tmux_vim_focus_losting'
+let s:tmux_vim_focus_losting_lock = '/tmp/tmux_vim_focus_losting.' . $USER
 function! s:tmux_focus_gained()
     if s:tmux_is_running
         " When gain focus, vim can't handle normal-mode cursor sharp
