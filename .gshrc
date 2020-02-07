@@ -97,6 +97,9 @@ alias men='tldr'
 # markdown
 alias mk='typora'
 
+# baidu yun pan
+alias by='winpty BaiduPCS-Go.exe'
+
 #####################################
 #             Function              #
 #####################################
