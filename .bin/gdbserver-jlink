@@ -6,6 +6,8 @@ port="2331"
 rtos=""
 select=""
 
+NONOTIFY_PATTERN='Connected correctly'
+
 function usage ()
 {
     cat <<EOF
@@ -326,11 +328,14 @@ while true; do
                 curloglines="$(wc -l <"$jlinklogfile")"
                 if [[ "$curloglines" != "$lastloglines" ]]; then
                     logerrmsg="$(tail -n +$((lastloglines+1)) "$jlinklogfile" | grep -i "fail\|error")"
-                    if [[ -n "$nonotifypattern" ]]; then
-                        logerrmsg=$(grep -v -i "$nonotifypattern" <<<"$logerrmsg")
-                    fi
                     if [[ -n "$logerrmsg" ]]; then
-                        notifu '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
+                        logerrmsg=$(grep -v -i "$NONOTIFY_PATTERN" <<<"$logerrmsg")
+                        if [[ -n "$nonotifypattern" ]]; then
+                            logerrmsg=$(grep -v -i "$nonotifypattern" <<<"$logerrmsg")
+                        fi
+                        if [[ -n "$logerrmsg" ]]; then
+                            notifu '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
+                        fi
                     fi
                     lastloglines="$curloglines"
                 fi
