@@ -148,6 +148,7 @@
     lgb = !cd -- ${GIT_PREFIX:-.} && git lg --branches
     lc  = !cd -- ${GIT_PREFIX:-.} && git lg ORIG_HEAD.. --name-status
     lf  = !cd -- ${GIT_PREFIX:-.} && git lg --name-status
+    lw  = !cd -- ${GIT_PREFIX:-.} && git lgb --author=liqiang --author=fengyichui --since='1 weeks ago'
 
     # https://github.com/prabirshrestha/ProfilesAndSettings/blob/master/.gitconfig
     # show tags and any tag annotation (tito adds tag annotations for example)
