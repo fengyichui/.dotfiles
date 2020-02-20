@@ -30,6 +30,7 @@ flash_vendor_table = {
     0x85: 'PUYA',            # Puya
     0xE0: 'BOYA_0',          # Boya
     0x68: 'BOYA_1',          # Boya
+    0xEB: 'TONGXIN',          # TongXin
     0x52: 'ALLIANCE',        # Alliance Semiconductor
     0x01: 'AMD',             # AMD
     0x37: 'AMIC',            # AMIC
