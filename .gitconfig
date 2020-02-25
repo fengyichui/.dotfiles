@@ -142,6 +142,7 @@
     lso = ls-files --others --exclude-standard
     lsr = ls-remote
     clone1 = clone --depth=1
+    cleanthis = clean -dxf -- ./
 
     # various pretty loggers from various places
     lg  = !cd -- ${GIT_PREFIX:-.} && LESS=$LESS' -S' git log --graph --pretty=format:'%C(yellow)%cd %C(red)%h%Creset -%C(auto)%d%Creset %s %C(blue)(%an) %C(dim)%C(white)%cr%Creset' --abbrev-commit --date=short
