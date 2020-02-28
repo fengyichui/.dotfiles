@@ -502,9 +502,8 @@ imap <C-F12> <C-o>:tnext<cr>
 " Shortcut: Ctrl {{{2
 
 " Windows
-if !has('clipboard')
-let sysclipreg='"'
-elseif has('unnamedplus')
+if has('clipboard')
+if has('unnamedplus')
 let sysclipreg='+'
 else
 let sysclipreg='*'
@@ -516,6 +515,10 @@ execute 'vnoremap <C-c> "'.sysclipreg.'y'
 execute 'cnoremap <C-c> <C-f>^v$"'.sysclipreg.'y<C-c><C-e>'
 execute 'vnoremap <C-x> "'.sysclipreg.'x'
 execute 'cnoremap <C-x> <C-f>^v$"'.sysclipreg.'y<C-c><C-e><C-u>'
+else
+inoremap <silent> <C-v> <C-o>:r !clippaste<cr>
+vnoremap <silent> <C-c> "ry:call system('clipcopy', @r)<cr>
+endif
 execute 'inoremap <C-s> <C-o>:update<cr>'
 execute 'inoremap <C-z> <C-o>u'
 execute 'inoremap <C-a> <C-o>gg<C-o>gH<C-o>G'
