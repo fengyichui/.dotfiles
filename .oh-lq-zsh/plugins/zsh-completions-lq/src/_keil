@@ -1,7 +1,7 @@
 #compdef keil
 
 _arguments -C \
-  ': :_files -g "*.uv(proj|mpw)"'
+  ': :_files -g "*.uv(proj|projx|mpw)"'
 
 # Local Variables:
 # mode: Shell-Script
