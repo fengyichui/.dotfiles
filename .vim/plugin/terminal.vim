@@ -97,8 +97,8 @@ call s:key_fix()
 let s:cursor_normal  = "\e[1 q" " blinking block
 let s:cursor_insert  = "\e[5 q" " blinking vertical bar
 let s:cursor_replace = "\e[3 q" " blinking underscore
-let s:cursor_undercurl_s = "\e[4:3m" " Undercurl start
-let s:cursor_undercurl_e = "\e[4:0m" " Undercurl end
+let s:cursor_undercurl_s = "\e[4:3m" " curly underline start
+let s:cursor_undercurl_e = "\e[4:0m" " curly underline end
 
 " tmux and xterm check
 if !exists('$TMUX')
@@ -168,7 +168,7 @@ let s:restore_screen = "\e[?1049l"
 let s:enable_focus_reporting = "\e[?1004h"
 let s:disable_focus_reporting = "\e[?1004l"
 
-" Tmux cursor shape
+" Tmux cursor shape (tmux not support 'curly underline')
 let s:tmux_cursor_normal  = s:tmux_wrap(s:cursor_normal)
 let s:tmux_cursor_insert  = s:tmux_wrap(s:cursor_insert)
 let s:tmux_cursor_replace = s:tmux_wrap(s:cursor_replace)
