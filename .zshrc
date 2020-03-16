@@ -27,6 +27,8 @@ if [[ -f "/tmp/.notmux.tmp" ]]; then
 else
     if [[ -z "$SSH_CONNECTION" && -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
         if [[ "$OSTYPE" == "cygwin" ]]; then
+            # Disable pseudo console support in pty (issue with tmux)
+            export CYGWIN=disable_pcon
             # FIXME: workaround cygwin tmux
             # https://www.cygwin.com/cygwin-ug-net/highlights.html#ov-hi-sockets :
             # AF_UNIX (AF_LOCAL) sockets are not available in Winsock. They are implemented in Cygwin by using local AF_INET sockets instead.
