@@ -51,14 +51,9 @@ alias gbk2utf8='iconv -f GBK -t UTF8'
 
 # web
 #alias dict="webx 'http://dict.youdao.com/search?q='"
-alias dict="webx 'http://cn.bing.com/dict/search?q='"
+#alias dict="webx 'http://cn.bing.com/dict/search?q='"
+alias dict="webx 'http://dict.cn/'"
 alias wiki="webx 'http://en.wikipedia.org/wiki/'"
-alias baidu="webx 'http://m.baidu.com/s?wd='"
-alias baike="webx 'http://wapbaike.baidu.com/item/'"
-alias qsbk="webx 'http://www.qiushibaike.com/text/'"
-alias news="webx 'http://news.sina.cn/?pos=1&vt=1&ttp=f1|1|1'"
-alias zhihu="webx 'http://www.zhihu.com/explore'"
-alias cpp="webx 'http://www.cplusplus.com/search.do?q='"
 alias rfc="webx 'https://tools.ietf.org/rfc/rfc'"
 
 # arm gdb with tmux,gdb.dashboard
