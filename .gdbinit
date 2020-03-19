@@ -557,21 +557,21 @@ end
 
 define dump_fault_armcm
     set $ok = 1
-    set $_ispr = $xpsr & 0x1FF
-    if $_ispr == 0
+    set $_ipsr = $xpsr & 0x1FF
+    if $_ipsr == 0
         printf "No Any Faults!\n"
         set $ok = 0
     else
-        if $_ispr == 3
+        if $_ipsr == 3
             printf "Hardware Fault IRQ Pending\n"
         else
-            if $_ispr == 4
+            if $_ipsr == 4
                 printf "Memory Manage Fault IRQ Pending\n"
             else
-                if $_ispr == 5
+                if $_ipsr == 5
                     printf "Bus Fault IRQ Pending\n"
                 else
-                    if $_ispr == 6
+                    if $_ipsr == 6
                         printf "Usage Fault IRQ Pending\n"
                     else
                         if $_ipsr > 15
