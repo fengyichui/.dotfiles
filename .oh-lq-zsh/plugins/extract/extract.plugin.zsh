@@ -8,6 +8,7 @@ extract() {
 			Default: Extract archive file
 			Options:
 			    -l, --list      List archive files' name.
+			    -p, --plain     Plain extract files
 			    -c, --compress  Compress files/directories to archive file
 			                    extract -c <archive-name> <files>
 		EOF
@@ -28,10 +29,17 @@ extract() {
 
         local list_archive
         local extract_dir
+        local plain_extract
 
         list_archive=0
         if [[ "$1" == "-l" ]] || [[ "$1" == "--list" ]]; then
             list_archive=1
+            shift
+        fi
+
+        plain_extract=0
+        if [[ "$1" == "-p" ]] || [[ "$1" == "--plain" ]]; then
+            plain_extract=1
             shift
         fi
 
@@ -98,24 +106,43 @@ extract() {
                 rmdir --ignore-fail-on-non-empty "$extract_dir"
 
                 if [[ -d "$extract_dir" ]]; then
-                    # remove double dir
-                    extract_sub_dir=$(ls -A $extract_dir)
-                    sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
-                    if [[ "$sub_dir_files_num" == "1" ]]; then
-                        if [[ -e "$extract_sub_dir" && "$extract_sub_dir" != "$extract_dir" ]]; then
-                            echo -n "'$extract_sub_dir' is exist, remove and replace it? [yN] "
-                            read -rs -k 1 answer
-                            [[ -n "$answer" ]] && echo
-                            if [[ "$answer" != "y" ]]; then
-                                echo "Abort triming extracted directory!" >&2
-                                return
+                    if [[ "$plain_extract" == "1" ]]; then
+                        plain_extract_dir=$extract_dir
+                        while true; do
+                            extract_sub_dir=$(ls -A $plain_extract_dir)
+                            sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
+                            if [[ "$sub_dir_files_num" != "1" ]]; then
+                                break
                             fi
-                            rm -rf "$extract_sub_dir"
-                        fi
-                        rm -rf "${extract_sub_dir}.$$"
-                        mv "$extract_dir/$extract_sub_dir" "${extract_sub_dir}.$$"
+                            if [[ ! -d "$plain_extract_dir/$extract_sub_dir" ]]; then
+                                break
+                            fi
+                            plain_extract_dir="$plain_extract_dir/$extract_sub_dir"
+                        done
+                        setopt NULL_GLOB
+                        mv "$plain_extract_dir"/{.,}* ./
+                        unsetopt NULL_GLOB
                         rmdir --ignore-fail-on-non-empty "$extract_dir"
-                        mv "${extract_sub_dir}.$$" $extract_sub_dir
+                    else
+                        # remove double dir
+                        extract_sub_dir=$(ls -A $extract_dir)
+                        sub_dir_files_num=$(wc -l <<< $extract_sub_dir)
+                        if [[ "$sub_dir_files_num" == "1" ]]; then
+                            if [[ -e "$extract_sub_dir" && "$extract_sub_dir" != "$extract_dir" ]]; then
+                                echo -n "'$extract_sub_dir' is exist, remove and replace it? [yN] "
+                                read -rs -k 1 answer
+                                [[ -n "$answer" ]] && echo
+                                if [[ "$answer" != "y" ]]; then
+                                    echo "Abort triming extracted directory!" >&2
+                                    return
+                                fi
+                                rm -rf "$extract_sub_dir"
+                            fi
+                            rm -rf "${extract_sub_dir}.$$"
+                            mv "$extract_dir/$extract_sub_dir" "${extract_sub_dir}.$$"
+                            rmdir --ignore-fail-on-non-empty "$extract_dir"
+                            mv "${extract_sub_dir}.$$" $extract_sub_dir
+                        fi
                     fi
                 fi
             fi
