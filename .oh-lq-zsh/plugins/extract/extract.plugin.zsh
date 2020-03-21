@@ -122,7 +122,7 @@ extract() {
                         setopt NULL_GLOB
                         mv "$plain_extract_dir"/{.,}* ./
                         unsetopt NULL_GLOB
-                        rmdir --ignore-fail-on-non-empty "$extract_dir"
+                        find "$extract_dir" -type d -empty -delete
                     else
                         # remove double dir
                         extract_sub_dir=$(ls -A $extract_dir)
