@@ -1,13 +1,14 @@
 #!/bin/zsh
 ######################################################################
 # @file x
-# @brief Extract or compress archive
+# @brief Extract or compress archive files
 # @date 2017/2/28 22:57:47
 # @author liqiang
 ######################################################################
 
-if (( $# == 0 )); then
+if (( $# == 0 )) || [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
     cat <<EOF
+Extract or compress archive files
 Usage: x [-option] [file ...]
 Default: Extract archive file
 Options:
