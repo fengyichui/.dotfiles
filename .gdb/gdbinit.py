@@ -301,6 +301,40 @@ class log_end_register(gdb.Command):
         gdb.execute("set logging overwrite off", from_tty)
 
 
+# redir command
+class redir_command_register(gdb.Command):
+
+    """Auto substitute-path command
+    redir <new-path>
+    default is current directory
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("redir", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
+
+    def invoke(self, args, from_tty):
+        argv = gdb.string_to_argv(args)
+        # current dir
+        if len(argv) == 0:
+            cur_dir = '.'
+        else:
+            cur_dir = argv[0]
+        cur_absdir = os.path.realpath(cur_dir)
+        # source dir
+        src_absdir = None
+        src_dir = gdb.execute('info source', to_string=True).splitlines()
+        for absdir in src_dir:
+            match = re.match(r'^Compilation directory is (.*)$', absdir, flags=re.I)
+            if match:
+                src_absdir = match.group(1)
+                break
+        else:
+            raise gdb.GdbError("Can't find compilation directory! May be work: 'set $pc=main' and 'list'")
+        # substitute-path
+        print("'{}' -> '{}'".format(src_absdir, cur_absdir))
+        gdb.execute('set substitute-path {} {}'.format(src_absdir.replace("\\", "\\\\"), cur_absdir), from_tty)
+
+
 ######################################################################
 # Register
 ######################################################################
@@ -317,6 +351,7 @@ less_command_register()
 log_command_register()
 log_begin_register()
 log_end_register()
+redir_command_register()
 
 # @} #
 
