@@ -639,10 +639,10 @@ vnoremap <silent> <A-=> :call lq#OpComment('add', 'v')<cr>
 vnoremap <silent> <A--> :call lq#OpComment('del', 'v')<cr>
 
 " Search (*/# remap by mark.vim)
-nnoremap n :ZZWrap normal! nzv<cr>
-nnoremap N :ZZWrap normal! Nzv<cr>
-nnoremap * :ZZWrap normal! *zv<cr>
-nnoremap # :ZZWrap normal! #zv<cr>
+nnoremap <silent> n :ZZWrap echo @/ \| normal! nzv<cr>
+nnoremap <silent> N :ZZWrap echo @/ \| normal! Nzv<cr>
+nnoremap <silent> * :ZZWrap normal! *zv<cr>
+nnoremap <silent> # :ZZWrap normal! #zv<cr>
 " Visual mode pressing * or # searches for the current selection
 vnoremap <silent> * :call lq#VisualSelect('search')<cr>//<cr>zvzz
 vnoremap <silent> # :call lq#VisualSelect('search')<cr>??<cr>zvzz
