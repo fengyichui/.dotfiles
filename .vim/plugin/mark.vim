@@ -166,8 +166,8 @@ nnoremap <silent> \* :call <sid>SearchCurrentMark()<cr>
 nnoremap <silent> \# :call <sid>SearchCurrentMark("b")<cr>
 nnoremap <silent> \/ :call <sid>SearchAnyMark()<cr>
 nnoremap <silent> \? :call <sid>SearchAnyMark("b")<cr>
-nnoremap <silent> * :if !<sid>SearchNext()<bar>execute ":ZZWrap normal! *zv"<bar>endif<cr>
-nnoremap <silent> # :if !<sid>SearchNext("b")<bar>execute ":ZZWrap normal! #zv"<bar>endif<cr>
+nnoremap <silent> \n :call <sid>SearchCurrentMark()<cr>
+"nnoremap <silent> \N :call <sid>SearchNext("b")<cr>
 
 command! -nargs=? Mark call s:DoMark(<f-args>)
 
