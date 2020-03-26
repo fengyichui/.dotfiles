@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cyg2win -e -i "arm-none-eabi-ld.exe $*"
+cyg2win -e -r -i "arm-none-eabi-ld.exe $*"
 
