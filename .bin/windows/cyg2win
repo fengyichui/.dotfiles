@@ -84,7 +84,7 @@ fi
 if [[ -n "$execute" ]]; then
 #    echo "$result"
     if [[ -n "$win2cyg" ]]; then
-        eval "$result" | cyg2win -r
+        eval "$result" 2>&1 | cyg2win -r
     else
         eval "$result"
     fi
