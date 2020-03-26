@@ -5,13 +5,15 @@ input=''
 execute=''
 slash=''
 precise=''
+win2cyg=''
 
 function print_usage ()
 {
     echo "Convert cygwin-string to windows-string and excute it"
     echo "Options:"
     echo "  -i <input>  convert input string"
-    echo "  -e          execute it"
+    echo "  -r          convert by win2cyg"
+    echo "  -e          execute it, if -r present, input use cyg2win, ouput use win2cyg"
     echo "  -p          use cygpath to precise convert each exist paths"
     echo "  -s          use slash(\\) instead of backslash(/)"
     echo "  -h          show this help and exit"
@@ -20,9 +22,10 @@ function print_usage ()
 }
 
 # Parsing params
-while getopts i:eshp opt; do
+while getopts i:reshp opt; do
     case $opt in
         i) input="$OPTARG" ;;
+        r) win2cyg=1 ;;
         e) execute=1 ;;
         p) precise=1 ;;
         s) slash=1 ;;
@@ -37,39 +40,54 @@ if [[ -z "$input" ]]; then
 
     # check
     if [[ -z "$input" ]]; then
-        print_usage
+        exit 0
     fi
 fi
 
-if [[ -n "$precise" ]]; then
-    result=''
-    for i in $input; do
-        i=${i/\~/$HOME}
-        if [[ -e "$i" ]]; then
-            result="${result}$(cygpath -m $i) "
-        else
-            result="${result}${i} "
-        fi
-    done
+if [[ -n "$win2cyg" && -z "$execute" ]]; then
+    if [[ -n "$precise" ]]; then
+        result=''
+        for i in $input; do
+            result="${result}$(cygpath -u $i) "
+        done
+    else
+        result=$(sed "s#\\\\\\+#\\/#g; s#\\([A-Za-z]\\):/#/cygdrive/\\1/#g" <<<"$input")
+    fi
 else
-    # cygwin dir keyword
-    user_dir=$(cygpath ~)       # /home/username
-    root_dir=$(cygpath -m /)    # D:/cygwin64
-    # convert
-    result=$(echo "$input" | sed "s#${user_dir}/#${root_dir}${user_dir}/#g; \
-                                  s#/cygdrive/\\([a-z]\\)/#\\1:/#g; \
-                                  s#~/#${root_dir}${user_dir}/#g; \
-                                  s#\\(^\\|\\s\\|\"\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g")
-fi
+    if [[ -n "$precise" ]]; then
+        result=''
+        for i in $input; do
+            i=${i/\~/$HOME}
+            if [[ -e "$i" ]]; then
+                result="${result}$(cygpath -m $i) "
+            else
+                result="${result}${i} "
+            fi
+        done
+    else
+        # cygwin dir keyword
+        user_dir=$(cygpath ~)       # /home/username
+        root_dir=$(cygpath -m /)    # D:/cygwin64
+        # convert
+        result=$(sed "s#${user_dir}/#${root_dir}${user_dir}/#g; \
+                      s#/cygdrive/\\([a-z]\\)/#\\1:/#g; \
+                      s#~/#${root_dir}${user_dir}/#g; \
+                      s#\\(^\\|\\s\\|\"\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g" <<<"$input")
+    fi
 
-if [[ -n "$slash" ]]; then
-    result=${result//\//\\\\} # $(echo "$result" | sed "s#/#\\\\\\\\#g")
+    if [[ -n "$slash" ]]; then
+        result=${result//\//\\\\} # $(echo "$result" | sed "s#/#\\\\\\\\#g")
+    fi
 fi
 
 # excute
 if [[ -n "$execute" ]]; then
 #    echo "$result"
-    eval "$result"
+    if [[ -n "$win2cyg" ]]; then
+        eval "$result" | cyg2win -r
+    else
+        eval "$result"
+    fi
 else
     echo "$result"
 fi
