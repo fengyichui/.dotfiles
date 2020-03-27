@@ -6,11 +6,13 @@ execute=''
 slash=''
 precise=''
 win2cyg=''
+autocmd=''
 
 function print_usage ()
 {
     echo "Convert cygwin-string to windows-string and excute it"
     echo "Options:"
+    echo "  -a <files>  convert command.exe to command with 'cyg2win -e -r -i command.exe \$*'"
     echo "  -i <input>  convert input string"
     echo "  -r          convert by win2cyg"
     echo "  -e          execute it, if -r present, input use cyg2win, ouput use win2cyg"
@@ -22,8 +24,9 @@ function print_usage ()
 }
 
 # Parsing params
-while getopts i:reshp opt; do
+while getopts a:i:reshp opt; do
     case $opt in
+        a) autocmd="$OPTARG" ;;
         i) input="$OPTARG" ;;
         r) win2cyg=1 ;;
         e) execute=1 ;;
@@ -32,6 +35,26 @@ while getopts i:reshp opt; do
         ?) print_usage ;;
     esac
 done
+
+# auto generate cyg2win command
+if [[ -n "$autocmd" ]]; then
+    dir="$(realpath "$autocmd")"
+    for exe in $(ls "$dir"); do
+        if [[ "$exe" == *.exe ]]; then
+            cygexe=$(basename -s .exe "$exe")
+            if [[ -d "$dir" ]]; then
+                exe="$dir/$exe"
+            fi
+            echo "generating $cygexe ..."
+            cat >$cygexe << EOF
+#!/bin/bash
+cyg2win -e -r -i "'$exe' \$*"
+EOF
+            chmod +x "$cygexe"
+        fi
+    done
+    exit 0
+fi
 
 # check input
 if [[ -z "$input" ]]; then
