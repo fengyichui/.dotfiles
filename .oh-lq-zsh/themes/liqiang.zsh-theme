@@ -111,6 +111,7 @@ function precmd() {
 # Hook Functions: trigger by `kill -s USR1 $$`
 function TRAPUSR1() {
     # try 10 times
+    local i
     for i in {1..10}; do
         # read from temp file
         tmp_prompt=$(cat "${HOME}/.zsh_tmp_prompt" 2>/dev/null)
