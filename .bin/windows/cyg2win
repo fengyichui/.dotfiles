@@ -37,13 +37,16 @@ done
 if [[ -z "$input" ]]; then
     # read stdin
     IFS='' read -d '' -r input
-
     # check
     if [[ -z "$input" ]]; then
         exit 0
     fi
 fi
 
+# root direcotry (D:/cygwin64)
+root_dir=$(cygpath -m /)
+
+# convert
 if [[ -n "$win2cyg" && -z "$execute" ]]; then
     if [[ -n "$precise" ]]; then
         result=''
@@ -51,13 +54,18 @@ if [[ -n "$win2cyg" && -z "$execute" ]]; then
             result="${result}$(cygpath -u $i) "
         done
     else
-        result=$(sed "s#\\\\\\+#\\/#g; s#\\([A-Za-z]\\):/#/cygdrive/\\1/#g" <<<"$input")
+        result=$(sed "s#\\\\\\+#\\/#g; \
+                      s#$root_dir/#/#Ig; \
+                      s#\\([A-Za-z]\\):/#/cygdrive/\\l\\1/#g" <<<"$input")
     fi
 else
+    # cygwin dir keyword
+    user_dir=$(cygpath ~)       # /home/username
+    # convert
     if [[ -n "$precise" ]]; then
         result=''
         for i in $input; do
-            i=${i/\~/$HOME}
+            i=${i/\~/$user_dir}
             if [[ -e "$i" ]]; then
                 result="${result}$(cygpath -m $i) "
             else
@@ -65,18 +73,14 @@ else
             fi
         done
     else
-        # cygwin dir keyword
-        user_dir=$(cygpath ~)       # /home/username
-        root_dir=$(cygpath -m /)    # D:/cygwin64
-        # convert
         result=$(sed "s#${user_dir}/#${root_dir}${user_dir}/#g; \
                       s#/cygdrive/\\([a-z]\\)/#\\1:/#g; \
                       s#~/#${root_dir}${user_dir}/#g; \
                       s#\\(^\\|\\s\\|\"\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g" <<<"$input")
     fi
-
+    # slash
     if [[ -n "$slash" ]]; then
-        result=${result//\//\\\\} # $(echo "$result" | sed "s#/#\\\\\\\\#g")
+        result=${result//\//\\\\}
     fi
 fi
 
