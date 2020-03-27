@@ -45,6 +45,6 @@ windows:
             - gdb_dashboard_tty=$(cat /tmp/gdb_dashboard_tty)
             - arm-none-eabi-gdb --silent -ex "source ~/.dotfiles/.gdb/dashboard.gdb" -ex "dashboard -output $gdb_dashboard_tty"
             - shell clear
-        - gdbserver:
-            - gdbserver-jlink
+#        - gdbserver:
+#            - python3
 
