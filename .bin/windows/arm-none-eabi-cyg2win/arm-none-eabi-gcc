@@ -1,3 +1,0 @@
-#!/bin/bash
-
-cyg2win -e -r -i "arm-none-eabi-gcc.exe $*"
