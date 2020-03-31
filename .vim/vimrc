@@ -754,22 +754,21 @@ command! -nargs=* -complete=file Makegcc   set makeprg=make     | compiler! gcc 
 command! -nargs=* -complete=file Makedox   set makeprg=doxygen  | compiler! gcc  | make <args>
 command!                         Maketags  !ctags -R --fields=+iaSszt --c-kinds=+p --c++-kinds=+p --extra=+q --totals .
 
-
 " X command
-command!       -nargs=* Xcolumn     call lq#ColumnOp(<q-args>)
-command!       -nargs=0 Xhex        call lq#HexEndianToggle()
-command!       -nargs=0 XrootVCS    call lq#SwitchVCSRoot()
-command!       -nargs=0 Xycm        packadd YouCompleteMe
-command!       -nargs=0 Xhighlight  packadd TagHighlight | edit
-command!       -nargs=0 Xale        packadd ale | edit
-command!       -nargs=0 Xomni       packadd OmniCppComplete | call omni#cpp#complete#Init()
-command!       -nargs=0 Xsignify    let g:signify_disable_by_default=0 | SignifyEnable
-command!       -nargs=0 Xstartify   Startify
-command!       -nargs=0 Xundotree   UndotreeToggle
-command!       -nargs=0 Xcolorizer  ColorToggle
-command!       -nargs=0 Xtail       TailToggle
-command!       -nargs=0 Xmatrix     Matrix
-command! -bang -nargs=0 Xdir        call lq#OpenDir(<bang>0)
+command! -range -nargs=* Xcol        call lq#ColumnOp(<q-args>)
+command!        -nargs=0 Xhex        call lq#HexEndianToggle()
+command!        -nargs=0 XrootVCS    call lq#SwitchVCSRoot()
+command!        -nargs=0 Xycm        packadd YouCompleteMe
+command!        -nargs=0 Xhighlight  packadd TagHighlight | edit
+command!        -nargs=0 Xale        packadd ale | edit
+command!        -nargs=0 Xomni       packadd OmniCppComplete | call omni#cpp#complete#Init()
+command!        -nargs=0 Xsignify    let g:signify_disable_by_default=0 | SignifyEnable
+command!        -nargs=0 Xstartify   Startify
+command!        -nargs=0 Xundotree   UndotreeToggle
+command!        -nargs=0 Xcolorizer  ColorToggle
+command!        -nargs=0 Xtail       TailToggle
+command!        -nargs=0 Xmatrix     Matrix
+command! -bang  -nargs=0 Xdir        call lq#OpenDir(<bang>0)
 
 " Plugin {{{1
 

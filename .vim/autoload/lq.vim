@@ -219,67 +219,89 @@ function! lq#OpComment(op, nv)
     match none
 endfunction
 
-function! lq#ColumnOp(...)
+function! lq#ColumnOp(...) range
     if a:0 == 0
         return
     endif
 
     let args = a:1
     let args = substitute(args, '\\"', '<\\~liq=/>', 'g') "用 <\~liq=/> 替换 \"
-    let lst_line   = matchlist(args, '\v-l\=([0-9.^$]*),\s*([0-9.^$]*)')
-    let lst_column = matchlist(args, '\v-c\=([0-9.^$]*)')
-    let lst_insert = matchlist(args, '\v-i\="([^"]*)"')
-    let lst_offset = matchlist(args, '\v-o\=([+-/\*])(\d*)')
-    let lst_format = matchlist(args, '\v-f\="([^"]*)"')
+    let lst_line  = matchlist(args, '\v-line\=([0-9.^$]*),\s*([0-9.^$]*)')
+    let lst_col   = matchlist(args, '\v-col\=([0-9.^$]*)')
+    let lst_value = matchlist(args, '\v-value\="([^"]*)"')
+    let lst_exp   = matchlist(args, '\v-exp\=([+-/\*])(\d*)')
+    let lst_fmt   = matchlist(args, '\v-fmt\="([^"]*)"')
 
-    if empty(lst_line) || empty(lst_column) || empty(lst_insert)
+    if empty(lst_line)
+        let begin_line = line("'<")
+        let end_line   = line("'>")
+        if begin_line < end_line
+            let lst_line = ["", begin_line, end_line]
+        elseif begin_line > end_line
+            let lst_line = ["", end_line, begin_line]
+        endif
+    endif
+
+    if empty(lst_col)
+        let cur_column = col("'>")
+        let end_column = col("$")
+        if cur_column >= end_column
+            let lst_col = ["", "$"]
+        else
+            let lst_col = ["", cur_column-1]
+        endif
+    endif
+
+    if empty(lst_line) || empty(lst_col)
         echo 'Column operation parameter:'
-        echo '    Must:     -l[ine]=1,25             => [n: number], [.: current], [1: first], [$: last] '
-        echo '              -c[olumn]=8              => [n: number], [.: current], [0: begin], [$: end]'
-        echo '              -i[nsert]="insert data"  => if want insert ", write \"; if -o is present, it is the 1st value'
-        echo '    Optional: -o[ffset]=+1             => [+-*/]'
-        echo '              -f[ormat]=" %02X "       => like the 1st parameter in printf(). if want insert ", write \"'
-        echo 'Example:'
-        echo '    column -l=1,$ -c=0 -i="0x40000000" -o=+16 -f="0x%08X "'
+        echo '    -line=1,25      [n: number], [.: current], [1: first], [$: last]'
+        echo '    -col=8          [n: number], [.: current], [0: begin], [$: end]'
+        echo '    -value="data"   if -exp is present, it is the 1st value'
+        echo '    -exp=+1         expression [+-*/]'
+        echo '    -fmt=" %02X "   format use printf'
+        echo 'If want insert ", write \"'
+        echo "Default: Xcolumn -line='<,'> -col=. -value=\"1\" -exp=+1 -fmt=\"%d\""
+        echo 'Example: Xcolumn -line=1,$ -col=0 -value="0x40000000" -exp=+16 -fmt="0x%08X "'
         echo 'by liqiang 2013-4-18 21:20:55'
         return
-    else
-        let l:line_begin = (lst_line[1]   =~ "[.^$]") ? line(lst_line[1]) : lst_line[1]
-        let l:line_end   = (lst_line[2]   =~ "[.^$]") ? line(lst_line[2]) : lst_line[2]
-        let l:column     = (lst_column[1] ==# '.'   ) ? col('.')          : lst_column[1]
-        let l:insert     = substitute(lst_insert[1], '<\\\~liq=/>', '"', 'g')
     endif
 
-    if empty(lst_offset)
-        let l:op     = 'none'
-        let l:offset = 'none'
+    let l:line_begin = (lst_line[1] =~ "[.^$]") ? line(lst_line[1]) : lst_line[1]
+    let l:line_end   = (lst_line[2] =~ "[.^$]") ? line(lst_line[2]) : lst_line[2]
+    let l:column     = (lst_col[1]  =~ "[.]")   ? col(lst_col[1])   : lst_col[1]
+
+    if empty(lst_value)
+        let l:value = "1"
     else
-        let l:op     = lst_offset[1]
-        let l:offset = lst_offset[2]
-        if l:insert =~# '^[a-zA-Z]$'
-            let l:bAsciiOp = 1
-            let l:insert = char2nr(l:insert)
-        else
-            let l:bAsciiOp = 0
-        endif
+        let l:value = substitute(lst_value[1], '<\\\~liq=/>', '"', 'g')
     endif
 
-    if empty(lst_format)
-        if l:op == 'none'
-            let l:format = '%s'
+    if empty(lst_exp)
+        let l:op     = '+'
+        let l:offset = '1'
+    else
+        let l:op     = lst_exp[1]
+        let l:offset = lst_exp[2]
+    endif
+
+    let l:bAsciiOp = 0
+    if l:value =~# '^[a-zA-Z]$'
+        let l:bAsciiOp = 1
+        let l:value = char2nr(l:value)
+    endif
+
+    if empty(lst_fmt)
+        if l:bAsciiOp == 1
+            let l:format = '%c'
         else
-            if l:bAsciiOp == 1
-                let l:format = '%c'
-            else
-                let l:format = '%d'
-            endif
+            let l:format = '%d'
         endif
     else
-        let l:format = substitute(lst_format[1], '<\\\~liq=/>', '"', 'g')
+        let l:format = substitute(lst_fmt[1], '<\\\~liq=/>', '"', 'g')
     endif
 
     "显示参数
-    echo l:line_begin.','.l:line_end.' '.l:column.' '.l:insert.' '.l:op.' '.l:offset.' '.l:format
+    echo l:line_begin.','.l:line_end.' '.l:column.' '.l:value.' '.l:op.' '.l:offset.' '.l:format
 
     "如果当前文件的最大行小于需要插入的行 则插入新行
     let max_line = line("$")
@@ -292,9 +314,9 @@ function! lq#ColumnOp(...)
     "realy work hard
     for i in range(l:line_begin, l:line_end)
         if l:column ==# '^'     "行首插入
-            execute 'silent!' . i . 's/^/\=printf(l:format, l:insert)/'
+            execute 'silent!' . i . 's/^/\=printf(l:format, l:value)/'
         elseif l:column ==# '$' "行尾插入
-            execute 'silent!' . i . 's/\s*$/\=printf(l:format, l:insert)/'
+            execute 'silent!' . i . 's/\s*$/\=printf(l:format, l:value)/'
         else                    "当前位置插入
             "行宽度不够 则添加
             let line_len = strlen(getline(i))
@@ -306,10 +328,10 @@ function! lq#ColumnOp(...)
                 execute 'silent!' . i . 's/$/\=printf("%s",add_space)/'
             endif
             "执行 execute 真好用 O(∩_∩)O
-            execute 'silent!' . i . 's/\(^.\{' . l:column . '}\)\@<=/\=printf(l:format, l:insert)/'
+            execute 'silent!' . i . 's/\(^.\{' . l:column . '}\)\@<=/\=printf(l:format, l:value)/'
         endif
         if l:op !=# 'none'
-            execute 'let l:insert = l:insert ' . l:op . ' l:offset'
+            execute 'let l:value = l:value ' . l:op . ' l:offset'
         endif
     endfor
 endfunction
