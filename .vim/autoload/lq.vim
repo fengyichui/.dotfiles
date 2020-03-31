@@ -260,7 +260,7 @@ function! lq#ColumnOp(...) range
         echo '    -exp=+1         expression [+-*/]'
         echo '    -fmt=" %02X "   format use printf'
         echo 'If want insert ", write \"'
-        echo "Default: Xcolumn -line='<,'> -col=. -value=\"1\" -exp=+1 -fmt=\"%d\""
+        echo "Default: Xcolumn -line='<,'> -col=. -value=\"1\" -exp=+1 -fmt=\"%d \""
         echo 'Example: Xcolumn -line=1,$ -col=0 -value="0x40000000" -exp=+16 -fmt="0x%08X "'
         echo 'by liqiang 2013-4-18 21:20:55'
         return
@@ -292,9 +292,18 @@ function! lq#ColumnOp(...) range
 
     if empty(lst_fmt)
         if l:bAsciiOp == 1
-            let l:format = '%c'
+            let l:format = '%c '
         else
-            let l:format = '%d'
+            let line_num = l:line_end - l:line_begin
+            if line_num < 10
+                let l:format = '%d '
+            elseif line_num < 100
+                let l:format = '%-2d '
+            elseif line_num < 1000
+                let l:format = '%-3d '
+            else
+                let l:format = '%-4d '
+            endif
         endif
     else
         let l:format = substitute(lst_fmt[1], '<\\\~liq=/>', '"', 'g')
