@@ -298,11 +298,11 @@ function! lq#ColumnOp(...) range
             if line_num < 10
                 let l:format = '%d '
             elseif line_num < 100
-                let l:format = '%-2d '
+                let l:format = '%2d '
             elseif line_num < 1000
-                let l:format = '%-3d '
+                let l:format = '%3d '
             else
-                let l:format = '%-4d '
+                let l:format = '%4d '
             endif
         endif
     else
