@@ -205,10 +205,10 @@ hi VertSplit        ctermfg=238             ctermbg=238             cterm=none
 hi SignColumn       guifg=#A6E22E           guibg=#444444
 hi SignColumn       ctermfg=118             ctermbg=238
 " line numbers
-hi LineNr           guifg=#767676           guibg=#444444
-hi LineNr           ctermfg=243             ctermbg=238
-hi CursorLineNr     guifg=#eeee00           guibg=#444444
-hi CursorLineNr     ctermfg=11              ctermbg=238
+hi LineNr           guifg=#767676           guibg=#444444           gui=none
+hi LineNr           ctermfg=243             ctermbg=238             cterm=none
+hi CursorLineNr     guifg=#eeee00           guibg=#444444           gui=none
+hi CursorLineNr     ctermfg=11              ctermbg=238             cterm=none
 " match parenthesis, brackets
 hi MatchParen       guifg=NONE              guibg=NONE              gui=underline
 hi MatchParen       ctermfg=NONE            ctermbg=NONE            cterm=underline
