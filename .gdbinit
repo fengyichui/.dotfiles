@@ -68,41 +68,22 @@ define hexdump
     if $argc < 1
         help hexdump
     else
-        set $daddr = $arg0
         if $argc == 1
-            set $dlines = 16
+            set $bytes = 256
         else
-            set $dlines = $arg1
+            set $bytes = $arg1
         end
-        set $line = 0
-        while ($line < $dlines)
-            set $addr = $daddr + ($line * 0x10)
-            printf "%08X: ", $addr
-            set $i = 0
-            while $i < 0x08
-                printf "%02X ", *(unsigned char *)($addr+$i)
-                set $i++
-            end
-            printf " "
-            while $i < 0x10
-                printf "%02X ", *(unsigned char *)($addr+$i)
-                set $i++
-            end
-            printf " |"
-            set $i = 0
-            while $i < 0x10
-                ascii_char $addr+$i
-                set $i++
-            end
-            printf "|\n"
-            set $line++
-        end
+        set $addr_begin = $arg0
+        set $addr_end = $addr_begin+$bytes
+        dump memory .gdbdump.bin $addr_begin $addr_end
+        # shell hexdump -e '"%08_ax: " 8/1 "%02x " "  " 8/1 "%02x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+        shell hexdump -C .gdbdump.bin
     end
 end
 document hexdump
-Syntax: hexdump <ADDR> [<NR_LINES>]
+Syntax: hexdump <ADDR> [<BYTES>]
 | Display a 16-byte hex/ASCII dump of memory starting at address ADDR.
-| if no NR_LINES field, NR_LINES = 16
+| if no BYTES field, BYTES = 256
 end
 
 
@@ -110,36 +91,21 @@ define hexdump32
     if $argc < 1
         help hexdump32
     else
-        set $daddr = $arg0
         if $argc == 1
-            set $dlines = 16
+            set $bytes = 256
         else
-            set $dlines = $arg1
+            set $bytes = $arg1
         end
-        set $line = 0
-        while ($line < $dlines)
-            set $addr = $daddr + ($line * 0x10)
-            printf "%08X: ", $addr
-            set $i = 0
-            while $i < 0x10
-                printf "%08X ", *(unsigned int *)($addr+$i)
-                set $i += 4
-            end
-            printf " |"
-            set $i = 0
-            while $i < 0x10
-                ascii_char $addr+$i
-                set $i++
-            end
-            printf "|\n"
-            set $line++
-        end
+        set $addr_begin = $arg0
+        set $addr_end = $addr_begin+$bytes
+        dump memory .gdbdump.bin $addr_begin $addr_end
+        shell hexdump -e '"%08_ax: " 4/4 "%08x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
     end
 end
 document hexdump32
-Syntax: hexdump32 <ADDR> [<NR_LINES>]
+Syntax: hexdump32 <ADDR> [<BYTES>]
 | Display a 4-int(32bit) hex/ASCII dump of memory starting at address ADDR.
-| if no NR_LINES field, NR_LINES = 16
+| if no BYTES field, BYTES = 256
 end
 
 
