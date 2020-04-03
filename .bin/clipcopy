@@ -29,7 +29,13 @@ elif [[ $OSTYPE == cygwin* ]]; then
     else
         if [[ -n "$copyfile" ]]; then
             # https://github.com/rostok/file2clip.git
-            file2clip "$@" < /dev/null
+            result=''
+            for i in $@; do
+                path="$(realpath "$i")"
+                [[ -z "$path" ]] && exit 1
+                result="$result $(cygpath -w "$path")"
+            done
+            file2clip $result < /dev/null
         else
             cat "$@" > /dev/clipboard
         fi
