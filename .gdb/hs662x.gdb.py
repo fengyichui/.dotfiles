@@ -23,8 +23,11 @@ import time
 ######################################################################
 # VARIABLES
 ######################################################################
+flash_id = 0
 flash_size = 1024*512
 flash_sector_size = 1024*4
+device_name = 'HS662X'
+device_version = 1
 debug_file = ''
 
 flash_vendor_table = {
@@ -116,6 +119,12 @@ def flash_prepare_and_show():
     else:
         debug_file = ''
 
+    # global
+    global flash_size
+    global flash_id
+    global device_name
+    global device_version
+
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
@@ -130,8 +139,6 @@ def flash_prepare_and_show():
     device_version = (device_info>>8) & 0xFF
     print('Device: {} A{}'.format(device_name, device_version))
 
-    # Flash ID
-    global flash_size
     # Ext
     flash_id_ext = int(gdb.parse_and_eval('sf_readId(1)'))
     if flash_id_ext==0x0 or flash_id_ext==0xFFFFFF:
@@ -369,7 +376,7 @@ class flash_upload_register(gdb.Command):
 
         # Get file name
         if args == '':
-            flash_file = 'flash_image.bin'
+            flash_file = 'FLASH_{:06X}_{}KB_{}A{}.bin'.format(flash_id, flash_size/1024, device_name, device_version)
         else:
             flash_file = args
 
@@ -386,7 +393,7 @@ class flash_upload_register(gdb.Command):
         open(flash_file, 'wb').write(flash_image[0])
 
         # Finish
-        print("Finish")
+        print("Finish: {}".format(flash_file))
         flash_finish()
 
 
