@@ -28,7 +28,7 @@ ignore-all mon exec EnableLowPowerHandlingMode
 end
 
 define jlink
-shell gdbserver-jlink -X --speed=10000 -N="0xE00\\|0x400"
+shell gdbserver-jlink -X --retry --speed=10000 -N="0xE00\\|0x400"
 end
 
 define jlink-stop
