@@ -20,6 +20,7 @@ Options:
   -X                If no server running, start new server as daemon,
                     Otherwise restart it. Same: --daemon --restart --force
   -C|--clean        Clean all temp files and Kill all running JLinkGDBServer
+  -t|--retry        Retry until connection is ok
   -p|--port=*       Listen port (2331)
   -d|--device=*     Device (Cortex-M3)
   -s|--speed=*      Speed kB/s (auto)
@@ -47,6 +48,7 @@ do
         -D|--daemon) if [[ "$i" == "$1" ]]; then daemonmode=1; shift; fi ;;
         -X)          if [[ "$i" == "$1" ]]; then daemonmode=1; forceit=1; restartit=1; shift; fi ;;
         -C|--clean) cleanit=1 ;;
+        -t|--retry) retry=1 ;;
         -p=*|--port=*) port="${i#*=}" ;;
         -d=*|--device=*) device="${i#*=}" ;;
         -s=*|--speed=*) speed="${i#*=}" ;;
@@ -174,6 +176,18 @@ function check_jlinkgdbserver_pid ()
     echo "$(pgrep -i -f "jlinkgdbserver.* -port $port")"
 }
 
+function restart_jlinkgdbserver ()
+{
+    echo -n "$jlinkname restarting... "
+
+    rm -rf "$jlinklogfile"
+    rm -rf "$exerunningfile"
+    touch "$restartfile"
+
+    check_jlinkgdbserver_start_status
+    return $?
+}
+
 # check script whether is running
 if [[ -f "$scriptrunningfile" ]]; then
     if ! ps -p "$(<"$scriptrunningfile")" >/dev/null 2>&1; then
@@ -191,14 +205,12 @@ fi
 # restart
 if [[ -n "$restartit" ]]; then
     if [[ -f "$scriptrunningfile" ]]; then
-        echo -n "$jlinkname restarting... "
-
-        rm -rf "$jlinklogfile"
-        rm -rf "$exerunningfile"
-        touch "$restartfile"
-
-        check_jlinkgdbserver_start_status
-        exit $?
+        while true; do
+            restart_jlinkgdbserver
+            [[ $? == 0 ]] && exit 0
+            [[ -z "$retry" ]] && exit 1
+        done
+        exit 1
     else
         echo "$jlinkname Script is not running"
         if [[ -z "$forceit" ]]; then
@@ -239,7 +251,14 @@ if [[ -n "$daemonmode" ]]; then
     setsid $0 "$@" >/dev/null 2>&1 &
 
     check_jlinkgdbserver_start_status
-    exit $?
+    [[ $? == 0 ]] && exit 0
+    [[ -z "$retry" ]] && exit 1
+
+    while true; do
+        restart_jlinkgdbserver
+         [[ $? == 0 ]] && exit 0
+    done
+    exit 1
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
