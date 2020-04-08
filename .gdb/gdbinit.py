@@ -322,6 +322,7 @@ class redir_command_register(gdb.Command):
         cur_absdir = os.path.realpath(cur_dir)
         # source dir
         src_absdir = None
+        gdb.execute('list main', to_string=True)
         src_dir = gdb.execute('info source', to_string=True).splitlines()
         for absdir in src_dir:
             match = re.match(r'^Compilation directory is (.*)$', absdir, flags=re.I)
