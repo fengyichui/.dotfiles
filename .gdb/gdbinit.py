@@ -330,7 +330,7 @@ class redir_command_register(gdb.Command):
                 src_absdir = match.group(1)
                 break
         else:
-            raise gdb.GdbError("Can't find compilation directory! May be work: 'set $pc=main' and 'list'")
+            raise gdb.GdbError("Can't find compilation directory! May be work: 'list main'")
         # substitute-path
         print("'{}' -> '{}'".format(src_absdir, cur_absdir))
         gdb.execute('set substitute-path {} {}'.format(src_absdir.replace("\\", "\\\\"), cur_absdir), from_tty)
