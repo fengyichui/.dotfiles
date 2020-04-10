@@ -547,7 +547,7 @@ mpg ()
             rm combine.list
 
         else
-            echo "Invalid params!"
+            echo "Invalid parameters!"
         fi
     fi
 }
@@ -631,6 +631,41 @@ netinfo ()
         echo "  $ netsh int ipv4 add excludedportrange protocol=tcp startport=$_port numberofports=1"
         echo "  $ dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All (which will required a couple of restarts)"
     fi
+}
+
+bcut ()
+{
+    if [[ -z "$2" ]]; then
+        echo "  bcut 0x100-0x200 a.bin     Cut from 0x100 to 0x200"
+        echo "  bcut -0x200 a.bin          Cut from Begin to 0x200"
+        echo "  bcut 0x100- a.bin          Cut from 0x100 to End"
+        return 1
+    fi
+
+    # Cut (OFFSET1 - OFFSET2)
+    if grep -iq '^[0-9a-fx]\+-[0-9a-fx]\+$' <<<"$1"; then
+        a=$(sed 's/-.*//' <<<"$1")
+        b=$(sed 's/.*-//' <<<"$1")
+        fout="${a}-${b}"
+
+    # Cut (OFFSET1 - END)
+    elif grep -iq '^[0-9a-fx]\+-$' <<<"$1"; then
+        a=$(sed 's/-.*//' <<<"$1")
+        b='1000000000'
+        fout="${a}-end"
+
+    # Cut (Begin - OFFSET2)
+    elif grep -iq '^-[0-9a-fx]\+$' <<<"$1"; then
+        a='0'
+        b=$(sed 's/.*-//' <<<"$1")
+        fout="begin-${b}"
+
+    else
+        echo "Invalid parameters!"
+        return 1
+    fi
+
+    dd if="$2" of="${fout}_${2##*/}" skip=$(($a)) bs=$(($b-$a)) iflag=skip_bytes count=1
 }
 
 #####################################
