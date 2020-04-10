@@ -857,6 +857,25 @@ document dump_reg_armcm
 Dump cortex-M0/M1/M3/M4 register information
 end
 
+define dump_mem_symbol
+    if $argc < 2
+        help dump_mem_symbol
+    else
+        set $addr=$arg0
+        set $addr_end=$arg1
+        while $addr < $addr_end
+            set $value = *(unsigned int *)$addr
+            if $value != 0
+                info line *$value
+            end
+            set $addr = $addr + sizeof(unsigned int)
+        end
+    end
+end
+document dump_mem_symbol
+Syntax: dump_mem_symbol <ADDR_BEGIN> <ADDR_END>
+| eg: dump_mem_symbol $sp *(int*)__initial_sp
+end
 
 define ll
     if $argc == 0
