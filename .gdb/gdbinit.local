@@ -53,6 +53,7 @@ mon device hs6621c
 ignore-all mon exec SetAllowFlashCache = 0
 end
 
+# In Windows, use UsbDriverTool.exe to install 'libusb-WinUSB' with 'J-link'
 define reconnect_openocd
 ignore-all kill
 target remote | openocd -c 'adapter driver jlink; transport select swd; set CHIPNAME CM; source [find target/fm4.cfg]; adapter speed 5000; gdb_port pipe; log_output /tmp/openocd.log;'
