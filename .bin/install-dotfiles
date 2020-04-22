@@ -9,6 +9,7 @@ ln -v -snf "$SRCDIR/.subversion" "$HOME"
 ln -v -snf "$SRCDIR/.tmuxinator" "$HOME"
 ln -v -snf "$SRCDIR/.vim" "$HOME"
 ln -v -snf "$SRCDIR/.w3m" "$HOME"
+ln -v -snf "$SRCDIR/.cargo" "$HOME"
 ln -v -snf "$SRCDIR/.bash_profile" "$HOME"
 ln -v -snf "$SRCDIR/.bashrc" "$HOME"
 ln -v -snf "$SRCDIR/.ctags" "$HOME"
@@ -21,7 +22,6 @@ ln -v -snf "$SRCDIR/.tigrc" "$HOME"
 ln -v -snf "$SRCDIR/.termux" "$HOME"
 ln -v -snf "$SRCDIR/.tmux.conf" "$HOME"
 ln -v -snf "$SRCDIR/.zshrc" "$HOME"
-ln -v -snf "$SRCDIR/.pip" "$HOME"
 
 # .config
 [[ ! -d $HOME/.config ]] && mkdir $HOME/.config
@@ -29,4 +29,5 @@ ln -v -snf "$SRCDIR/.config/aria2" "$HOME/.config/"
 ln -v -snf "$SRCDIR/.config/git" "$HOME/.config/"
 ln -v -snf "$SRCDIR/.config/mpv" "$HOME/.config/"
 ln -v -snf "$SRCDIR/.config/pudb" "$HOME/.config/"
+ln -v -snf "$SRCDIR/.config/pip" "$HOME/.config/"
 
