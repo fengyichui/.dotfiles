@@ -237,7 +237,7 @@ endif
   syn match doxygenDotRegionSpecial contained +[\\@]\(enddot\>\)\@=+
 
   " Match single line identifiers. (subpage cond endcond liqiang+)
-  syn keyword doxygenBOther contained class enum file fn mainpage interface subpage cond endcond
+  syn keyword doxygenBOther contained class enum file fn mainpage interface subpage cond endcond if else elseif endif
   \ namespace struct typedef union var def name
   \ nextgroup=doxygenSpecialTypeOnelineDesc
 
