@@ -22,6 +22,7 @@ ln -v -snf "$SRCDIR/.tigrc" "$HOME"
 ln -v -snf "$SRCDIR/.termux" "$HOME"
 ln -v -snf "$SRCDIR/.tmux.conf" "$HOME"
 ln -v -snf "$SRCDIR/.zshrc" "$HOME"
+ln -v -snf "$SRCDIR/.gemrc" "$HOME"
 
 # .config
 [[ ! -d $HOME/.config ]] && mkdir $HOME/.config
