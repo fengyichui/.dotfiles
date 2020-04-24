@@ -10,9 +10,9 @@ Usage:
 
 Options:
   -x, --hex         show as hex
-  -b, --begin       file position begin
-  -e, --end         file position end
-  -l, --length      file position length
+  -b, --begin       file position begin (default: begin of file)
+  -e, --end         file position end (default: end of file)
+  -l, --length      file position length (default: size of file)
   -h, --help        Show this help
 
 Format:
@@ -21,34 +21,40 @@ Format:
     >: big-endian, std. size & alignment
   The remaining chars indicate types of args and must match exactly;
   these can be preceded by a decimal repeat count:
-    x: pad byte (no data)
-    c: char
-    b: signed byte
-    B: unsigned byte
-    ?: _Bool (requires C99; if not available, char is used instead)
-    h: short
-    H: unsigned short
-    i: int
-    I: unsigned int
-    l: long
-    L: unsigned long
-    f: float
-    d: double
-    e: half-float
+    x: pad byte (no data)   1
+    c: char                 1
+    b: signed byte          1
+    B: unsigned byte        1
+    h: short                2
+    H: unsigned short       2
+    i: int                  4
+    I: unsigned int         4
+    l: long                 8
+    L: unsigned long        8
+    f: float                4
+    d: double               8
+    e: half-float           2
+    ?: _Bool                1
   Special cases (preceding decimal count indicates length):
     s: string (array of char);
     p: pascal string (with count byte).
-  Special cases (only available in native format):
-    n: ssize_t
-    N: size_t;
-    P: an integer type that is wide enough to hold a pointer.
-  Special case (not in native mode unless 'long long' in platform C):
-    q: long long;
+  Special cases:
+    q: long long
     Q: unsigned long long
   Whitespace between formats is ignored.
 
 Example:
-    binunpack -x -b 0xff000 -e 0xff0c0 "<4sHHI8s34Iffff5I" image.bin
+  binunpack -b 0xff000 -e 0xff0c0 "<4sHH4IB3xf" image.bin
+  -> unpack image.bin from 0xff000 to 0xff0c0, struct is:
+      struct {
+        uint8_t  a[4];  // 4s
+        uint16_t b;     // H
+        uint16_t c;     // H
+        uint32_t d[4];  // 4I
+        uint8_t  e;     // B
+        uint8_t  f[3];  // 3x   padding
+        float    g;     // f
+      }
 '''
 
 def usage ():
