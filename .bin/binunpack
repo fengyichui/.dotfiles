@@ -1,0 +1,129 @@
+#!/bin/python3
+
+import sys
+import struct
+import getopt
+
+usage_string = '''
+Usage:
+  binunpack [options] <format> <file>
+
+Options:
+  -x, --hex         show as hex
+  -b, --begin       file position begin
+  -e, --end         file position end
+  -l, --length      file position length
+  -h, --help        Show this help
+
+Format:
+  The format char indicates byte order, size and alignment:
+    <: little-endian, std. size & alignment
+    >: big-endian, std. size & alignment
+  The remaining chars indicate types of args and must match exactly;
+  these can be preceded by a decimal repeat count:
+    x: pad byte (no data)
+    c: char
+    b: signed byte
+    B: unsigned byte
+    ?: _Bool (requires C99; if not available, char is used instead)
+    h: short
+    H: unsigned short
+    i: int
+    I: unsigned int
+    l: long
+    L: unsigned long
+    f: float
+    d: double
+    e: half-float
+  Special cases (preceding decimal count indicates length):
+    s: string (array of char);
+    p: pascal string (with count byte).
+  Special cases (only available in native format):
+    n: ssize_t
+    N: size_t;
+    P: an integer type that is wide enough to hold a pointer.
+  Special case (not in native mode unless 'long long' in platform C):
+    q: long long;
+    Q: unsigned long long
+  Whitespace between formats is ignored.
+
+Example:
+    binunpack -x -b 0xff000 -e 0xff0c0 "<4sHHI8s34Iffff5I" image.bin
+'''
+
+def usage ():
+    print(usage_string)
+
+hex_show = False
+pos_begin = 0
+pos_end = 0
+pos_length = 0
+
+options = "hxb:e:l:"
+long_options = ["help", "hex", "begin=", "end=", "length="]
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], options, long_options)
+except getopt.GetoptError:
+    usage()
+    sys.exit(1)
+
+if len(args) != 2:
+    usage()
+    sys.exit(1)
+
+for opt, arg in opts:
+    if opt in ("-h", "--help"):
+        usage()
+        sys.exit(0)
+
+    elif opt in ("-x", "--hex"):
+        hex_show = True
+
+    elif opt in ("-b", "--begin"):
+        pos_begin = int(arg, 0)
+
+    elif opt in ("-e", "--end"):
+        pos_end = int(arg, 0)
+
+    elif opt in ("-l", "--length"):
+        pos_length = int(arg, 0)
+
+fmt = args[0]
+binfile = args[1]
+
+if pos_end > 0:
+    pos_length = pos_end - pos_begin
+
+fo = open(binfile, 'rb')
+
+if pos_begin < 0:
+    fo.seek(pos_begin, 2)
+else:
+    fo.seek(pos_begin, 0)
+
+if pos_length == 0:
+    fbytes = fo.read()
+else:
+    fbytes = fo.read(pos_length)
+
+print("Unpack binary real length {} bytes".format(len(fbytes)))
+
+try:
+    unpacklist = struct.unpack(fmt, fbytes)
+except Exception as e:
+    print("Error: {}".format(e))
+    sys.exit(2)
+
+for i,data in enumerate(unpacklist):
+    print("{:2d}: ".format(i), end='')
+    if hex_show:
+        if isinstance(data, int):
+            print("0x{:X}".format(data))
+        elif isinstance(data, bytes):
+            print("{}".format(' '.join('%02X' % x for x in data)))
+        else:
+            print("{}".format(data))
+    else:
+        print("{}".format(data))
+
