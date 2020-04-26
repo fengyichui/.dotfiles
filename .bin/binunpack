@@ -6,7 +6,7 @@ import getopt
 
 usage_string = '''
 Usage:
-  binunpack [options] <format> <file>
+  binunpack [options] <format> <file/hex_string>
 
 Options:
   -x, --hex         show as hex
@@ -55,6 +55,8 @@ Example:
         uint8_t  f[3];  // 3x   padding
         float    g;     // f
       }
+
+  binunpack "<4sHH" "11 22 33 44 55 66 77 88"
 '''
 
 def usage ():
@@ -96,22 +98,32 @@ for opt, arg in opts:
         pos_length = int(arg, 0)
 
 fmt = args[0]
-binfile = args[1]
+unpackthing = args[1]
 
-if pos_end > 0:
-    pos_length = pos_end - pos_begin
+try:
+    fo = open(unpackthing, 'rb')
 
-fo = open(binfile, 'rb')
+    if pos_end > 0 and pos_length == 0:
+        pos_length = pos_end - pos_begin
 
-if pos_begin < 0:
-    fo.seek(pos_begin, 2)
-else:
-    fo.seek(pos_begin, 0)
+    if pos_begin < 0:
+        fo.seek(pos_begin, 2)
+    else:
+        fo.seek(pos_begin, 0)
 
-if pos_length == 0:
-    fbytes = fo.read()
-else:
-    fbytes = fo.read(pos_length)
+    if pos_length == 0:
+        fbytes = fo.read()
+    else:
+        fbytes = fo.read(pos_length)
+
+except:
+    fbytes = bytes.fromhex(unpackthing)
+
+    if pos_length > 0 and pos_end == 0:
+        pos_end = pos_begin + pos_length
+
+    if pos_end != 0:
+        fbytes = fbytes[pos_begin:pos_end]
 
 print("Unpack binary real length {} bytes".format(len(fbytes)))
 
