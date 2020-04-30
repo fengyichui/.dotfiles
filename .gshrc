@@ -111,12 +111,20 @@ keil ()
     file="${@: -1}"
     if [[ -n "$file" ]]; then
         if [[ -f "$file" ]]; then
-            HOME="$(cygpath -D -m)/../" daemon UV4 $@
+            if [[ -n "$WSL_DISTRO_NAME" ]]; then
+                daemon UV4.exe $@
+            else
+                HOME="$(cygpath -D -m)/../" daemon UV4 $@
+            fi
         else
             echo "No such project: $file"
         fi
     else
-        HOME="$(cygpath -D -m)/../" daemon UV4
+        if [[ -n "$WSL_DISTRO_NAME" ]]; then
+            daemon UV4.exe
+        else
+            HOME="$(cygpath -D -m)/../" daemon UV4
+        fi
     fi
 }
 
