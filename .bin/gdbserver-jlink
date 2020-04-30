@@ -268,9 +268,8 @@ params="-device $device -speed $speed -port $port $select -if SWD -nolocalhoston
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
     gdbserver=JLinkGDBServerCL
 elif [[ "$OSTYPE" =~ "linux" ]]; then
-    kernel=$(uname -r)
     # WSL
-    if [[ "$kernel" =~ "Microsoft" ]]; then
+    if [[ -n "$WSL_DISTRO_NAME" ]]; then
         gdbserver=JLinkGDBServerCL.exe
     else
         gdbserver=JLinkGDBServer
