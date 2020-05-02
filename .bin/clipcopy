@@ -48,6 +48,24 @@ elif [[ $OSTYPE == linux-android ]]; then
         termux-clipboard-set < "$file"
     fi
 
+elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+    if [[ -z "$file" ]]; then
+        clip.exe
+    else
+        if [[ -n "$copyfile" ]]; then
+            # https://github.com/rostok/file2clip.git
+            result=''
+            for i in $@; do
+                path="$(realpath "$i")"
+                [[ -z "$path" ]] && exit 1
+                result="$result $(wslpath -w "$path")"
+            done
+            file2clip.exe $result
+        else
+            clip.exe < "$file"
+        fi
+    fi
+
 else
     if command -v xclip > /dev/null 2>&1; then
         if [[ -z "$file" ]]; then
@@ -61,13 +79,6 @@ else
             xsel --clipboard --input
         else
             xsel --clipboard --input < "$file"
-        fi
-
-    elif command -v clip.exe > /dev/null 2>&1; then
-        if [[ -z "$file" ]]; then
-            clip.exe
-        else
-            clip.exe < "$file"
         fi
 
     else
