@@ -1,6 +1,9 @@
 
 #####################################################
 #
+# WSL windows 目录在:
+#   \\wsl$\
+#
 # wsltty作为控制台
 #   https://github.com/mintty/wsltty
 #   安装位置：
@@ -57,9 +60,6 @@ sudo apt-get install git \
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
 ./.dotfiles/.bin/install-dotfiles
 
-# default shell
-chsh -s /bin/zsh
-
 # wsltty config
 wslconfigdir="$(wslpath -u "$appdata\\wsltty")"
 cp ~/.dotfiles/.minttyrc $wslconfigdir/config
@@ -72,3 +72,6 @@ enabled = true
 options = "metadata,umask=22,fmask=11"
 EOF'
 echo "Run: 'wsl --shutdown' in Powershell, make some changes take effect"
+
+# default shell
+chsh -s /bin/zsh
