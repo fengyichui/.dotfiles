@@ -39,13 +39,14 @@ fi
 echo "$cmds" > /tmp/.init.tmp
 
 # Start new window
-
 if [[ "$OSTYPE" == "cygwin" ]]; then
     cygstart -w --action=open mintty $window --exec "$SHELL" --login -i
     #cmd /C start /I /B "$(cygpath -w -a /bin/mintty)" -
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    user="$(cmd.exe /c "<nul set /p=%UserProfile%" 2>/dev/null)"
-    $(wslpath $user)/AppData/Local/wsltty/bin/mintty.exe $window --WSL="$WSL_DISTRO_NAME" --configdir="$user\\AppData\\Roaming\\wsltty" --exec "$SHELL" --login -i
+    userprofile="$(cmd.exe /c "<nul set /p=%USERPROFILE%" 2>/dev/null)"
+    appdata="$(cmd.exe /c "<nul set /p=%APPDATA%" 2>/dev/null)"
+    localappdata="$(cmd.exe /c "<nul set /p=%LOCALAPPDATA%" 2>/dev/null)"
+    $(wslpath $localappdata)/wsltty/bin/mintty.exe $window --WSL="$WSL_DISTRO_NAME" --configdir="$appdata\\wsltty" --exec "$SHELL" --login -i
 else
     echo "Not support OS"
 fi
