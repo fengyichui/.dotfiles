@@ -17,6 +17,7 @@
 #
 # X support:
 #   VcXsrv (https://sourceforge.net/projects/vcxsrv/)
+#   可以将存储的配置文件放到‘启动’中，以实现开机启动
 #
 #####################################################
 
@@ -74,6 +75,7 @@ sudo apt-get install git \
                      zsh \
                      vim-gtk \
                      silversearcher-ag \
+                     w3m \
 
 # install my dotfiles
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
