@@ -2,7 +2,8 @@
 #####################################################
 #
 # WSL windows 目录在:
-#   \\wsl$\
+#   \\wsl$\Ubuntu-18.04
+#   \\wsl$\Ubuntu-20.04
 #
 # wsltty作为控制台
 #   https://github.com/mintty/wsltty
@@ -26,7 +27,25 @@ localappdata="$(cmd.exe /c "<nul set /p=%LOCALAPPDATA%" 2>/dev/null)"
 
 # Update apt source:
 # https://mirrors.tuna.tsinghua.edu.cn/help/ubuntu/
-if [[ "$WSL_DISTRO_NAME" == "Ubuntu-20.04" ]]; then
+
+if [[ "$WSL_DISTRO_NAME" == "Ubuntu-18.04" ]]; then
+    sudo mv -f /etc/apt/sources.list /etc/apt/sources.list.bak
+    sudo bash -c 'cat >/etc/apt/sources.list <<EOF
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
+EOF'
+elif [[ "$WSL_DISTRO_NAME" == "Ubuntu-20.04" ]]; then
     sudo mv -f /etc/apt/sources.list /etc/apt/sources.list.bak
     sudo bash -c 'cat >/etc/apt/sources.list <<EOF
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
