@@ -8,22 +8,21 @@ fi
 
 path=${1:-"."}
 
-os=$(uname -o)
-if [ "$os" == "Cygwin" ]; then
+if [[ "$OSTYPE" == "cygwin" ]]; then
     if [ -e "$path" ]; then
         path=$(cygpath --absolute --windows "$path")
     fi
     export HOME="$(cygpath -m --mydocs)/../"
     explorer "$path"
-else
-    if command -v explorer.exe > /dev/null 2>&1; then
-        explorer.exe "$path"
-    elif command -v xdg-open > /dev/null 2>&1; then
-        xdg-open "$path"
-    else
-        exit 1
-    fi
-fi
 
-exit 0
+elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+    wslview "$path"
+
+elif command -v xdg-open > /dev/null 2>&1; then
+    xdg-open "$path"
+
+else
+    echo "Not support OS!"
+    exit 1
+fi
 
