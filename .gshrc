@@ -254,7 +254,8 @@ ggg ()
 # create a daemon process
 __setsid ()
 {
-    setsid --fork "$@" >/tmp/setsid.${1##*/}.log 2>&1 &
+#    setsid --fork "$@" >/tmp/setsid.${1##*/}.log 2>&1 &
+    setsid "$@" >/tmp/setsid.${1##*/}.log 2>&1 &
 }
 daemon ()
 {
