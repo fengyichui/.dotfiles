@@ -131,13 +131,17 @@ keil ()
 # set windows code page as 437 (English)
 wincpEN ()
 {
-    cmd /c chcp 437 >/dev/null
+    if [[ "$OSTYPE" == "cygwin" ]]; then
+        cmd.exe /c chcp 437 >/dev/null
+    fi
 }
 
 # set windows code page as 936 (Simplified Chinese)
 wincpCH ()
 {
-    cmd /c chcp 936 >/dev/null
+    if [[ "$OSTYPE" == "cygwin" ]]; then
+        cmd.exe /c chcp 936 >/dev/null
+    fi
 }
 
 # workaround windows exe output
@@ -581,19 +585,13 @@ urldecode ()
     python3 -c "import sys, urllib.parse; print(urllib.parse.unquote(sys.argv[1]))" "$urlcode_data"
 }
 
-# explainshell
-explainshell ()
-{
-    chrome 'https://www.explainshell.com/explain?cmd='$(urlencode "$1") &!
-}
-
 # net info from port or exe name
 netinfo ()
 {
     wincpEN
     if [[ -n "$1" ]]; then
-        _tasklists=$(winexe tasklist)
-        _netstats=$(winexe netstat -aon)
+        _tasklists=$(winexe tasklist.exe)
+        _netstats=$(winexe netstat.exe -aon)
         if [[ "$(awk '/^[0-9]+$/' <<< $1)" == "$1" ]]; then
             # check local port
             _port=$1
@@ -630,14 +628,14 @@ netinfo ()
             fi
         fi
     else
-        winexe netstat -aon -p tcp
+        winexe netstat.exe -aon -p tcp
         echo
         echo "Usage: netinfo <local-port> <exe-name>"
-        winexe netsh interface ipv4 show excludedportrange protocol=tcp
+        winexe netsh.exe interface ipv4 show excludedportrange protocol=tcp
         echo "Excluded port may be is excluded by Hyper-V"
         echo "Try:"
         echo "  $ dism.exe /Online /Disable-Feature:Microsoft-Hyper-V (which will required a couple of restarts)"
-        echo "  $ netsh int ipv4 add excludedportrange protocol=tcp startport=$_port numberofports=1"
+        echo "  $ netsh.exe int ipv4 add excludedportrange protocol=tcp startport=$_port numberofports=1"
         echo "  $ dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All (which will required a couple of restarts)"
     fi
 }
