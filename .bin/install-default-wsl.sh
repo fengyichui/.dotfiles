@@ -76,6 +76,11 @@ sudo apt-get install git \
                      vim-gtk \
                      silversearcher-ag \
                      w3m \
+                     make \
+                     tree \
+                     git-svn \
+                     moreutils \
+                     exuberant-ctags \
 
 # install my dotfiles
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
