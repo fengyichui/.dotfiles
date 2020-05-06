@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 ######################################################################
 # @file makekeil.py
 # @brief 
@@ -32,9 +32,9 @@ keilparams = {'make':'-j0 -b', 'clean':'-j0 -c', 'debug':'-d', 'download':'-f'}
 keil_process = None
 tail_process = None
 
-in_cygwin = re.search(r'cygwin', platform.system(), re.I)
-tmpfilefd, tmpfilename = tempfile.mkstemp()
-os.close(tmpfilefd)
+uname = subprocess.getoutput("uname -a")
+in_cygwin = re.search(r'cygwin', uname, re.I)
+in_wsl    = re.search(r'microsoft', uname, re.I)
 
 # make
 # make flag
@@ -81,14 +81,23 @@ sys.stdout.flush()
 # MAIN
 ######################################################################
 
-if in_cygwin:
-    uvproj_win = subprocess.getoutput("cygpath -w '{}'".format(uvproj))
-    tmpfilename_win = subprocess.getoutput("cygpath -w '{}'".format(tmpfilename))
+if in_wsl:
+    # keil not support "\\wsl$\Ubuntu-18.04" path type
+    tmpfilename_win = subprocess.getoutput('cmd.exe /c "<nul set /p=%TEMP%\\uv4_%RANDOM%.log" 2>/dev/null')
+    tmpfilename = subprocess.getoutput("wslpath -u '{}'".format(tmpfilename_win))
+    uvproj_win = subprocess.getoutput("wslpath -w '{}'".format(uvproj))
+    open(tmpfilename, 'w').close()
 else:
-    uvproj_win = uvproj
-    tmpfilename_win = tmpfilename
+    tmpfilefd, tmpfilename = tempfile.mkstemp()
+    os.close(tmpfilefd)
+    if in_cygwin:
+        uvproj_win = subprocess.getoutput("cygpath -w '{}'".format(uvproj))
+        tmpfilename_win = subprocess.getoutput("cygpath -w '{}'".format(tmpfilename))
+    else:
+        uvproj_win = uvproj
+        tmpfilename_win = tmpfilename
 
-keil_process = subprocess.Popen('UV4 ' + keilparams[flag] + ' "' + uvproj_win + '" -o "' + tmpfilename_win + '"', shell=True)
+keil_process = subprocess.Popen('UV4.exe ' + keilparams[flag] + ' "' + uvproj_win + '" -o "' + tmpfilename_win + '"', shell=True)
 tail_process = subprocess.Popen('tail -f ' + tmpfilename, shell=True)
 
 while True:
