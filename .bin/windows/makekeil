@@ -97,8 +97,10 @@ else:
         uvproj_win = uvproj
         tmpfilename_win = tmpfilename
 
-keil_process = subprocess.Popen('UV4.exe ' + keilparams[flag] + ' "' + uvproj_win + '" -o "' + tmpfilename_win + '"', shell=True)
-tail_process = subprocess.Popen('tail -f ' + tmpfilename, shell=True)
+keil_cmd = ['UV4.exe'] + keilparams[flag].split() + [uvproj_win, '-o', tmpfilename_win]
+tail_cmd = ['tail', '-f', tmpfilename]
+keil_process = subprocess.Popen(keil_cmd)
+tail_process = subprocess.Popen(tail_cmd)
 
 while True:
     try:
