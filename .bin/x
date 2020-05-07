@@ -16,6 +16,7 @@ Options:
     -p, --plain     Plain extract files
     -c, --compress  Compress files/directories to archive file
                     x -c <archive-name> <files>
+    -i, --install   Install linux package to /
 EOF
     exit 0
 fi
@@ -36,6 +37,27 @@ if [[ "$1" == "-c" ]] || [[ "$1" == "--compress" ]]; then
         (*.rar) ;;
         (*) tar cavf "$@" ;;
     esac
+    exit 0
+fi
+
+# install
+if [[ "$1" == "-i" ]] || [[ "$1" == "--install" ]]; then
+    shift
+    while (( $# > 0 )); do
+        if [[ ! -f "$1" ]]; then
+            echo "extract: '$1' is not a valid file" >&2
+            shift
+            continue
+        fi
+        # install
+        case "$1" in
+            (*.tar.gz|*.tgz) sudo tar zxvf "$1" -C / ;;
+            (*.tar.xz|*.txz) sudo tar --xz -xvf "$1" -C / ;;
+            (*.tar)          sudo tar xvf "$1" -C / ;;
+            (*) echo "extract: '$1' cannot be extracted" >&2 ;;
+        esac
+        shift
+    done
     exit 0
 fi
 
