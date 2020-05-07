@@ -132,7 +132,7 @@ keil ()
 wincpEN ()
 {
     if [[ "$OSTYPE" == "cygwin" ]]; then
-        cmd.exe /c chcp 437 >/dev/null
+        cmd.exe /c "chcp 437" 2>/dev/null 1>/dev/null
     fi
 }
 
@@ -140,7 +140,7 @@ wincpEN ()
 wincpCH ()
 {
     if [[ "$OSTYPE" == "cygwin" ]]; then
-        cmd.exe /c chcp 936 >/dev/null
+        cmd.exe /c "chcp 936" 2>/dev/null 1>/dev/null
     fi
 }
 
