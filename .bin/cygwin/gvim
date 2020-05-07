@@ -2,5 +2,5 @@
 
 export HOME="$(cygpath -m --mydocs)/../"
 
-cyg2win -p -e -i "gvim.exe $* &"
+linux2win -p -e -i "gvim.exe $* &"
 

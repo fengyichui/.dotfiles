@@ -5,22 +5,40 @@ input=''
 execute=''
 slash=''
 precise=''
-win2cyg=''
+win2linux=''
 autocmd=''
+
+if [[ "$OSTYPE" == "cygwin" ]]; then
+    mount_dir='/cygdrive'
+elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+    mount_dir='/mnt'
+else
+    echo "Not support OS!"
+    exit 1
+fi
 
 function print_usage ()
 {
-    echo "Convert cygwin-string to windows-string and excute it"
+    echo "Convert cygwin/wsl-string to windows-string and excute it"
     echo "Options:"
-    echo "  -a <files>  convert command.exe to command with 'cyg2win -e -r -i command.exe \$*'"
+    echo "  -a <files>  convert command.exe to command with 'linux2win -e -r -i command.exe \$*'"
     echo "  -i <input>  convert input string"
-    echo "  -r          convert by win2cyg"
-    echo "  -e          execute it, if -r present, input use cyg2win, ouput use win2cyg"
-    echo "  -p          use cygpath to precise convert each exist paths"
+    echo "  -r          convert by win2linux"
+    echo "  -e          execute it, if -r present, input use linux2win, ouput use win2linux"
+    echo "  -p          use cygpath/wslpath to precise convert each exist paths"
     echo "  -s          use slash(\\) instead of backslash(/)"
     echo "  -h          show this help and exit"
     echo "by liqiang (2018/06/06)"
     exit 1
+}
+
+function pathconvert ()
+{
+    if [[ "$OSTYPE" == "cygwin" ]]; then
+        cygpath $@
+    elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+        wslpath $@
+    fi
 }
 
 # Parsing params
@@ -28,7 +46,7 @@ while getopts a:i:reshp opt; do
     case $opt in
         a) autocmd="$OPTARG" ;;
         i) input="$OPTARG" ;;
-        r) win2cyg=1 ;;
+        r) win2linux=1 ;;
         e) execute=1 ;;
         p) precise=1 ;;
         s) slash=1 ;;
@@ -36,7 +54,7 @@ while getopts a:i:reshp opt; do
     esac
 done
 
-# auto generate cyg2win command
+# auto generate linux2win command
 if [[ -n "$autocmd" ]]; then
     dir="$(realpath "$autocmd")"
     for exe in $(ls "$dir"); do
@@ -48,7 +66,7 @@ if [[ -n "$autocmd" ]]; then
             echo "generating $cygexe ..."
             cat >$cygexe << EOF
 #!/bin/bash
-cyg2win -e -r -i "'$exe' \$*"
+linux2win -e -r -i "'$exe' \$*"
 EOF
             chmod +x "$cygexe"
         fi
@@ -67,38 +85,39 @@ if [[ -z "$input" ]]; then
 fi
 
 # root direcotry (D:/cygwin64)
-root_dir=$(cygpath -m /)
+root_dir=$(pathconvert -m /)
+if [[ "${root_dir:(-1)}" == "/" ]]; then
+    root_dir=${root_dir:0:(-1)}
+fi
 
 # convert
-if [[ -n "$win2cyg" && -z "$execute" ]]; then
+if [[ -n "$win2linux" && -z "$execute" ]]; then
     if [[ -n "$precise" ]]; then
         result=''
         for i in $input; do
-            result="${result}$(cygpath -u $i) "
+            result="${result}$(pathconvert -u $i) "
         done
     else
         result=$(sed "s#\\\\\\+#\\/#g; \
                       s#$root_dir/#/#Ig; \
-                      s#\\([A-Za-z]\\):/#/cygdrive/\\l\\1/#g" <<<"$input")
+                      s#\\([A-Za-z]\\):/#$mount_dir/\\l\\1/#g" <<<"$input")
     fi
 else
-    # cygwin dir keyword
-    user_dir=$(cygpath ~)       # /home/username
     # convert
     if [[ -n "$precise" ]]; then
         result=''
         for i in $input; do
-            i=${i/\~/$user_dir}
+            i=${i/\~/$HOME}
             if [[ -e "$i" ]]; then
-                result="${result}$(cygpath -m $i) "
+                result="${result}$(pathconvert -m $i) "
             else
                 result="${result}${i} "
             fi
         done
     else
-        result=$(sed "s#${user_dir}/#${root_dir}${user_dir}/#g; \
-                      s#/cygdrive/\\([a-z]\\)/#\\1:/#g; \
-                      s#~/#${root_dir}${user_dir}/#g; \
+        result=$(sed "s#${HOME}/#${root_dir}${HOME}/#g; \
+                      s#$mount_dir/\\([a-z]\\)/#\\u\\1:/#g; \
+                      s#~/#${root_dir}${HOME}/#g; \
                       s#\\(^\\|\\s\\|\"\\)/\\([A-Za-z0-9._-]\\+\\)/#\\1${root_dir}/\\2/#g" <<<"$input")
     fi
     # slash
@@ -110,8 +129,8 @@ fi
 # excute
 if [[ -n "$execute" ]]; then
 #    echo "$result"
-    if [[ -n "$win2cyg" ]]; then
-        eval "$result" 2>&1 | cyg2win -r
+    if [[ -n "$win2linux" ]]; then
+        eval "$result" 2>&1 | linux2win -r
     else
         eval "$result"
     fi
