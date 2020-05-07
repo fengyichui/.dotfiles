@@ -51,9 +51,11 @@ if [[ "$1" == "-i" ]] || [[ "$1" == "--install" ]]; then
         fi
         # install
         case "$1" in
-            (*.tar.gz|*.tgz) sudo tar zxvf "$1" -C / ;;
-            (*.tar.xz|*.txz) sudo tar --xz -xvf "$1" -C / ;;
-            (*.tar)          sudo tar xvf "$1" -C / ;;
+            (*.tar.gz|*.tgz)         sudo tar zxvf          "$1" -C / ;;
+            (*.tar.bz2|*.tbz|*.tbz2) sudo tar xvjf          "$1" -C / ;;
+            (*.tar.xz|*.txz)         sudo tar --xz -xvf     "$1" -C / ;;
+            (*.tar.zma|*.tlz)        sudo tar --lzma -xvf   "$1" -C / ;;
+            (*.tar)                  sudo tar xvf           "$1" -C / ;;
             (*) echo "extract: '$1' cannot be extracted" >&2 ;;
         esac
         shift
