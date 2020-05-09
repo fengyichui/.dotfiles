@@ -93,7 +93,11 @@ alias men='tldr'
 alias mk='typora'
 
 # baidu yun pan
+if [[ "$OSTYPE" == "cygwin" ]]; then
 alias by='winpty BaiduPCS-Go.exe'
+else
+alias by='BaiduPCS-Go'
+fi
 
 #####################################
 #             Function              #
@@ -461,7 +465,7 @@ f-elf2hex-arm ()
 }
 f-elf2hex-keil ()
 {
-    fromelf --i32 --output ${2:-${1%.*}.hex} $1
+    fromelf.exe --i32 --output ${2:-${1%.*}.hex} $1
 }
 f-elf2bin ()
 {
@@ -473,7 +477,7 @@ f-elf2bin-arm ()
 }
 f-elf2bin-keil ()
 {
-    fromelf --bin --output ${2:-${1%.*}.bin} $1
+    fromelf.exe --bin --output ${2:-${1%.*}.bin} $1
 }
 f-elf2dis ()
 {
@@ -485,7 +489,7 @@ f-elf2dis-arm ()
 }
 f-elf2dis-keil ()
 {
-    fromelf --text -c --output ${2:-${1%.*}.dis} $1
+    fromelf.exe --text -c --output ${2:-${1%.*}.dis} $1
 }
 f-elf2sym ()
 {
