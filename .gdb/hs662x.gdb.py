@@ -573,7 +573,7 @@ class flash_download_patch_register(gdb.Command):
 class issue_reappear_register(gdb.Command):
 
     """HS662x issue reappear with simulator
-    issue_reappear <ROM_DIR> <USR_DIR>
+    issue_reappear [<ROM_DIR>] <USR_DIR>
     ROM_DIR: xxx.axf xxx.bin
     USR_DIR: xxx.axf xxx.log xxx.bin
     """
@@ -585,7 +585,10 @@ class issue_reappear_register(gdb.Command):
 
         # param
         argv = gdb.string_to_argv(args)
-        if len(argv) == 2:
+        if len(argv) == 1:
+            rom_dir = None
+            usr_dir = argv[0]
+        elif len(argv) == 2:
             rom_dir = argv[0]
             usr_dir = argv[1]
         else:
@@ -598,13 +601,14 @@ class issue_reappear_register(gdb.Command):
         usr_log = None
 
         # Search ROM files
-        for file in os.listdir(rom_dir):
-            if file.endswith(".axf"):
-                rom_axf = os.path.join(rom_dir, file)
-            elif file.endswith(".bin"):
-                rom_bin = os.path.join(rom_dir, file)
-        if rom_axf == None or rom_bin == None:
-            raise gdb.GdbError('Can not found ROM axf/bin file!')
+        if rom_dir != None:
+            for file in os.listdir(rom_dir):
+                if file.endswith(".axf"):
+                    rom_axf = os.path.join(rom_dir, file)
+                elif file.endswith(".bin"):
+                    rom_bin = os.path.join(rom_dir, file)
+            if rom_axf == None or rom_bin == None:
+                raise gdb.GdbError('Can not found ROM axf/bin file!')
 
         # Search USR files
         for file in os.listdir(usr_dir):
@@ -614,7 +618,6 @@ class issue_reappear_register(gdb.Command):
                 usr_bin = os.path.join(usr_dir, file)
             elif file.endswith(".log"):
                 usr_log = os.path.join(usr_dir, file)
-
         if usr_bin == None or usr_log == None:
             raise gdb.GdbError('Can not found USR bin/log file!')
 
@@ -632,13 +635,21 @@ class issue_reappear_register(gdb.Command):
         print("\nPress 'Ctrl-C' to continue")
         gdb.execute('run', to_string=True)
 
-        # Add ROM and USR info
-        gdb.execute('file {}'.format(rom_axf), to_string=True)
-        gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True)
-        if usr_axf:
-            gdb.execute('add-symbol-file {} 0'.format(usr_axf), to_string=True)
+        # Restore USR info
+        if usr_axf != None:
+            gdb.execute('file {}'.format(usr_axf), to_string=True)
         gdb.execute('restore {} binary 0'.format(usr_bin), to_string=True)
         gdb.execute('restore {} binary 0x20000000'.format(usr_bin), to_string=True)
+
+        # Restore ROM info
+        if rom_axf != None:
+            if usr_axf == None:
+                gdb.execute('file {}'.format(rom_axf), to_string=True)
+            else:
+                gdb.execute('add-symbol-file {} 0x08000000'.format(rom_axf), to_string=True)
+            gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True)
+
+        # dump memery / register
         gdb.execute('restore_dump_mem {}'.format(usr_log), to_string=True)
         gdb.execute('restore_dump_reg {}'.format(usr_log), to_string=True)
 
@@ -685,7 +696,7 @@ flash_download_cfg_register()
 flash_download_patch_register()
 flash_download_image_register()
 flash_erase_register()
-issue_reappear_register();
+issue_reappear_register()
 
 # @} #
 
