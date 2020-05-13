@@ -336,6 +336,21 @@ class redir_command_register(gdb.Command):
         gdb.execute('set substitute-path {} {}'.format(src_absdir.replace("\\", "\\\\"), cur_absdir), from_tty)
 
 
+# reload file
+class reloadfile_command_register(gdb.Command):
+
+    """Reload file
+    """
+
+    def __init__(self):
+        super(self.__class__, self).__init__("reloadfile", gdb.COMMAND_USER, gdb.COMPLETE_COMMAND)
+
+    def invoke(self, args, from_tty):
+        debug_file = gdb.current_progspace().filename
+        if debug_file != None:
+            gdb.execute("file {}".format(debug_file), from_tty)
+
+
 ######################################################################
 # Register
 ######################################################################
@@ -353,6 +368,7 @@ log_command_register()
 log_begin_register()
 log_end_register()
 redir_command_register()
+reloadfile_command_register()
 
 # @} #
 

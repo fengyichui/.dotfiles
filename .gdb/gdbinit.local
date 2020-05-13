@@ -70,6 +70,7 @@ c
 end
 
 define rc1
+reloadfile
 remap2ram
 # 1st-rst: halt cpu
 mon reset 1
@@ -80,7 +81,7 @@ c
 end
 
 define rc2
-#remap2flash
+reloadfile
 # 1st-rst: halt cpu
 mon reset 1
 # Invalidate cache
