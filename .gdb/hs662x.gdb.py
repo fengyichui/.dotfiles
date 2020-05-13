@@ -110,13 +110,9 @@ def flash_finish():
 
 def flash_prepare_and_show():
     # save user debug file
-    # Symbols from "/home/lenovo/work.pro/ble/trunk/rwble/a.axf".
     global debug_file
-    file_info = gdb.execute('info files', to_string=True)
-    begin = file_info.find('Symbols from "')
-    if begin != -1:
-        debug_file = file_info[begin+14:file_info.find('".')]
-    else:
+    debug_file = gdb.current_progspace().filename
+    if debug_file == None:
         debug_file = ''
 
     # global
