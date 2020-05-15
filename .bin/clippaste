@@ -21,8 +21,11 @@ elif [[ $OSTYPE == linux-android ]]; then
     termux-clipboard-get
 
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    powershell.exe -Command Get-Clipboard | head -c -2
-
+    clipdata="$(powershell.exe -Command Get-Clipboard | tr -d '\r')"
+#    while [[ "${clipdata:(-1):1}" == $'\n' ]]; do
+#        clipdata="${clipdata:0:-1}"
+#    done
+    echo -n "$clipdata"
 else
     if command -v xclip > /dev/null 2>&1; then
         xclip -out -selection clipboard
