@@ -66,6 +66,9 @@ export LANG='en_US.UTF-8'
 # Editor
 export EDITOR='vim'
 
+# default X-window display
+export DISPLAY=':0.0'
+
 # Completion options
 #
 # These completion tuning parameters change the default behavior of bash_completion:

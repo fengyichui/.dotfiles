@@ -683,9 +683,6 @@ bcut ()
 #             Export                #
 #####################################
 
-# default X-window display
-export DISPLAY=':0.0'
-
 # TERM with SSH connetion @ref .tmux.conf
 if [[ -n "$SSH_CONNECTION" && "$TERM" == "tmux-256color" ]]; then
     export TERM='xterm-256color'

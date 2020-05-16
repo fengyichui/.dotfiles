@@ -10,6 +10,9 @@ export LANG=en_US.UTF-8
 # Editor
 export EDITOR='vim'
 
+# default X-window display
+export DISPLAY=':0.0'
+
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" == "cygwin" ]]; then
     ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$HOME/.dotfiles/.bin/cygwin
