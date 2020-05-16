@@ -16,6 +16,33 @@ fi
 
 file=$1
 
+if [[ -n "$copyfile" ]]; then
+    result=''
+    if [[ $OSTYPE == cygwin* ]]; then
+        for i in $@; do
+            path="$(realpath "$i")"
+            [[ -z "$path" ]] && exit 1
+            result="$result $(cygpath -w "$path")"
+        done
+        # https://github.com/rostok/file2clip.git
+        file2clip.exe $result < /dev/null
+        exit
+
+    elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+        for i in $@; do
+            path="$(realpath "$i")"
+            [[ -z "$path" ]] && exit 1
+            result="$result $(wslpath -w "$path")"
+        done
+        file2clip.exe $result
+        exit
+
+    else
+        print "clipcopy: Platform $OSTYPE not supported -f option" >&2
+        exit 1
+    fi
+fi
+
 if [[ $OSTYPE == darwin* ]]; then
     if [[ -z "$file" ]]; then
         pbcopy
@@ -27,18 +54,7 @@ elif [[ $OSTYPE == cygwin* ]]; then
     if [[ -z "$file" ]]; then
         cat > /dev/clipboard
     else
-        if [[ -n "$copyfile" ]]; then
-            # https://github.com/rostok/file2clip.git
-            result=''
-            for i in $@; do
-                path="$(realpath "$i")"
-                [[ -z "$path" ]] && exit 1
-                result="$result $(cygpath -w "$path")"
-            done
-            file2clip $result < /dev/null
-        else
-            cat "$@" > /dev/clipboard
-        fi
+        cat "$@" > /dev/clipboard
     fi
 
 elif [[ $OSTYPE == linux-android ]]; then
@@ -52,18 +68,7 @@ elif [[ -n "$WSL_DISTRO_NAME" ]]; then
     if [[ -z "$file" ]]; then
         clip.exe
     else
-        if [[ -n "$copyfile" ]]; then
-            # https://github.com/rostok/file2clip.git
-            result=''
-            for i in $@; do
-                path="$(realpath "$i")"
-                [[ -z "$path" ]] && exit 1
-                result="$result $(wslpath -w "$path")"
-            done
-            file2clip.exe $result
-        else
-            clip.exe < "$file"
-        fi
+        clip.exe < "$file"
     fi
 
 else
