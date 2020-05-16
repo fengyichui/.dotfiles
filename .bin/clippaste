@@ -11,6 +11,20 @@
 #   clippaste > <file>      - paste contents to a file
 #
 
+# Try X
+if command -v xclip >/dev/null 2>&1; then
+    xclip -out -selection clipboard 2>/dev/null
+    result=$?
+
+elif command -v xsel >/dev/null 2>&1; then
+    xsel --clipboard --output 2>/dev/null
+    result=$?
+fi
+
+# X may be not valid
+[[ "$result" == "0" ]] && exit 0
+
+# No X
 if [[ $OSTYPE == darwin* ]]; then
     pbpaste
 
@@ -22,20 +36,10 @@ elif [[ $OSTYPE == linux-android ]]; then
 
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
     clipdata="$(powershell.exe -Command Get-Clipboard | tr -d '\r')"
-#    while [[ "${clipdata:(-1):1}" == $'\n' ]]; do
-#        clipdata="${clipdata:0:-1}"
-#    done
     echo -n "$clipdata"
+
 else
-    if command -v xclip > /dev/null 2>&1; then
-        xclip -out -selection clipboard
-
-    elif command -v xsel > /dev/null 2>&1; then
-        xsel --clipboard --output
-
-    else
-        print "clipcopy: Platform $OSTYPE not supported or xclip/xsel not installed" >&2
-        exit 1
-    fi
+    echo "clippaste: Platform $OSTYPE not supported or xclip/xsel not installed" >&2
+    exit 1
 fi
 
