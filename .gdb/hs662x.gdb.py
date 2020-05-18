@@ -29,6 +29,7 @@ flash_sector_size = 1024*4
 device_name = 'HS662X'
 device_version = 1
 debug_file = ''
+script_dir = os.path.dirname(__file__)
 
 flash_vendor_table = {
     0x85: 'PUYA',            # Puya
@@ -80,10 +81,6 @@ APP_MAX_SIZE             = 128 * flash_sector_size
 CFG_MAX_SIZE             = 3 * flash_sector_size
 PATCH_MAX_SIZE           = 2 * flash_sector_size
 
-CHIP_HS6620             = 0x6620
-CHIP_HS6621             = 0x6621
-CHIP_HS6621C             = 0x6622
-
 ONCE_OP_SIZE            = 32*1024
 
 ######################################################################
@@ -91,17 +88,28 @@ ONCE_OP_SIZE            = 32*1024
 ######################################################################
 
 def chip():
-    try:
-        device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int'))) >> 16
-        if device_info == 0x6620:
-            return CHIP_HS6620
-        else:
-            return CHIP_HS6621
-    except:
-        pass
+    global device_name
+    global device_version
 
-    device_info = int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int'))) >> 16
-    return CHIP_HS6621C
+    try:
+        # HS6620 / HS6621
+        device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))
+        if (device_info>>16) == 0x6620:
+            device_name = 'HS6620'
+        else:
+            device_name = 'HS6621'
+        device_version = (device_info>>8) & 0xFF
+
+    except:
+        try:
+            # HS6621C
+            device_info = int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))
+            device_name = 'HS6621C'
+            device_version = (device_info>>8) & 0xFF
+        except:
+            raise gdb.GdbError("Can't detect supported chip!")
+
+    return {'name':device_name, 'version':device_version}
 
 
 def flash_finish():
@@ -109,31 +117,35 @@ def flash_finish():
 
 
 def flash_prepare_and_show():
-    # save user debug file
+    # global
+    global flash_size
+    global flash_id
     global debug_file
+
+    # save user debug file
     debug_file = gdb.current_progspace().filename
     if debug_file == None:
         debug_file = ''
 
-    # global
-    global flash_size
-    global flash_id
-    global device_name
-    global device_version
+    # chip info
+    chip_info = chip()
+
+    # FLM
+    if chip_info['name'] == 'HS6621C':
+        flash_flm = 'HS6621C.GDB.FLM'
+    else:
+        flash_flm = 'HS662X.GDB.FLM'
+
+    # Show device name
+    print('Device: {} A{}'.format(device_name, device_version))
 
     # Init
     gdb.execute('mon reset 1', to_string=True)
     gdb.execute('mon halt', to_string=True)
-    gdb.execute('file ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
-    gdb.execute('restore ~/.dotfiles/.gdb/HS662X.GDB.FLM', to_string=True)
+    gdb.execute('file {}/{}'.format(script_dir, flash_flm), to_string=True)
+    gdb.execute('restore {}/{}'.format(script_dir, flash_flm), to_string=True)
     gdb.execute('set $sp=&m_stack_mem[1024]')
     gdb.execute('set $res=Init(0, 6000000, 3)')
-
-    # Show device name
-    device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))
-    device_name = 'HS{:04X}'.format(device_info>>16)
-    device_version = (device_info>>8) & 0xFF
-    print('Device: {} A{}'.format(device_name, device_version))
 
     # Ext
     flash_id_ext = int(gdb.parse_and_eval('sf_readId(1)'))
@@ -292,7 +304,7 @@ class remap2ram_register(gdb.Command):
         super(self.__class__, self).__init__("remap2ram", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        if chip() == CHIP_HS6620:
+        if chip()['name'] == 'HS6620':
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 6')
             print("Remapped to RAM (HS6620)")
@@ -312,7 +324,7 @@ class remap2rom_register(gdb.Command):
         super(self.__class__, self).__init__("remap2rom", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        if chip() == CHIP_HS6620:
+        if chip()['name'] == 'HS6620':
             gdb.execute('set *0x400e003c |= 0x20')
             gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 5')
             print("Remapped to ROM (HS6620)")
@@ -625,7 +637,7 @@ class issue_reappear_register(gdb.Command):
 
         # Start simulate
         gdb.execute('file', to_string=True)
-        gdb.execute('file ~/.dotfiles/.gdb/sim_cm3.axf', to_string=True)
+        gdb.execute('file {}/sim_cm3.axf'.format(script_dir), to_string=True)
         gdb.execute('target sim', to_string=True)
         gdb.execute('load', to_string=True)
         print("\nPress 'Ctrl-C' to continue")
