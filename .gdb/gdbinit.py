@@ -305,24 +305,33 @@ class log_end_register(gdb.Command):
 class redir_command_register(gdb.Command):
 
     """Auto substitute-path command
-    redir <new-path>
-    default is current directory
+    redir <-n> <new-path>
+    -n: don't execute "list main"
+    new-path: default is current directory
     """
 
     def __init__(self):
         super(self.__class__, self).__init__("redir", gdb.COMMAND_USER, gdb.COMPLETE_FILENAME)
 
     def invoke(self, args, from_tty):
+        listmain = True
+        # Parse option
         argv = gdb.string_to_argv(args)
-        # current dir
         if len(argv) == 0:
             cur_dir = '.'
         else:
-            cur_dir = argv[0]
+            if argv[0] == '-n':
+                listmain = False
+                cur_dir = '.' if len(argv)==1 else argv[1]
+            else:
+                cur_dir = argv[0]
+        # list main
+        if listmain:
+            gdb.execute('list main', to_string=True)
+        # current dir
         cur_absdir = os.path.realpath(cur_dir)
         # source dir
         src_absdir = None
-        gdb.execute('list main', to_string=True)
         src_dir = gdb.execute('info source', to_string=True).splitlines()
         for absdir in src_dir:
             match = re.match(r'^Compilation directory is (.*)$', absdir, flags=re.I)
