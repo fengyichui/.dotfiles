@@ -17,7 +17,7 @@ export DISPLAY=':0.0'
 if [[ "$OSTYPE" == "cygwin" ]]; then
     ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$HOME/.dotfiles/.bin/cygwin
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
+    ePATH=$HOME/.bin:$HOME/.bin.windows:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
 else
     ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
 fi
