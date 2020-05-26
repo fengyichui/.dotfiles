@@ -17,7 +17,7 @@ fi
 # parse params
 for i in "$@"; do
     case "$i" in
-        -n) export NOTMUX=1; shift ;;
+        -n) export NOTMUX=1; touch /tmp/.notmux.tmp; shift ;;
         -m) window='--window max'; shift ;;
         -s) slash=1; shift ;;
         *)  break ;;
