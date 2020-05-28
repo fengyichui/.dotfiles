@@ -70,10 +70,10 @@ fi
 sudo apt update
 sudo apt upgrade
 
-# Package
+# Package (vim-gtk3 has more high performance than vim-gtk)
 sudo apt-get install git \
                      zsh \
-                     vim-gtk \
+                     vim-gtk3 \
                      silversearcher-ag \
                      w3m \
                      make \
