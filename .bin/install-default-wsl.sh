@@ -82,8 +82,19 @@ sudo apt-get install git \
                      moreutils \
                      exuberant-ctags \
 
-# install my dotfiles
-git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
+# install my dotfiles and other package files
+git clone --depth 1 https://gitee.com/fengyichui/dotfiles.git .dotfiles
+git clone --depth 1 https://gitee.com/fengyichui/bin.linux.git .bin
+git clone --depth 1 https://gitee.com/fengyichui/bin.windows.git .bin.windows
+git clone --depth 1 https://gitee.com/fengyichui/linuxpackage.git .linuxpackage
+
+# gitee to github
+sed -i -e 's#https://gitee.com/fengyichui/dotfiles.git#https://github.com/fengyichui/.dotfiles.git#' .dotfiles/.git/config
+sed -i -e 's#https://gitee.com/fengyichui/bin.linux.git#https://github.com/fengyichui/.bin.linux.git#' .bin/.git/config
+sed -i -e 's#https://gitee.com/fengyichui/bin.windows.git#https://github.com/fengyichui/.bin.windows.git#' .bin.windows/.git/config
+sed -i -e 's#https://gitee.com/fengyichui/linuxpackage.git#https://github.com/fengyichui/.linuxpackage.git#' .linuxpackage/.git/config
+
+# install dotfiles
 ./.dotfiles/.bin/install-dotfiles
 
 # wsltty config
