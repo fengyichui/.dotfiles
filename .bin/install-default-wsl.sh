@@ -67,20 +67,21 @@ else
     echo "Not support WSL version: $WSL_DISTRO_NAME"
     exit 1
 fi
-sudo apt update
-sudo apt upgrade
+sudo apt-get --yes update
+sudo apt-get --yes upgrade
 
 # Package (vim-gtk3 has more high performance than vim-gtk)
-sudo apt-get install git \
-                     zsh \
-                     vim-gtk3 \
-                     silversearcher-ag \
-                     w3m \
-                     make \
-                     tree \
-                     git-svn \
-                     moreutils \
-                     exuberant-ctags \
+sudo apt-get --yes install \
+    git \
+    zsh \
+    vim-gtk3 \
+    silversearcher-ag \
+    w3m \
+    make \
+    tree \
+    git-svn \
+    moreutils \
+    exuberant-ctags \
 
 # install my dotfiles and other package files
 git clone --depth 1 https://gitee.com/fengyichui/dotfiles.git .dotfiles
