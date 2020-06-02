@@ -85,6 +85,8 @@ reloadfile
 # 1st-rst: halt cpu
 mon reset 1
 # Invalidate cache
+set *0xE0042004 = 1
+set *0xE0042008 = 0
 set *0xE0042020 = 1
 ignore-all mon exec InvalidateCache
 # load
