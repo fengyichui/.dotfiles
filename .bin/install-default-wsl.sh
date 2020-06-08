@@ -110,5 +110,10 @@ options = "metadata,umask=22,fmask=11"
 EOF'
 echo "Run: 'wsl --shutdown' in Powershell, make some changes take effect"
 
+# zsh processes under tmux accumulate, eating CPU
+# https://github.com/microsoft/WSL/issues/3914
+echo "May enable 'Windows 10 Virtual Machine Platform' on 'Turn Windows Features on or off'"
+
 # default shell
 chsh -s /bin/zsh
+
