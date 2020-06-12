@@ -83,6 +83,7 @@ sudo apt-get --yes install \
     moreutils \
     exuberant-ctags \
     xclip \
+    net-tools \
 
 # install my dotfiles and other package files
 git clone --depth 1 https://gitee.com/fengyichui/dotfiles.git .dotfiles
