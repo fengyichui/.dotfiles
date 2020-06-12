@@ -50,6 +50,9 @@ end
 define reconnect_hs6621c
 reconnect
 mon device hs6621c
+# CPU div=2
+set *0x40001004 = 0x00c00206
+set *0x4000100C = 1
 ignore-all mon exec SetAllowFlashCache = 0
 end
 
