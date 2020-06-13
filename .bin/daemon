@@ -8,7 +8,14 @@ fi
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
     # Startup wsl.exe to create new instance, and use "cmd.exe /c start /b"
-    setsid >/tmp/setsid.${1##*/}.log 2>&1 cmd.exe '/c' start '/b' wsl.exe "$@" &
+    initfile=/tmp/wsl_daemon_init.$$.tmp
+    cat >$initfile << EOF
+export PATH='$PATH'
+$@
+rm $initfile
+EOF
+    setsid >/dev/null 2>&1 cmd.exe '/c' start '/b' wsl.exe bash -c "source $initfile" &
 else
-    setsid >/tmp/setsid.${1##*/}.log 2>&1 "$@" &
+    # >/tmp/setsid.${1##*/}.log
+    setsid >/dev/null 2>&1 "$@" &
 fi
