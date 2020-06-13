@@ -7,12 +7,8 @@ if [[ ! -f "$cmdpath" ]]; then
 fi
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
-    # windows exe should use "cmd.exe /c start" to create daemon
-    if grep -q -i "\.exe$" <<< "$1"; then
-        setsid >/tmp/setsid.${1##*/}.log 2>&1 cmd.exe /c start "$@" &
-        exit
-    fi
+    # Startup wsl.exe to create new instance, and use "cmd.exe /c start /b"
+    setsid >/tmp/setsid.${1##*/}.log 2>&1 cmd.exe '/c' start '/b' wsl.exe "$@" &
+else
+    setsid >/tmp/setsid.${1##*/}.log 2>&1 "$@" &
 fi
-
-setsid >/tmp/setsid.${1##*/}.log 2>&1 "$@" &
-

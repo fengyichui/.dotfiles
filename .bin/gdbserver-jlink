@@ -54,7 +54,7 @@ do
         -s=*|--speed=*) speed="${i#*=}" ;;
         -u=*|--usb=*) select="-select usb=${i#*=}" ;;
         -i=*|--ip=*) select="-select ip=${i#*=}" ;;
-        -N=*|--nonotify=*) nonotifypattern="${i#*=}" ;;
+        -N=*|--nonotify=*) if [[ -n $nonotifypattern ]]; then nonotifypattern="$nonotifypattern|${i#*=}"; else nonotifypattern="${i#*=}"; fi ;;
         -N|--nonotify) nonotify=1 ;;
 
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
@@ -248,7 +248,7 @@ fi
 # daemon
 if [[ -n "$daemonmode" ]]; then
     echo -n "$jlinkname Script run as Daemon... "
-    setsid $0 "$@" >/dev/null 2>&1 &
+    daemon $0 "$@"
 
     check_jlinkgdbserver_start_status
     [[ $? == 0 ]] && exit 0
