@@ -259,23 +259,6 @@ ggg ()
     done
 }
 
-# create a daemon process
-__setsid ()
-{
-#    setsid --fork "$@" >/tmp/setsid.${1##*/}.log 2>&1 &
-    setsid "$@" >/tmp/setsid.${1##*/}.log 2>&1 &
-}
-daemon ()
-{
-    cmdpath="$(command -v "$1" 2>/dev/null)"
-    if [[ -f "$cmdpath" ]]; then
-        __setsid "$@"
-    else
-        echo "No such file: $1"
-        return 1
-    fi
-}
-
 # do some commands in each sub-directory
 dirdo ()
 {

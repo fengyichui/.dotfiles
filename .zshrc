@@ -167,10 +167,6 @@ if [[ "$OSTYPE" == "cygwin" ]]; then
     __git_changed-in-index_files () { _wanted files expl 'local files' _files }
 fi
 
-# overwrite .gshrc __setsid function
-#__setsid () { setsid --fork "$@" >/tmp/setsid.${1##*/}.log 2>&1 &! }
-__setsid () { setsid "$@" >/tmp/setsid.${1##*/}.log 2>&1 &! }
-
 # prof finish
 #zprof
 
