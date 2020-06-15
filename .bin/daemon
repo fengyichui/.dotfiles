@@ -8,7 +8,7 @@ fi
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
     # Startup wsl.exe to create new instance, and use "cmd.exe /c start /b"
-    initfile=/tmp/wsl_daemon_init.$$.tmp
+    initfile=$(mktemp /tmp/wsl_daemon.tmp.XXXXXXXXXX)
     cat >$initfile << EOF
 export PATH='$PATH'
 $@
