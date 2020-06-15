@@ -2,7 +2,7 @@
 
 cmdpath="$(command -v "$1" 2>/dev/null)"
 if [[ ! -f "$cmdpath" ]]; then
-    echo "No such file: $1"
+    echo "No such command: $1"
     exit 1
 fi
 
