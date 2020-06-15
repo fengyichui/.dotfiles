@@ -54,7 +54,7 @@ do
         -s=*|--speed=*) speed="${i#*=}" ;;
         -u=*|--usb=*) select="-select usb=${i#*=}" ;;
         -i=*|--ip=*) select="-select ip=${i#*=}" ;;
-        -N=*|--nonotify=*) if [[ -n $nonotifypattern ]]; then nonotifypattern="$nonotifypattern|${i#*=}"; else nonotifypattern="${i#*=}"; fi ;;
+        -N=*|--nonotify=*) if [[ -n $nonotifypattern ]]; then nonotifypattern="$nonotifypattern\\|${i#*=}"; else nonotifypattern="${i#*=}"; fi ;;
         -N|--nonotify) nonotify=1 ;;
 
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
