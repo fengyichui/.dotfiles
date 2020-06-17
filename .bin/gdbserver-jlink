@@ -304,7 +304,6 @@ function kill_jlinkgdbserver ()
 # clean
 function cleanexit ()
 {
-    wait
     kill_jlinkgdbserver
     rm -rf ${fileprefix}*
     echo -e "\n\e[31m$jlinkname Script Exit\e[0m"
@@ -376,4 +375,7 @@ done
 
 # exit
 cleanexit
+
+# wait all jobs exit
+wait
 
