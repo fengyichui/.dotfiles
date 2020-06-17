@@ -470,7 +470,7 @@ nnoremap <F7> :call lq#CompileIt()<cr>
 
 " Create highlist type file, :ts / Ctrl+] / Ctrl+T
 nnoremap <F9> :UpdateTypesFile<cr>
-nnoremap <C-F9> :call lq#MakeTags()<cr>
+nnoremap <C-F9> :call lq#MakeTags("")<cr>
 
 " YouCompleteMe
 nnoremap <F10> :YcmDiags<CR>
@@ -752,7 +752,7 @@ command! -nargs=* -complete=file Makekeil  set makeprg=makekeil | compiler! keil
 command! -nargs=* -complete=file Makeiar   set makeprg=makeiar  | compiler! iar  | make <args>
 command! -nargs=* -complete=file Makegcc   set makeprg=make     | compiler! gcc  | make -j <args>
 command! -nargs=* -complete=file Makedox   set makeprg=doxygen  | compiler! gcc  | make <args>
-command!                         Maketags  !ctags -R --fields=+iaSszt --c-kinds=+p --c++-kinds=+p --extra=+q --totals .
+command! -nargs=?                Maketags  call lq#MakeTags(<q-args>)
 
 " X command
 command! -range -nargs=* Xcol        call lq#ColumnOp(<q-args>)
