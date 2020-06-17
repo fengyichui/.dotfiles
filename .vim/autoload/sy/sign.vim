@@ -9,6 +9,13 @@ else
   let s:sign_delete = ' '
 endif
 
+" Support for sign priority was added together with sign_place().
+if exists('*sign_place')
+  let s:sign_priority = printf('priority=%d', get(g:, 'signify_priority', 10))
+else
+  let s:sign_priority = ''
+endif
+
 let s:sign_show_count  = get(g:, 'signify_sign_show_count', 1)
 let s:delete_highlight = ['', 'SignifyLineDelete']
 " 1}}}
@@ -61,7 +68,7 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
     let a:sy.lines = []
     let ids        = []
 
-    let [old_line, new_line, old_count, new_count] = sy#sign#parse_hunk(line)
+    let [old_line, old_count, new_line, new_count] = sy#sign#parse_hunk(line)
 
     " Workaround for non-conventional diff output in older Fossil versions:
     " https://fossil-scm.org/forum/forumpost/834ce0f1e1
@@ -70,7 +77,7 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
       let new_line = old_line - 1 - deleted
     endif
 
-    " 2 lines added:
+    " Pure add:
 
     " @@ -5,0 +6,2 @@ this is line 5
     " +this is line 5
@@ -85,7 +92,7 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
         call add(ids, s:add_sign(a:sy, line, 'SignifyAdd'))
       endwhile
 
-    " 2 lines removed:
+    " Pure delete
 
     " @@ -6,2 +5,0 @@ this is line 5
     " -this is line 6
@@ -105,14 +112,13 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
         call add(ids, s:add_sign(a:sy, new_line, 'SignifyDeleteMore', s:sign_delete))
       endif
 
-    " 2 lines changed:
-
-    " @@ -5,2 +5,2 @@ this is line 4
-    " -this is line 5
-    " -this is line 6
-    " +this os line 5
-    " +this os line 6
-    elseif old_count == new_count
+    " There are additions and deletions, however we don't know which lines are
+    " 'changed' and which are new so we just show the whole block as changed.
+    "
+    " With sufficiently smart heuristics we could see which lines are the most
+    " dissimilar to the previous lines and mark them as additions but for now
+    " we will not do that.
+    else
       let modified += old_count
       let offset    = 0
       while offset < new_count
@@ -121,58 +127,6 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
         if s:external_sign_present(a:sy, line) | continue | endif
         call add(ids, s:add_sign(a:sy, line, 'SignifyChange'))
       endwhile
-    else
-
-      " 2 lines changed; 2 lines removed:
-
-      " @@ -5,4 +5,2 @@ this is line 4
-      " -this is line 5
-      " -this is line 6
-      " -this is line 7
-      " -this is line 8
-      " +this os line 5
-      " +this os line 6
-      if old_count > new_count
-        let modified += new_count
-        let removed   = old_count - new_count
-        let deleted  += removed
-        let offset    = 0
-        while offset < new_count - 1
-          let line    = new_line + offset
-          let offset += 1
-          if s:external_sign_present(a:sy, line) | continue | endif
-          call add(ids, s:add_sign(a:sy, line, 'SignifyChange'))
-        endwhile
-        let line = new_line + offset
-        if s:external_sign_present(a:sy, line) | continue | endif
-        call add(ids, s:add_sign(a:sy, line, (removed > 9)
-              \ ? 'SignifyChangeDeleteMore'
-              \ : 'SignifyChangeDelete'. removed))
-
-      " lines changed and added:
-
-      " @@ -5 +5,3 @@ this is line 4
-      " -this is line 5
-      " +this os line 5
-      " +this is line 42
-      " +this is line 666
-      else
-        let modified += old_count
-        let offset    = 0
-        while offset < old_count
-          let line    = new_line + offset
-          let offset += 1
-          if s:external_sign_present(a:sy, line) | continue | endif
-          call add(ids, s:add_sign(a:sy, line, 'SignifyChange'))
-        endwhile
-        while offset < new_count
-          let added  += 1
-          let line    = new_line + offset
-          let offset += 1
-          if s:external_sign_present(a:sy, line) | continue | endif
-          call add(ids, s:add_sign(a:sy, line, 'SignifyAdd'))
-        endwhile
-      endif
     endif
 
     if !empty(ids)
@@ -187,12 +141,6 @@ function! sy#sign#process_diff(sy, vcs, diff) abort
   for line in filter(keys(a:sy.internal), '!has_key(a:sy.signtable, v:val)')
     execute 'sign unplace' a:sy.internal[line].id 'buffer='.a:sy.buffer
   endfor
-
-  if has('gui_macvim') && has('gui_running') && mode() == 'n'
-    " MacVim needs an extra kick in the butt, when setting signs from the
-    " exit handler. :redraw would trigger a "hanging cursor" issue.
-    call feedkeys("\<c-l>", 'n')
-  endif
 
   if empty(a:sy.updated_by) && empty(a:sy.hunks)
     call sy#verbose('Successful exit value, but no diff. Keep VCS for time being.', a:vcs)
@@ -223,13 +171,13 @@ function! sy#sign#remove_all_signs(bufnr) abort
 endfunction
 
 " #parse_hunk {{{1
-" Parse a hunk as '@@ -273,3 +267,14' into [old_line, new_line, old_count, new_count]
+" Parse a hunk as '@@ -273,3 +267,14' into [old_line, old_count, new_line, new_count]
 function! sy#sign#parse_hunk(diffline) abort
   let tokens = matchlist(a:diffline, '^@@ -\v(\d+),?(\d*) \+(\d+),?(\d*)')
   return [
         \ str2nr(tokens[1]),
-        \ str2nr(tokens[3]),
         \ empty(tokens[2]) ? 1 : str2nr(tokens[2]),
+        \ str2nr(tokens[3]),
         \ empty(tokens[4]) ? 1 : str2nr(tokens[4])
         \ ]
 endfunction
@@ -288,10 +236,11 @@ function! s:add_sign(sy, line, type, ...) abort
           \ a:1,
           \ s:delete_highlight[g:signify_line_highlight])
   endif
-  execute printf('sign place %d line=%d name=%s buffer=%s',
+  execute printf('sign place %d line=%d name=%s %s buffer=%s',
         \ id,
         \ a:line,
         \ a:type,
+        \ s:sign_priority,
         \ a:sy.buffer)
 
   return id
@@ -299,6 +248,12 @@ endfunction
 
 " s:external_sign_present {{{1
 function! s:external_sign_present(sy, line) abort
+  " If sign priority is supported, so are multiple signs per line.
+  " Therefore, we can report no external signs present and let
+  " g:signify_priority control whether Sy's signs are shown.
+  if !empty(s:sign_priority)
+    return
+  endif
   if has_key(a:sy.external, a:line)
     if has_key(a:sy.internal, a:line)
       " Remove Sy signs from lines with other signs.

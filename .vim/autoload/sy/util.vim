@@ -31,7 +31,9 @@ function! sy#util#refresh_windows() abort
   endif
 
   if !get(g:, 'signify_cmdwin_active')
-    keepjumps windo if exists('b:sy') | call sy#start() | endif
+    for bufnr in tabpagebuflist()
+      call sy#start({'bufnr': bufnr})
+    endfor
   endif
 
   if exists('winid')
@@ -91,7 +93,8 @@ endfunction
 
 " #return_if_no_changes {{{1
 function! sy#util#return_if_no_changes() abort
-  if !exists('b:sy') || empty(b:sy.hunks)
+  let sy = getbufvar(bufnr(''), 'sy')
+  if empty(sy) || empty(sy.hunks)
     echomsg 'signify: There are no changes.'
     return 'return'
   endif
@@ -136,29 +139,31 @@ function! sy#util#popup_create(hunkdiff) abort
     let height  += scroll
   endif
 
+  let padding = repeat(' ', offset - 1)
+
   if exists('*nvim_open_win')
     call sy#util#popup_close()
     let buf = nvim_create_buf(0, 1)
     call nvim_buf_set_option(buf, 'syntax', 'diff')
-    call nvim_buf_set_lines(buf, 0, -1, 0, a:hunkdiff)
+    call nvim_buf_set_lines(buf, 0, -1, 0, map(a:hunkdiff, 'v:val[0].padding.v:val[1:]'))
     let s:popup_window = nvim_open_win(buf, v:false, {
           \ 'relative': 'win',
           \ 'row': winline,
-          \ 'col': offset - 1,
-          \ 'width': winwidth('%') - offset + 1,
+          \ 'col': 0,
+          \ 'width': winwidth('%'),
           \ 'height': height,
           \ })
     call nvim_win_set_option(s:popup_window, 'cursorline', v:false)
-    call nvim_win_set_option(s:popup_window, 'foldcolumn', 0)
+    call nvim_win_set_option(s:popup_window, 'foldcolumn', has('nvim-0.5') ? '0' : 0)
     call nvim_win_set_option(s:popup_window, 'foldenable', v:false)
     call nvim_win_set_option(s:popup_window, 'number', v:false)
     call nvim_win_set_option(s:popup_window, 'relativenumber', v:false)
     call nvim_win_set_option(s:popup_window, 'wrap', v:true)
     autocmd CursorMoved * ++once call sy#util#popup_close()
   elseif exists('*popup_create')
-    let s:popup_window = popup_create(a:hunkdiff, {
+    let s:popup_window = popup_create(map(a:hunkdiff, 'v:val[0].padding.v:val[1:]'), {
           \ 'line': 'cursor+1',
-          \ 'col': offset,
+          \ 'col': 0,
           \ 'minwidth': winwidth('%'),
           \ 'maxheight': height,
           \ 'moved': 'any',
