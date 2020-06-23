@@ -358,6 +358,7 @@ class reloadfile_command_register(gdb.Command):
         debug_file = gdb.current_progspace().filename
         if debug_file != None:
             gdb.execute("file {}".format(debug_file), from_tty)
+            gdb.execute("directory", from_tty)
 
 
 ######################################################################
