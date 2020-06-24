@@ -69,6 +69,10 @@
 [push]
     default = simple
 
+[pull]
+    rebase = false
+    ff = only
+
 [diff]
     # Controls which diff tool is used by git-difftool
     tool = vimdiff
