@@ -10,12 +10,15 @@ path=${1:-"."}
 
 if [[ "$OSTYPE" == "cygwin" ]]; then
     if [ -e "$path" ]; then
-        path=$(cygpath --absolute --windows "$path")
+        path="$(cygpath -a -m "$path")"
     fi
     export HOME="$(cygpath -m --mydocs)/../"
     explorer "$path"
 
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
+    if [ -e "$path" ]; then
+        path="$(wslpath -a -m "$path")"
+    fi
     wslview "$path"
 
 elif command -v xdg-open > /dev/null 2>&1; then
