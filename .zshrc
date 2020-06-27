@@ -10,8 +10,13 @@ export LANG=en_US.UTF-8
 # Editor
 export EDITOR='vim'
 
-# default X-window display
-export DISPLAY=':0.0'
+# default X-window display (hostname:displaynumber.screennumber, port:6000)
+if [[ -n "$WSL_DISTRO_NAME" && -n "$WSL_INTEROP" ]]; then
+    # Windows Firewall: > New-NetFirewallRule -DisplayName "WSL" -Direction Inbound  -InterfaceAlias "vEthernet (WSL)"  -Action Allow
+    export DISPLAY="$(awk '/nameserver/{print $2}' /etc/resolv.conf):0.0"
+else
+    export DISPLAY=':0.0'
+fi
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" == "cygwin" ]]; then
