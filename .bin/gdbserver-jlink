@@ -352,7 +352,7 @@ while true; do
                             logerrmsg=$(grep -v -i "$nonotifypattern" <<<"$logerrmsg")
                         fi
                         if [[ -n "$logerrmsg" ]]; then
-                            notifu.exe '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' &
+                            notifu.exe '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' '/d' '8000' &
                         fi
                     fi
                     lastloglines="$curloglines"
