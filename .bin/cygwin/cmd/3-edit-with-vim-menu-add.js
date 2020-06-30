@@ -3,7 +3,7 @@ var WshShell = new ActiveXObject("WScript.Shell");
 WshShell.CurrentDirectory = "..\\..\\..";
 CygwinNew = "\"" + WshShell.CurrentDirectory + "\\.bin\\windows\\hstart.exe\" /NOCONSOLE \"" +
             "\"" + WshShell.CurrentDirectory + "\\..\\..\\..\\bin\\bash.exe\" " +
-            "\"" + WshShell.CurrentDirectory + "\\.bin\\windows\\new\" "
+            "\"" + WshShell.CurrentDirectory + "\\.bin\\new\" "
 CygwinMintty = "\"" + WshShell.CurrentDirectory + "\\..\\..\\..\\bin\\mintty.exe\""
 
 WshShell.RegWrite("HKCU\\Software\\Classes\\*\\shell\\vim-in-cygwin\\" , "Edit with &Vim in Cygwin", "REG_SZ");
