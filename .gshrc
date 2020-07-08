@@ -395,7 +395,7 @@ exe-sfx ()
         fi
         echo "SFX: $sfxpath"
         # WinRAR
-        WinRAR a -sfx -afrar -s -m5 -ma -iicon.sfx/sfx.ico -k -z.sfx/sfx.opt $exeresult $@
+        WinRAR.exe a -sfx -afrar -s -m5 -ma -iicon.sfx/sfx.ico -k -z.sfx/sfx.opt $exeresult $@
         rm -r .sfx
     else
         cat << EOF
