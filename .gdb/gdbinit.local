@@ -27,12 +27,23 @@ disable_wdt
 ignore-all mon exec EnableLowPowerHandlingMode
 end
 
+set $jlink_running = 0
+
 define jlink
 shell gdbserver-jlink -X --retry --speed=10000 -N="0xE00" -N="0x400"
+set $jlink_running = 1
 end
 
 define jlink-stop
 shell gdbserver-jlink --stop
+set $jlink_running = 0
+end
+
+define hook-quit
+if ($jlink_running)
+ignore-all kill
+ignore-all jlink-stop
+end
 end
 
 define reconnect
