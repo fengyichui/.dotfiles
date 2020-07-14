@@ -373,9 +373,9 @@ while true; do
     sleep 0.2
 done
 
+# wait notifu
+kill %notifu
+
 # exit
 cleanexit
-
-# wait all jobs exit
-wait
 
