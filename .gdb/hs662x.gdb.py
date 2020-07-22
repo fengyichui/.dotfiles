@@ -605,7 +605,9 @@ class issue_reappear_register(gdb.Command):
         rom_axf = None
         rom_bin = None
         usr_axf = None
-        usr_bin = None
+        usr_ram_bin = None
+        usr_em_bin = None
+        usr_flash_bin = None
         usr_log = None
 
         # Search ROM files
@@ -623,16 +625,22 @@ class issue_reappear_register(gdb.Command):
             if file.endswith(".axf"):
                 usr_axf = os.path.join(usr_dir, file)
             elif file.endswith(".bin"):
-                usr_bin = os.path.join(usr_dir, file)
+                usr_ram_bin = os.path.join(usr_dir, file)
+            elif file.endswith(".ebin"):
+                usr_em_bin = os.path.join(usr_dir, file)
+            elif file.endswith(".fbin"):
+                usr_flash_bin = os.path.join(usr_dir, file)
             elif file.endswith(".log"):
                 usr_log = os.path.join(usr_dir, file)
-        if usr_bin == None or usr_log == None:
+        if usr_ram_bin == None or usr_log == None:
             raise gdb.GdbError('Can not found USR bin/log file!')
 
         print("rom_axf: {}".format(rom_axf))
         print("rom_bin: {}".format(rom_bin))
         print("usr_axf: {}".format(usr_axf))
-        print("usr_bin: {}".format(usr_bin))
+        print("usr_ram_bin: {}".format(usr_ram_bin))
+        print("usr_em_bin: {}".format(usr_em_bin))
+        print("usr_flash_bin: {}".format(usr_flash_bin))
         print("usr_log: {}".format(usr_log))
 
         # Start simulate
@@ -646,16 +654,22 @@ class issue_reappear_register(gdb.Command):
         # Restore USR info
         if usr_axf != None:
             gdb.execute('file {}'.format(usr_axf), to_string=True)
-        gdb.execute('restore {} binary 0'.format(usr_bin), to_string=True)
-        gdb.execute('restore {} binary 0x20000000'.format(usr_bin), to_string=True)
+        gdb.execute('restore {} binary 0'.format(usr_ram_bin), to_string=True) # Remaped address
+        gdb.execute('restore {} binary 0x20000000'.format(usr_ram_bin), to_string=True) # Physical address
+        if usr_em_bin != None:
+            gdb.execute('restore {} binary 0x41310000'.format(usr_em_bin), to_string=True)
+        if usr_flash_bin != None:
+            gdb.execute('restore {} binary 0x12000000'.format(usr_flash_bin), to_string=True) # HS6621
+            gdb.execute('restore {} binary 0x00400000'.format(usr_flash_bin), to_string=True) # HS6621C
 
         # Restore ROM info
         if rom_axf != None:
             if usr_axf == None:
                 gdb.execute('file {}'.format(rom_axf), to_string=True)
             else:
-                gdb.execute('add-symbol-file {} 0x08000000'.format(rom_axf), to_string=True)
-            gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True)
+                gdb.execute('add-symbol-file {}'.format(rom_axf), to_string=True)
+            gdb.execute('restore {} binary 0x08000000'.format(rom_bin), to_string=True) # HS6620/HS6621
+            gdb.execute('restore {} binary 0x00100000'.format(rom_bin), to_string=True) # HS6621C
 
         # dump memery / register
         gdb.execute('restore_dump_mem {}'.format(usr_log), to_string=True)
