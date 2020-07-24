@@ -92,8 +92,13 @@ cp etc/git-extras-completion.zsh /etc
 cd ..
 rm -rf git-extras
 
-# Exclude port
-netsh.exe int ipv4 add excludedportrange protocol=tcp startport=6000 numberofports=10       # X server from 6000
-netsh.exe int ipv4 add excludedportrange protocol=tcp startport=1080 numberofports=10       # Proxy Socks5
-netsh.exe int ipv4 add excludedportrange protocol=tcp startport=8118 numberofports=1        # Proxy http (Privoxy)
-netsh.exe int ipv4 add excludedportrange protocol=tcp startport=2330 numberofports=10       # Segger Jlink (2331)
+# Exclude port (Huge amount of ports are being reserved)
+#netsh.exe int ipv4 add excludedportrange protocol=tcp startport=6000 numberofports=10       # X server from 6000
+#netsh.exe int ipv4 add excludedportrange protocol=tcp startport=1080 numberofports=10       # Proxy Socks5
+#netsh.exe int ipv4 add excludedportrange protocol=tcp startport=8118 numberofports=1        # Proxy http (Privoxy)
+#netsh.exe int ipv4 add excludedportrange protocol=tcp startport=2330 numberofports=10       # Segger Jlink (2331)
+#
+# https://github.com/docker/for-win/issues/3171#issuecomment-554587817
+# https://github.com/microsoft/WSL/issues/5306#issuecomment-643603942
+netsh.exe int ipv4 set dynamic tcp start=49152 num=16384
+
