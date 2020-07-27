@@ -35,6 +35,7 @@ if [[ "$1" == "-c" ]] || [[ "$1" == "--compress" ]]; then
         (*.zip) zip -r "$@" ;;
         (*.7z) 7za a "$@" ;;
         (*.rar) ;;
+#        (*.tar.xz) XZ_OPT=-T0 tar cavf "$@" ;;
         (*) tar cavf "$@" ;;
     esac
     exit 0
