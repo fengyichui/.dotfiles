@@ -4,7 +4,7 @@
 # For cygwin, wifi control
 #
 
-cmd /c chcp 437 >/dev/null
+cmd.exe /c chcp 437 >/dev/null 2>&1
 
 ssid="lqWIFI"
 key="1234567890"
@@ -21,7 +21,7 @@ function usage()
     echo "    help:      Show me"
     echo ""
     echo "wifi show:"
-    netsh wlan show '/?'
+    netsh.exe wlan show '/?'
 }
 
 function gbk2utf8()
@@ -30,43 +30,43 @@ function gbk2utf8()
 }
 
 if [ $# == 0 ]; then
-    ipconfig '/all' | gbk2utf8 | awk '/^\w/{h=1;hs=hsn;hsn=$0}; /^\s+\w/{bs=bs$0"\n"}; {if(h){if(!match(bs, "Media disconnected")){print hs;print bs}h=0;bs=""}}'
-    netsh wlan show interfaces | gbk2utf8
+    ipconfig.exe '/all' | gbk2utf8 | awk '/^\w/{h=1;hs=hsn;hsn=$0}; /^\s+\w/{bs=bs$0"\n"}; {if(h){if(!match(bs, "Media disconnected")){print hs;print bs}h=0;bs=""}}'
+    netsh.exe wlan show interfaces | gbk2utf8
     exit 1
 fi
 
 case $1 in
     "start")
-        netsh wlan show driver | findstr Hosted
+        netsh.exe wlan show driver | findstr.exe Hosted
         echo "    --------------------------"
-        netsh wlan set hostednetwork mode=allow ssid=$ssid key=$key
-        netsh wlan start hostednetwork
+        netsh.exe wlan set hostednetwork mode=allow ssid=$ssid key=$key
+        netsh.exe wlan start hostednetwork
         echo "ssid=$ssid key=$key"
-        netsh wlan show hostednetwork
+        netsh.exe wlan show hostednetwork
         ;;
     "stop")
-        netsh wlan stop hostednetwork
-        netsh wlan set hostednetwork mode=disallow
-        netsh wlan show hostednetwork
+        netsh.exe wlan stop hostednetwork
+        netsh.exe wlan set hostednetwork mode=disallow
+        netsh.exe wlan show hostednetwork
         ;;
     "connect")
-        netsh wlan connect "$2"
+        netsh.exe wlan connect "$2"
         ;;
     "disconnect")
-        netsh wlan disconnect
+        netsh.exe wlan disconnect
         ;;
     "delete")
         while (($#!=1))
         do
-            netsh wlan delete profile "$2"
+            netsh.exe wlan delete profile "$2"
             shift
         done
         ;;
     "show")
         if [[ "$2" ]]; then
-            netsh wlan show "$2" | gbk2utf8
+            netsh.exe wlan show "$2" | gbk2utf8
         else
-            netsh wlan show all | gbk2utf8
+            netsh.exe wlan show all | gbk2utf8
         fi
         ;;
     *)
