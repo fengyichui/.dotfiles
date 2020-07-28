@@ -13,10 +13,10 @@
 #
 ######################################################################
 
-privoxy_config_dir='/etc/privoxy'
-privoxy_config=$privoxy_config_dir'/config'
-gfwlist_action='gfwlist.action'
-gfwlist_config=$privoxy_config_dir/$gfwlist_action
+privoxy_config_dir="/etc/privoxy"
+privoxy_config="$privoxy_config_dir/config"
+gfwlist_action="gfwlist.action"
+gfwlist_config="$privoxy_config_dir/$gfwlist_action"
 
 gen_pac=0
 pac_proxy=0
@@ -26,6 +26,14 @@ redo_socks_forward=0
 pre_pac_enable=0
 system_proxy=0
 daemon_mode=0
+
+# sudo
+if [[ "$OSTYPE" != "cygwin" ]]; then
+    if [[ "$EUID" != "0" ]]; then
+        sudo $0 $@
+        exit
+    fi
+fi
 
 # Get socks and http address
 get_address ()
@@ -91,7 +99,7 @@ do
             ;;
         -k|--kill)
             killall privoxy
-            sysproxy off
+            sysproxy.exe off
             exit 0
             shift
             ;;
@@ -168,7 +176,7 @@ echo -e "\e[32mForward SOCKS5: $socks_forward\e[0m"
 # open system proxy
 if [[ "$system_proxy" == "1" ]]; then
     echo -e "\e[32mSystem proxy running\e[0m"
-    sysproxy global $http_listen
+    sysproxy.exe global $http_listen
 fi
 
 if [[ "$daemon_mode" == "1" ]]; then
@@ -184,7 +192,7 @@ else
     # close system proxy
     if [[ "$system_proxy" == "1" ]]; then
         # close system proxy
-        sysproxy off
+        sysproxy.exe off
     fi
 fi
 
