@@ -18,6 +18,7 @@ fi
 for i in "$@"; do
     case "$i" in
         -n) export NOTMUX=1; touch /tmp/.notmux.tmp; shift ;;
+        -a) export NOTMUX=1; touch /tmp/.notmux.tmp; administrator=1; shift ;;
         -m) window='--window max'; shift ;;
         -s) slash=1; shift ;;
         *)  break ;;
@@ -47,8 +48,12 @@ elif [[ -n "$WSL_DISTRO_NAME" ]]; then
     userprofile="$(cmd.exe /c "<nul set /p=%USERPROFILE%" 2>/dev/null)"
     appdata="$(cmd.exe /c "<nul set /p=%APPDATA%" 2>/dev/null)"
     localappdata="$(cmd.exe /c "<nul set /p=%LOCALAPPDATA%" 2>/dev/null)"
-    setsid >/dev/null 2>&1 $(wslpath $localappdata)/wsltty/bin/mintty.exe $window --WSL="$WSL_DISTRO_NAME" --configdir="$appdata\\wsltty" --icon="$localappdata\\wsltty\\wsl.ico" --exec "$SHELL" --login -i
-
+    if [[ -n "$administrator" ]]; then
+        elevate="ELEVATE"
+    else
+        elevate="NOELEVATE"
+    fi
+    hstart.exe /$elevate "$localappdata\\wsltty\\bin\\mintty.exe $window --WSL=$WSL_DISTRO_NAME --configdir=$appdata\\wsltty --icon=$localappdata\\wsltty\\wsl.ico --exec $SHELL --login -i"
 else
     echo "Not support OS!"
     exit 1
