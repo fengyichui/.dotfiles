@@ -53,7 +53,8 @@ elif [[ -n "$WSL_DISTRO_NAME" ]]; then
     else
         elevate="NOELEVATE"
     fi
-    hstart.exe /$elevate "$localappdata\\wsltty\\bin\\mintty.exe $window --WSL=$WSL_DISTRO_NAME --configdir=$appdata\\wsltty --icon=$localappdata\\wsltty\\wsl.ico --exec $SHELL --login -i"
+    hstart.exe /D="$(wslpath -w "$PWD")" /$elevate "$localappdata\\wsltty\\bin\\mintty.exe $window --WSL=$WSL_DISTRO_NAME --configdir=$appdata\\wsltty --icon=$localappdata\\wsltty\\wsl.ico --exec $SHELL --login -i"
+
 else
     echo "Not support OS!"
     exit 1
