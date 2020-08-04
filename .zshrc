@@ -28,11 +28,11 @@ fi
 
 # Add my PATH (Must be in front of executed tmux)
 if [[ "$OSTYPE" == "cygwin" ]]; then
-    ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$HOME/.dotfiles/.bin/cygwin
+    ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$HOME/.dotfiles/.bin/cygwin
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    ePATH=$HOME/.bin:$HOME/.bin.windows:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
+    ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.bin.windows:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
 else
-    ePATH=$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
+    ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
 fi
 if [[ "$PATH" != "$ePATH"* ]]; then
     export PATH=$ePATH:$PATH
