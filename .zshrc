@@ -163,7 +163,7 @@ export TIMEFMT="$fg[green]%J: $fg[yellow]%*Es $fg[cyan](cpu=%P user=%U kernel=%S
 
 ## pager
 export PAGER='less'
-export LESS='-R -M -x4 -j.3'
+export LESS='-i -R -M -x4 -j.3'
 
 # default open with $EDITER
 alias -s {c,cc,cpp,h,hpp,asm,s,java,bin,hex,map,dis,sct,symdefs,mk,mak,ini,log,md,xml,txt}=$EDITOR
