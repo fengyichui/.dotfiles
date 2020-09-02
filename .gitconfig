@@ -140,6 +140,7 @@
     st  = status --short
     stt = status --short --ignored
     st2 = status --porcelain=2 --untracked-files=no
+    sl  = !git s | awk '{print $2}' | xargs ls --color=auto --group-directories-first -ld --time-style=long-iso -h 2>/dev/null
     archivethis = archive HEAD -o archive.zip
     archivethis-xz = archive HEAD -o archive.tar.xz
     ls = "!f() { git ls-files | grep "${@:-''}"; }; f"
