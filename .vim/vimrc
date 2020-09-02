@@ -559,7 +559,8 @@ nnoremap <A-up>     <c-w>-
 nnoremap <A-down>   <c-w>+
 
 " Like Ctrl-P, Use Alt-P to open buffer explorer
-nnoremap <A-p> :CtrlPBuffer<cr>
+"nnoremap <A-p> :CtrlPBuffer<cr>
+nnoremap <A-p> :CtrlPMRU<cr>
 nnoremap <A-S-p> :CtrlPTag<cr>
 
 " search next quickfix item
@@ -830,7 +831,7 @@ let g:colorizer_startup = 0
 let g:load_doxygen_syntax = 1
 
 " Signify
-let g:signify_disable_by_default = 1
+let g:signify_disable_by_default = 0
 let g:signify_vcs_list = ['git', 'svn']
 let g:signify_sign_show_count = 0
 let g:signify_skip_filetype = {'xxd':1}
