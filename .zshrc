@@ -167,6 +167,8 @@ export LESS='-i -R -M -x4 -j.3'
 
 # default open with $EDITER
 alias -s {c,cc,cpp,h,hpp,asm,s,java,bin,hex,map,dis,sct,symdefs,mk,mak,ini,log,md,xml,txt}=$EDITOR
+# .bat/.cmd use cmd.exe open
+_wslbatch() { eval cmd.exe /c "$(wslpath -m "$1")"; } && alias -s {cmd,bat}=_wslbatch
 
 # General shell config
 source ~/.dotfiles/.gshrc
