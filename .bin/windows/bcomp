@@ -1,4 +1,0 @@
-#!/bin/bash
-
-linux2win -p -e -i "bcomp.exe $*"
-
