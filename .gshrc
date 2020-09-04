@@ -192,7 +192,7 @@ vimdiff-dir ()
 }
 
 # latest
-latest ()
+ff-latest ()
 {
     find "$@" -type f -printf "%TY-%Tm-%Td %TT \t%p\n" | sort -rn | less -F
 }
