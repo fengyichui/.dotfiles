@@ -7,14 +7,13 @@ if [[ ! -f "$cmdpath" ]]; then
 fi
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    # no tmux
+    touch /tmp/.notmux.tmp
+    # init file
+    echo "$@" > /tmp/.init.tmp
+    echo "exit" >> /tmp/.init.tmp
     # Startup wsl.exe to create new instance, and use "cmd.exe /c start /b"
-    initfile=$(mktemp /tmp/wsl_daemon.tmp.XXXXXXXXXX)
-    cat >$initfile << EOF
-export PATH='$PATH'
-$@
-rm $initfile
-EOF
-    setsid >/dev/null 2>&1 cmd.exe '/c' start '/b' wsl.exe -d "$WSL_DISTRO_NAME" bash -c "source $initfile" &
+    setsid >/dev/null 2>&1 cmd.exe '/c' start '/b' wsl.exe -d "$WSL_DISTRO_NAME" --exec "$SHELL" -i &
 else
     # >/tmp/setsid.${1##*/}.log
     setsid >/dev/null 2>&1 "$@" &
