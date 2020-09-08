@@ -301,6 +301,15 @@ function kill_jlinkgdbserver ()
     fi
 }
 
+function notify_user ()
+{
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -t 5000 -i dialog-warning "$jlinkname" "$1"
+    else
+        notifu.exe '/t' warn '/p' "$jlinkname" '/m' "$1" '/q' '/d' '8000' &
+    fi
+}
+
 # clean
 function cleanexit ()
 {
@@ -352,7 +361,7 @@ while true; do
                             logerrmsg=$(grep -v -i "$nonotifypattern" <<<"$logerrmsg")
                         fi
                         if [[ -n "$logerrmsg" ]]; then
-                            notifu.exe '/t' warn '/p' "$jlinkname" '/m' "$logerrmsg" '/q' '/d' '8000' &
+                            notify_user "$logerrmsg"
                         fi
                     fi
                     lastloglines="$curloglines"
