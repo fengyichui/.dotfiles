@@ -84,6 +84,7 @@ sudo apt-get --yes install \
     exuberant-ctags \
     xclip \
     net-tools \
+    xfce4-notifyd \
 
 # install my dotfiles and other package files
 git clone --depth 1 https://gitee.com/fengyichui/dotfiles.git .dotfiles
