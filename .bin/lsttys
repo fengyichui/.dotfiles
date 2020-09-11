@@ -1,5 +1,16 @@
 #! bash
 
+# show support baudrate
+if [[ -n "$1" ]]; then
+    for bauds in $(
+        sed -r 's/^#define\s+B([1-9][0-9]+)\s+.*/\1/p;d' < \
+            /usr/include/asm-generic/termbits.h ) ;do
+        echo $bauds
+        stty -F $1 $bauds && echo Ok.
+    done  2>&1 |
+        pr -at2
+    exit
+fi
 
 # Cygwin
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
