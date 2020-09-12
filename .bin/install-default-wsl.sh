@@ -85,6 +85,7 @@ sudo apt-get --yes install \
     xclip \
     net-tools \
     xfce4-notifyd \
+    command-not-found \
 
 # install my dotfiles and other package files
 git clone --depth 1 https://gitee.com/fengyichui/dotfiles.git .dotfiles
