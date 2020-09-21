@@ -1,8 +1,16 @@
 #!/bin/bash
 
+# remove -* param
+for i in "$@"; do
+    case $i in
+        -*) shift ;;
+        *) break ;;
+    esac
+done
+
 # check param
 if [ $# -gt 1 ]; then
-    echo "open: too many params!"
+    echo "open: too many params: '$*'"
     exit 1
 fi
 
