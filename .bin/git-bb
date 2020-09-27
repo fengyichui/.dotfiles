@@ -5,6 +5,9 @@ stash_push_opt='--include-untracked'
 if [[ "$1" == "-d" || "$1" == "-D" ]]; then
     delete_branch="$1"
     shift
+elif [[ "$1" == "-m" ]]; then
+    rename_branch=1
+    shift
 elif [[ "$1" == "-a" ]]; then
     stash_push_opt="--all"
     shift
@@ -12,13 +15,19 @@ fi
 
 if [[ -z "$1" || ! -z "$2" ]]; then
     echo "Switch branch and auto stash push/pop all modified and untracked files"
-    echo "Usage: git bb [-d][-D][-a] [branch]"
+    echo "Usage: git bb [-d][-D][-a][-m] [branch]"
     echo "Branchs: $(git branch --color=always | tr -d '\n' | sed 's/\*/  */g')"
     exit 1
 fi
 
 branch=$1
 message="SWITCH-BRANCH-AUTO-WIP"
+
+# rename branch
+if [[ -n "$rename_branch" ]]; then
+    git branch --move "$branch"
+    exit
+fi
 
 # Check branch whether is valid
 if ! git branch | grep -q "^\\s*$branch$"; then
