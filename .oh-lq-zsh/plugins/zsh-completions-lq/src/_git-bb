@@ -4,7 +4,8 @@ _arguments -C \
   ': :__git_branch_names' \
   '-d[Delete branch and its stash]' \
   '-D[Force delete branch and its stash]' \
-  '-a[Stash all files]'
+  '-a[Stash all files]' \
+  '-m[Rename branch]'
 
 # Local Variables:
 # mode: Shell-Script
