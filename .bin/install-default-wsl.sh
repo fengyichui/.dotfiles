@@ -73,13 +73,14 @@ sudo apt-get --yes upgrade
 # Package (vim-gtk3 has more high performance than vim-gtk)
 sudo apt-get --yes install \
     git \
+    git-svn \
+    git-extras \
     zsh \
     vim-gtk3 \
     silversearcher-ag \
     w3m \
     make \
     tree \
-    git-svn \
     moreutils \
     exuberant-ctags \
     xclip \
