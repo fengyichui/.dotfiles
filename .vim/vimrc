@@ -453,11 +453,11 @@ let @p = "######################################################################
 
 " nerdtree
 nnoremap <silent> <F1> :NERDTreeToggle<cr>
-nnoremap <silent> <F2> :NERDTreeFind<cr>
+nnoremap <silent> <F2> :if expand('%') =~# '^NERD_tree_\d\+$' \| NERDTreeToggle \| else \| NERDTreeFind \| endif<cr>
 
 " Tagbar
 nnoremap <silent> <F3> :call lq#ShowLists()<cr>
-nnoremap <silent> <F4> :TagbarOpen fj<cr>
+nnoremap <silent> <F4> :if expand('%') =~# '^__Tagbar__\.\d\+$' \| call tagbar#ToggleWindow() \| else \| call tagbar#OpenWindow('fj') \| endif<cr>
 
 " Run it
 nnoremap <F5> :call lq#RunIt()<cr>
