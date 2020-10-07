@@ -195,7 +195,7 @@ function! s:Opener._newVSplit()
     endif
 
     call nerdtree#exec('wincmd p', 1)
-    call nerdtree#exec('vnew', 1)
+    call nerdtree#exec('vsplit', 1)
 
     let l:currentWindowNumber = winnr()
 
@@ -219,7 +219,7 @@ endfunction
 
 " FUNCTION: Opener._openFile() {{{1
 function! s:Opener._openFile()
-    if !self._stay && !and(g:NERDTreeQuitOnOpen,1) && exists('b:NERDTreeZoomed') && b:NERDTreeZoomed
+    if !self._stay && !nerdtree#and(g:NERDTreeQuitOnOpen,1) && exists('b:NERDTreeZoomed') && b:NERDTreeZoomed
         call b:NERDTree.ui.toggleZoom()
     endif
 
