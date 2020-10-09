@@ -395,6 +395,9 @@ autocmd InsertLeave * set cursorline
 " q for help file quit
 autocmd FileType help if &readonly | nnoremap <buffer> q :q<cr> | endif
 
+" Kconfig
+autocmd FileType kconfig    syntax sync minlines=99999
+
 " Avoid silent shell command lead screen mess up
 autocmd ShellCmdPost * if !has('gui_running') | redraw! | endif
 
