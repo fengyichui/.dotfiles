@@ -406,10 +406,11 @@ exe-sfx ()
     else
         cat << EOF
 Usage:
-  exe-sfx [-n] setup_exe_file input_files_dirs
+  exe-sfx [-d][-t][-a][-o] setup_exe_file input_files_dirs
     -d: Delete unpack files after exit, unpack to %TEMP% (Default)
     -t: Not delete unpack files after exit, unpack to %TEMP%
     -a: Not delete unpack files after exit, unpack to %APPDATA%
+    -o: Parameter option for 'setup_exe_file'
 Dependent:
   wrestool: Extract ico from Windows binaries. (icoutils package)
   WinRAR:   Create SFX file
