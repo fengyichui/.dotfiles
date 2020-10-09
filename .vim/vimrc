@@ -763,6 +763,7 @@ command! -range -nargs=* Xcol        call lq#ColumnOp(<q-args>)
 command!        -nargs=0 Xhex        call lq#HexEndianToggle()
 command!        -nargs=0 XrootVCS    call lq#SwitchVCSRoot()
 command!        -nargs=0 Xycm        packadd YouCompleteMe
+command!        -nargs=0 XycmInitCFG !cp ~/.vim/pack/Valloric/opt/c_arm.ycm_extra_conf.py .ycm_extra_conf.py
 command!        -nargs=0 Xhighlight  packadd TagHighlight | edit
 command!        -nargs=0 Xale        packadd ale | edit
 command!        -nargs=0 Xomni       packadd OmniCppComplete | call omni#cpp#complete#Init()
