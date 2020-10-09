@@ -71,6 +71,8 @@ flags = [
 '-I', '.',
 '-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/include',
 '-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/lib',
+#'-isystem', '/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/include',
+#'-isystem', '/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/lib',
 ]
 
 
