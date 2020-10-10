@@ -995,11 +995,11 @@ function! lq#DocumentConverter(docfile, docfile_abs)
 endfunction
 
 " ARM gdb, need vim-8.1
-function! lq#TermArmGdb()
-    packadd termdebug
-    let g:termdebugger = "arm-none-eabi-gdb"
-    Termdebug
-endfunction
+"function! lq#TermArmGdb()
+"    packadd termdebug
+"    let g:termdebugger = "arm-none-eabi-gdb"
+"    Termdebug
+"endfunction
 
 " Open current directory
 function! lq#OpenDir(is_cwd)

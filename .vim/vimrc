@@ -401,6 +401,9 @@ autocmd FileType kconfig    syntax sync minlines=99999
 " Avoid silent shell command lead screen mess up
 autocmd ShellCmdPost * if !has('gui_running') | redraw! | endif
 
+" TerminalWinOpen
+autocmd TerminalWinOpen * setlocal statusline=\ %f
+
 " autoread in terminal (only worked for tmux)
 if !has("gui_running")
 autocmd FocusGained * silent! checktime
@@ -774,6 +777,7 @@ command!        -nargs=0 Xcolorizer  ColorToggle
 command!        -nargs=0 Xtail       TailToggle
 command!        -nargs=0 Xmatrix     Matrix
 command! -bang  -nargs=0 Xdir        call lq#OpenDir(<bang>0)
+command! -bang  -nargs=* -complete=file  Xgdb call termdebug_arm#StartDebug(<bang>0, <f-args>)
 
 " Allow saving of files as sudo when I forgot to start vim using sudo.
 command! -nargs=0 WW    silent w !sudo tee > /dev/null %
