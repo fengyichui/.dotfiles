@@ -207,7 +207,7 @@ func s:StartDebugCommon(dict)
 
   " Enable showing a balloon with eval info
   if has("balloon_eval") || has("balloon_eval_term")
-    set balloonexpr=TermDebugBalloonExpr()
+    set balloonexpr=TermDebugArmBalloonExpr()
     if has("balloon_eval")
       set ballooneval
     endif
@@ -250,7 +250,7 @@ func s:SendCommand(cmd)
 endfunc
 
 " This is global so that a user can create their mappings with this.
-func TermDebugSendCommand(cmd)
+func TermDebugArmSendCommand(cmd)
   let do_continue = 0
   if !s:stopped
     let do_continue = 1
@@ -604,7 +604,7 @@ endfunc
 
 " Show a balloon with information of the variable under the mouse pointer,
 " if there is any.
-func TermDebugBalloonExpr()
+func TermDebugArmBalloonExpr()
   if v:beval_winid != s:sourcewin
     return ''
   endif
