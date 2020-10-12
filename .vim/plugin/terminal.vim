@@ -21,20 +21,18 @@ let g:loaded_terminal = 1
 function! Fixkey_setKey(key, keyCode)
     execute "set " . a:key . "=" . a:keyCode
 endfunction
-
 function! Fixkey_mapKey(key, value)
     execute "map  " . a:key . " " . a:value
     execute "map! " . a:key . " " . a:value
 endfunction
 
-let g:Fixkey_numSpareKeys = 30
+" New keys are taken from <F22> through <F37> and <S-F22> through <S-F37>
+" <F20>,<F21> used for focus
+let g:Fixkey_spareKeysBegin = 22 " from F22
+let g:Fixkey_numSpareKeys = (37 - g:Fixkey_spareKeysBegin) * 2
 let g:Fixkey_spareKeysUsed = 0
 
-" Allocate a new key, set it to use the passed-in keyCode, then map it to
-" the passed-in key.
-" New keys are taken from <F22> through <F37> and <S-F22> through <S-F37>,
-" for a total of 30 keys.
-" <F20>,<F21> used for focus
+" Allocate a new key, set it to use the passed-in keyCode, then map it to the passed-in key.
 function! Fixkey_setNewKey(key, keyCode)
     if g:Fixkey_spareKeysUsed >= g:Fixkey_numSpareKeys
         echohl WarningMsg
@@ -49,7 +47,7 @@ function! Fixkey_setNewKey(key, keyCode)
         let fn -= half
         let shift = "S-"
     endif
-    let newKey = "<" . shift . "F" . (22 + fn) . ">"
+    let newKey = "<" . shift . "F" . (g:Fixkey_spareKeysBegin + fn) . ">"
     call Fixkey_setKey(newKey, a:keyCode)
     call Fixkey_mapKey(newKey, a:key)
     let g:Fixkey_spareKeysUsed += 1
