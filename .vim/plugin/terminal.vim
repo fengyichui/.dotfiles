@@ -214,6 +214,9 @@ function! s:tmux_fix()
 
     cnoremap <silent> <F20> <C-\>e<SID>do_autocmd('FocusLost')<CR>
     cnoremap <silent> <F21> <C-\>e<SID>do_autocmd('FocusGained')<CR>
+
+    tnoremap <silent> <F20> <C-W>:silent doautocmd <nomodeline> FocusLost %<CR>
+    tnoremap <silent> <F21> <C-W>:silent doautocmd <nomodeline> FocusGained %<CR>
 endfunction
 
 " FocusGaine
