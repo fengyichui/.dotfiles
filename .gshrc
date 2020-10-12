@@ -191,6 +191,12 @@ vimdiff-dir ()
     vim -c ":DirDiff $1 $2"
 }
 
+# vim directory diff
+vimgdb ()
+{
+    vim -c ":Xgdb $@"
+}
+
 # latest
 ff-latest ()
 {
