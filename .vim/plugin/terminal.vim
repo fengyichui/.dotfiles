@@ -27,14 +27,14 @@ function! Fixkey_mapKey(key, value)
     execute "map! " . a:key . " " . a:value
 endfunction
 
-let g:Fixkey_numSpareKeys = 50
+let g:Fixkey_numSpareKeys = 30
 let g:Fixkey_spareKeysUsed = 0
 
 " Allocate a new key, set it to use the passed-in keyCode, then map it to
 " the passed-in key.
-" New keys are taken from <F13> through <F37> and <S-F13> through <S-F37>,
-" for a total of 50 keys.
-" <F13>,<F14> used for focus
+" New keys are taken from <F22> through <F37> and <S-F22> through <S-F37>,
+" for a total of 30 keys.
+" <F20>,<F21> used for focus
 function! Fixkey_setNewKey(key, keyCode)
     if g:Fixkey_spareKeysUsed >= g:Fixkey_numSpareKeys
         echohl WarningMsg
@@ -49,7 +49,7 @@ function! Fixkey_setNewKey(key, keyCode)
         let fn -= half
         let shift = "S-"
     endif
-    let newKey = "<" . shift . "F" . (15 + fn) . ">"
+    let newKey = "<" . shift . "F" . (22 + fn) . ">"
     call Fixkey_setKey(newKey, a:keyCode)
     call Fixkey_mapKey(newKey, a:key)
     let g:Fixkey_spareKeysUsed += 1
@@ -197,23 +197,23 @@ function! s:tmux_fix()
 
     " When Tmux 'focus-events' option is on, Tmux will send <Esc>[O when the
     " window loses focus and <Esc>[I when it gains focus.
-    exec "set <F13>=\e[O"
-    exec "set <F14>=\e[I"
+    exec "set <F20>=\e[O"
+    exec "set <F21>=\e[I"
 
-    nnoremap <silent> <F13> :silent doautocmd <nomodeline> FocusLost %<CR>
-    nnoremap <silent> <F14> :silent doautocmd <nomodeline> FocusGained %<CR>
+    nnoremap <silent> <F20> :silent doautocmd <nomodeline> FocusLost %<CR>
+    nnoremap <silent> <F21> :silent doautocmd <nomodeline> FocusGained %<CR>
 
-    onoremap <silent> <F13> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>
-    onoremap <silent> <F14> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>
+    onoremap <silent> <F20> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>
+    onoremap <silent> <F21> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>
 
-    vnoremap <silent> <F13> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>gv
-    vnoremap <silent> <F14> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>gv
+    vnoremap <silent> <F20> <Esc>:silent doautocmd <nomodeline> FocusLost %<CR>gv
+    vnoremap <silent> <F21> <Esc>:silent doautocmd <nomodeline> FocusGained %<CR>gv
 
-    inoremap <silent> <F13> <C-\><C-O>:silent doautocmd <nomodeline> FocusLost %<CR>
-    inoremap <silent> <F14> <C-\><C-O>:silent doautocmd <nomodeline> FocusGained %<CR>
+    inoremap <silent> <F20> <C-\><C-O>:silent doautocmd <nomodeline> FocusLost %<CR>
+    inoremap <silent> <F21> <C-\><C-O>:silent doautocmd <nomodeline> FocusGained %<CR>
 
-    cnoremap <silent> <F13> <C-\>e<SID>do_autocmd('FocusLost')<CR>
-    cnoremap <silent> <F14> <C-\>e<SID>do_autocmd('FocusGained')<CR>
+    cnoremap <silent> <F20> <C-\>e<SID>do_autocmd('FocusLost')<CR>
+    cnoremap <silent> <F21> <C-\>e<SID>do_autocmd('FocusGained')<CR>
 endfunction
 
 " FocusGaine
@@ -259,7 +259,7 @@ endfunction
 " Fix tmux issue
 call <SID>tmux_fix()
 
-" When '&term' changes values for '<F13>', '<F14>', '&t_ti' and '&t_te' are
+" When '&term' changes values for '<F20>', '<F21>', '&t_ti' and '&t_te' are
 " reset. Below autocmd restores values for those options.
 autocmd TermChanged * call <SID>tmux_fix()
 
