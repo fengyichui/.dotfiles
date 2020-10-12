@@ -687,6 +687,9 @@ vmap e <C-v>
 nmap E viw<C-c>
 vmap E <C-c>
 
+" Map ESC to exit terminal mode
+tnoremap <Esc> <C-W>N
+
 
 " Command {{{1
 
