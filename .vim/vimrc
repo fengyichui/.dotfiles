@@ -402,7 +402,9 @@ autocmd FileType kconfig    syntax sync minlines=99999
 autocmd ShellCmdPost * if !has('gui_running') | redraw! | endif
 
 " TerminalWinOpen
+if exists("##TerminalWinOpen")
 autocmd TerminalWinOpen * setlocal statusline=\ %f
+endif
 
 " autoread in terminal (only worked for tmux)
 if !has("gui_running")
