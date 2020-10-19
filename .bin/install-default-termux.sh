@@ -10,11 +10,10 @@
 
 # Update apt source:
 #   $ apt edit-sources
-#   加入：deb [arch=all,aarch64] http://mirrors.tuna.tsinghua.edu.cn/termux stable main
-#         ( [arch=all,aarch64]: aarch64=$(uname -m) )
 #   帮助: https://mirror.tuna.tsinghua.edu.cn/help/termux/
-#sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
-sed -i 's@^\(deb.*stable main\)$@#\1\ndeb [arch=all,'"$(uname -m)"'] http://mirrors.tuna.tsinghua.edu.cn/termux stable main@' $PREFIX/etc/apt/sources.list
+sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/termux-packages-24 stable main@' $PREFIX/etc/apt/sources.list
+sed -i 's@^\(deb.*games stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/game-packages-24 games stable@' $PREFIX/etc/apt/sources.list.d/game.list
+sed -i 's@^\(deb.*science stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/science-packages-24 science stable@' $PREFIX/etc/apt/sources.list.d/science.list
 apt update && apt upgrade
 
 # Storage
