@@ -32,6 +32,9 @@ import os, sys
 import subprocess
 import ycm_core
 
+# device select: arm or linux
+device = "linux"
+
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
@@ -53,7 +56,7 @@ flags = [
 #'-Wno-missing-prototypes',
 #'-Wno-padded',
 '-D__GNUC__',
-'-D__ARM_NO_DEPRECATED_FUNCTIONS',
+#'-D__ARM_NO_DEPRECATED_FUNCTIONS',
 #'-stdlib=libc++',
 # THIS IS IMPORTANT! Without a "-std=<something>" flag, clang won't know which
 # language to use when compiling headers. So it will guess. Badly. So C++
@@ -76,29 +79,34 @@ flags = [
 #'-isystem', '/opt/gcc-arm-none-eabi-9-2020-q2-update/arm-none-eabi/lib',
 ]
 
-# check arm-none-eabi-gcc
-if '-isystem' not in flags:
-    try:
-        isystem_base = subprocess.check_output(['bash', '-c', 'command -v arm-none-eabi-gcc']).decode('utf8')[:-23]
-    except:
-        pass
-    else:
-        flags += ['-isystem', isystem_base + '/arm-none-eabi/include']
-        flags += ['-isystem', isystem_base + '/arm-none-eabi/lib']
+if device is "arm":
+    # check arm-none-eabi-gcc
+    if '-isystem' not in flags:
+        try:
+            isystem_base = subprocess.check_output(['bash', '-c', 'command -v arm-none-eabi-gcc']).decode('utf8')[:-23]
+        except:
+            pass
+        else:
+            flags += ['-isystem', isystem_base + '/arm-none-eabi/include']
+            flags += ['-isystem', isystem_base + '/arm-none-eabi/lib']
 
-# check UV4.exe
-if '-isystem' not in flags:
-    try: 
-        isystem_base = subprocess.check_output(['bash', '-c', 'command -v UV4.exe']).decode('utf8')[:-13]
-    except:
-        pass
-    else:
-        flags += ['-isystem', isystem_base + '/ARM/ARMCLANG/include']
-        flags += ['-isystem', isystem_base + '/ARM/ARMCLANG/lib']
+    # check UV4.exe
+    if '-isystem' not in flags:
+        try: 
+            isystem_base = subprocess.check_output(['bash', '-c', 'command -v UV4.exe']).decode('utf8')[:-13]
+        except:
+            pass
+        else:
+            flags += ['-isystem', isystem_base + '/ARM/ARMCLANG/include']
+            flags += ['-isystem', isystem_base + '/ARM/ARMCLANG/lib']
 
-# error
-if '-isystem' not in flags:
-    raise Exception("Can't find any compilers (.ycm_extra_conf.py)")
+    # error
+    if '-isystem' not in flags:
+        raise Exception("Can't find any compilers (.ycm_extra_conf.py)")
+
+else:
+    flags += ['-isystem', '/usr/include']
+    flags += ['-isystem', '/usr/local/include']
 
 # Set this to the absolute path to the folder (NOT the file!) containing the
 # compile_commands.json file to use that instead of 'flags'. See here for
