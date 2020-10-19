@@ -24,16 +24,18 @@ termux-setup-storage
 apt install termux-api
 
 # Package
-apt install git \
-            zsh \
-            vim \
-            coreutils \
-            python \
-            silversearcher-ag \
-            man \
-            curl \
-            wget \
-            openssh \
+apt --yes install \
+    git \
+    zsh \
+    vim \
+    coreutils \
+    python \
+    silversearcher-ag \
+    man \
+    curl \
+    wget \
+    openssh \
+    ncurses-utils \
 
 # install my dotfiles
 git clone --depth 1 https://github.com/fengyichui/.dotfiles.git
