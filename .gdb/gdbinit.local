@@ -75,6 +75,7 @@ disable_wdt
 end
 
 define rc
+reloadfile
 # 1st-rst: halt cpu
 mon reset 1
 load
