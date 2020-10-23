@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [[ "$1" == "-t" ]]; then
+    pane=$2
+    shift
+    shift
+else
+    pane=1
+fi
+
+if [[ -z "$1" || "$1" == "-h" ]]; then
+    cat <<EOF
+Usage:
+  1. start a tmux session and login to a remote host
+  2. split current session and run in local host:
+     $ tmux-rcp [-t remote-tmux-pane] remote-file [local-file]
+Show tmux pane:
+  $ tmux lsp [-a]
+EOF
+    exit 0
+fi
+
+remote_file=$1
+
+if [[ -n "$2" ]]; then
+    local_file=$2
+else
+    local_file=${remote_file##*/}
+fi
+
+tmux pipe-pane -o -t$pane "tail -n +2 | col -b | base64 -d > $local_file"
+tmux send-keys -t$pane "base64 $remote_file && read" Enter
+
+read -n1 -r -p "Is the output of the tmux pane $pane finished? [y] " answer
+
+tmux pipe-pane -t$pane
+tmux send-keys -t$pane Enter
+
