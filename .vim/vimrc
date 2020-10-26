@@ -460,10 +460,10 @@ let @p = "######################################################################
 " Shortcut: F {{{2
 
 " Map F1 to exit terminal mode
-tnoremap <F1> <C-W>N
+tnoremap <silent> <F1> <C-W>N
 
 " nerdtree
-nnoremap <silent> <F1> :NERDTreeToggle<cr>
+nnoremap <silent> <F1> :if &buftype=='terminal' \| call feedkeys("i") \| else \| NERDTreeToggle \| endif<cr>
 nnoremap <silent> <F2> :if expand('%') =~# '^NERD_tree_\d\+$' \| NERDTreeToggle \| else \| NERDTreeFind \| endif<cr>
 
 " Tagbar
