@@ -143,7 +143,7 @@
     st2 = status --porcelain=2 --untracked-files=no
     sl  = !git s | awk '{print $2}' | xargs ls --color=auto --group-directories-first -ld --time-style=long-iso -h 2>/dev/null
     archivethis = "!f() { git archive ${1:-HEAD} -o archive_$(date +'%Y%m%d').zip ; }; f"
-    archivethis-xz = "!f() { git archive ${1:-HEAD} -o archive_$(date +'%Y%m%d').tar.xz ; }; f"
+    archivethis-xz = "!f() { git ls-files $1 | tar -cavf archive_$(date +'%Y%m%d').tar.xz -T - ; }; f"
     archivethis-changed-xz = "!f() { git diff --name-only --diff-filter=ACMRT ${1:-HEAD} $2 | tar -cavf archive-changed_$(date +'%Y%m%d').tar.xz -T - ; }; f"
     ls = "!f() { git ls-files | grep "${@:-''}"; }; f"
     lso = ls-files --others --exclude-standard
