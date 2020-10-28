@@ -23,6 +23,7 @@ import tempfile
 import glob
 import platform
 import re
+import signal
 
 ######################################################################
 # VARIABLES
@@ -76,7 +77,22 @@ sys.stdout.flush()
 ######################################################################
 # FUNCTIONS
 ######################################################################
+def kill_windows_process(commandline):
+    print("Kill Windows Process [{}] ...".format(commandline.split(' ')[0]))
+    s = signal.signal(signal.SIGINT, signal.SIG_IGN)
+    kill_process = subprocess.Popen(['wmic.exe', 'Path', 'win32_process', 'Where',
+                                     "CommandLine Like '%" + commandline.replace('\\', '\\\\') + "%'",
+                                     'Call', 'Terminate'],
+                                     stdout=subprocess.DEVNULL)
+    kill_process.wait()
+    signal.signal(signal.SIGINT, s)
 
+def kill_keil_process(keil_process, keil_cmd):
+    try:
+        kill_windows_process(' '.join(keil_cmd))
+        keil_process.kill()
+    except:
+        pass
 
 ######################################################################
 # MAIN
@@ -102,8 +118,12 @@ keil_cmd = ['UV4.exe'] + keilparams[flag].split() + [uvproj_win, '-o', tmpfilena
 if target != None: keil_cmd += ['-t', target]
 if in_wsl: tail_cmd = ['powershell.exe', 'Get-Content', tmpfilename_win, '-Wait']
 else:      tail_cmd = ['tail', '-f', tmpfilename]
-keil_process = subprocess.Popen(keil_cmd)
-tail_process = subprocess.Popen(tail_cmd)
+
+try:
+    keil_process = subprocess.Popen(keil_cmd)
+    tail_process = subprocess.Popen(tail_cmd)
+except:
+    kill_keil_process(keil_process, keil_cmd)
 
 while True:
     try:
@@ -114,19 +134,18 @@ while True:
         break
 
     except:
-        try:
-            keil_process.kill()
-        except:
-            pass
+        kill_keil_process(keil_process, keil_cmd)
 
 while True:
-    if os.path.isfile(tmpfilename):
-        try:
+    try:
+        if os.path.isfile(tmpfilename):
             os.unlink(tmpfilename)
+        break
+    except:
+        try:
+            time.sleep(0.1)
         except:
-            time.sleep(0.01)
-            continue
-    break
+            pass
 
 print('Leaving directory')
 sys.stdout.flush()
