@@ -78,19 +78,31 @@ sys.stdout.flush()
 # FUNCTIONS
 ######################################################################
 def kill_windows_process(commandline):
-    print("Kill Windows Process [{}] ...".format(commandline.split(' ')[0]))
+#    print("Kill Windows Process [{}] ...".format(commandline.split(' ')[0]))
     s = signal.signal(signal.SIGINT, signal.SIG_IGN)
     kill_process = subprocess.Popen(['wmic.exe', 'Path', 'win32_process', 'Where',
                                      "CommandLine Like '%" + commandline.replace('\\', '\\\\') + "%'",
                                      'Call', 'Terminate'],
-                                     stdout=subprocess.DEVNULL)
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     kill_process.wait()
     signal.signal(signal.SIGINT, s)
 
 def kill_keil_process(keil_process, keil_cmd):
     try:
-        kill_windows_process(' '.join(keil_cmd))
+        if in_wsl:
+            print("\nKill Windows Process [UV4.exe] ...")
+            kill_windows_process(' '.join(keil_cmd))
         keil_process.kill()
+        keil_process.wait()
+    except:
+        pass
+
+def kill_tail_process(tail_process, tail_cmd):
+    try:
+        if in_wsl:
+            kill_windows_process(' '.join(tail_cmd))
+        tail_process.kill()
+        tail_process.wait()
     except:
         pass
 
@@ -120,19 +132,17 @@ if in_wsl: tail_cmd = ['powershell.exe', 'Get-Content', tmpfilename_win, '-Wait'
 else:      tail_cmd = ['tail', '-f', tmpfilename]
 
 try:
-    keil_process = subprocess.Popen(keil_cmd)
-    tail_process = subprocess.Popen(tail_cmd)
+    keil_process = subprocess.Popen(keil_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    tail_process = subprocess.Popen(tail_cmd,                            stderr=subprocess.DEVNULL)
 except:
     kill_keil_process(keil_process, keil_cmd)
 
 while True:
     try:
         keil_process.wait()
-        tail_process.kill()
-        tail_process.wait()
         time.sleep(0.1)
+        kill_tail_process(tail_process, tail_cmd)
         break
-
     except:
         kill_keil_process(keil_process, keil_cmd)
 
@@ -145,11 +155,11 @@ while True:
         try:
             time.sleep(0.1)
         except:
-            pass
+            print("\nDelete temporary file ...")
 
 print('Leaving directory')
 sys.stdout.flush()
-os.system("reset -w")
+#os.system("reset -w")
 
 # @} #
 
