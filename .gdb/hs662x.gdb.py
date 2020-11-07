@@ -291,6 +291,7 @@ class disable_wdt_register(gdb.Command):
 
     def invoke(self, args, from_tty):
         gdb.execute('set *0x400e0024 |= 1<<27')
+        gdb.execute('set *0x400e00e8 = 0x6666')
         print("WDT is disabled")
 
 
