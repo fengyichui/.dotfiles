@@ -205,6 +205,8 @@ function! lq#OpComment(op, nv)
             execute l:line . 's/^/"/'
         elseif &filetype == 'dosbatch'
             execute l:line . 's/^/::/'
+        elseif &filetype == 'ld'
+            execute l:line . 's#^#/*# | s#\s*$# */#'
         else
             execute l:line . 's/^/#/'
         endif
@@ -215,6 +217,9 @@ function! lq#OpComment(op, nv)
             execute 'silent! ' . l:line . 's/\v^(\s*)"/\1/'
         elseif &filetype == 'dosbatch'
             execute 'silent! ' . l:line . 's/\v^(\s*)::/\1/'
+        elseif &filetype == 'ld'
+            execute 'silent! ' . l:line . 's#\v^(\s*)/\*#\1#'
+            execute 'silent! ' . l:line . 's#\v(\s*)\*/(\s*)$##'
         else
             execute 'silent! ' . l:line . 's/\v^(\s*)#/\1/'
         endif
