@@ -295,45 +295,41 @@ class disable_wdt_register(gdb.Command):
         print("WDT is disabled")
 
 
-# remap to RAM
-class remap2ram_register(gdb.Command):
-
-    """HS662x remap to RAM
-    """
-
-    def __init__(self):
-        super(self.__class__, self).__init__("remap2ram", gdb.COMMAND_USER)
-
-    def invoke(self, args, from_tty):
-        if chip()['name'] == 'HS6620':
-            gdb.execute('set *0x400e003c |= 0x20')
-            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 6')
-            print("Remapped to RAM (HS6620)")
-        else:
-            gdb.execute('set *0x400e003c |= 0x20')
-            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 2')
-            print("Remapped to RAM (HS6621)")
-
-
 # remap to ROM
-class remap2rom_register(gdb.Command):
+class remap_register(gdb.Command):
 
-    """HS662x remap to ROM
+    """HS662x remap
     """
 
     def __init__(self):
-        super(self.__class__, self).__init__("remap2rom", gdb.COMMAND_USER)
+        super(self.__class__, self).__init__("remap", gdb.COMMAND_USER)
 
     def invoke(self, args, from_tty):
-        if chip()['name'] == 'HS6620':
-            gdb.execute('set *0x400e003c |= 0x20')
-            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 5')
-            print("Remapped to ROM (HS6620)")
+        if args == "ram":
+            if chip()['name'] == 'HS6620':
+                gdb.execute('set *0x400e003c |= 0x20')
+                gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 6')
+                print("Remapped to RAM (HS6620)")
+            else:
+                gdb.execute('set *0x400e003c |= 0x20')
+                gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 2')
+                print("Remapped to RAM (HS6621X)")
+        elif args == "otp":
+            if chip()['name'] == 'HS6620':
+                print("Can't remap to OTP (HS6620)")
+            else:
+                gdb.execute('set *0x400e003c |= 0x20')
+                gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 8')
+                print("Remapped to OTP (HS6621X)")
         else:
-            gdb.execute('set *0x400e003c |= 0x20')
-            gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 1')
-            print("Remapped to ROM (HS6621)")
-
+            if chip()['name'] == 'HS6620':
+                gdb.execute('set *0x400e003c |= 0x20')
+                gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 5')
+                print("Remapped to ROM (HS6620)")
+            else:
+                gdb.execute('set *0x400e003c |= 0x20')
+                gdb.execute('set *0x400e003c  = (*0x400e003c & 0xFFFFFFF0) | 1')
+                print("Remapped to ROM (HS6621X)")
 
 # reboot
 class reboot_register(gdb.Command):
@@ -346,7 +342,7 @@ class reboot_register(gdb.Command):
 
     def invoke(self, args, from_tty):
         gdb.execute('mon reset')
-        gdb.execute('remap2rom')
+        gdb.execute('remap rom')
         gdb.execute('mon reset 1')
         gdb.execute('c')
 
@@ -708,8 +704,7 @@ class issue_reappear_register(gdb.Command):
 
 # register
 disable_wdt_register()
-remap2ram_register()
-remap2rom_register()
+remap_register()
 reboot_register()
 device_info_register()
 flash_upload_register()

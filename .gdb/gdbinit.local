@@ -2,12 +2,24 @@
 # GDB init local file
 #
 
+set $jlink_running = 0
+set $runtype = 0
+
 define hs662x
 source ~/.dotfiles/.gdb/hs662x.gdb.py
 end
 
 define xx
 source ~/.dotfiles/.gdb/dashboard.gdb
+end
+
+define invalidate_cache
+set *0xE0042004 = 1
+set *0xE0042008 = 0
+set *0xE0042020 = 1
+set *0xE0042004 = 0
+set *0xE0042008 = 1
+ignore-all mon exec InvalidateCache
 end
 
 define connect2local
@@ -25,9 +37,8 @@ define connect
 connect2local
 disable_wdt
 ignore-all mon exec EnableLowPowerHandlingMode
+ignore-all mon exec SetAllowFlashCache = 0
 end
-
-set $jlink_running = 0
 
 define jlink
 shell gdbserver-jlink -X --retry --speed=10000 -N="0xE00" -N="0x400"
@@ -50,12 +61,13 @@ define reconnect
 ignore-all kill
 jlink
 connect
+set $runtype = 0
 end
 
 define reconnect_hs6621
 reconnect
 mon device hs6621
-ignore-all mon exec SetAllowFlashCache = 0
+set $runtype = 2
 end
 
 define reconnect_hs6621c
@@ -64,7 +76,13 @@ mon device hs6621c
 # CPU div=2
 set *0x40001004 = 0x00c00206
 set *0x4000100C = 1
-ignore-all mon exec SetAllowFlashCache = 0
+set $runtype = 2
+end
+
+define reconnect_hs6621d_otp
+reconnect
+mon device hs6621d-otp
+set $runtype = 3
 end
 
 # In Windows, use UsbDriverTool.exe to install 'libusb-WinUSB' with 'J-link'
@@ -74,7 +92,7 @@ target remote | openocd -c 'adapter driver jlink; transport select swd; set CHIP
 disable_wdt
 end
 
-define rc
+define rc_rom
 reloadfile
 # 1st-rst: halt cpu
 mon reset 1
@@ -84,9 +102,9 @@ mon reset 1
 c
 end
 
-define rc1
+define rc_ram
 reloadfile
-remap2ram
+remap ram
 # 1st-rst: halt cpu
 mon reset 1
 load
@@ -95,23 +113,47 @@ mon reset 1
 c
 end
 
-define rc2
+define rc_flash
 reloadfile
 # 1st-rst: halt cpu
 mon reset 1
 # Invalidate cache
-set *0xE0042004 = 1
-set *0xE0042008 = 0
-set *0xE0042020 = 1
-set *0xE0042004 = 0
-set *0xE0042008 = 1
-ignore-all mon exec InvalidateCache
+invalidate_cache
 # load
 load
 # set new sp and pc
 set $sp = *0x50003000
 set $pc = *0x50003004
 c
+end
+
+define rc_otp
+reloadfile
+remap otp
+# 1st-rst: halt cpu
+mon reset 1
+# Invalidate cache
+invalidate_cache
+# load
+load
+# 2nd-rst: make MSP valid
+mon reset 1
+c
+end
+
+define rc
+if ($runtype == 0)
+rc_rom
+end
+if ($runtype == 1)
+rc_ram
+end
+if ($runtype == 2)
+rc_flash
+end
+if ($runtype == 3)
+rc_otp
+end
 end
 
 define rrc
