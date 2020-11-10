@@ -7,6 +7,7 @@ export LC_ALL=C
 timestamp_show=1
 timestamp_from_start=''
 timestamp_len=0
+timestamp_us=''
 color_re_index=0
 color_fail_re='fatal|fail|error|warn|bad|wrong|assert|fault'
 color_seq=0
@@ -25,6 +26,7 @@ function print_usage ()
     echo "  -C          colorize line sequentially"
     echo "  -T          disable timestamp (default add system time)"
     echo "  -s          timestamp with 'elapsed since start of the program'"
+    echo "  -u          timestamp with subsecond (us)"
     echo "  -G          use iconv to convert GBK to UTF8"
     echo "  -f <file>   use 'tail -f <file>' to process"
     echo "  -h          show this help and exit"
@@ -33,13 +35,14 @@ function print_usage ()
 }
 
 # Parsing params
-while getopts g:c:f:CTsGh opt; do
+while getopts g:c:f:CTsuGh opt; do
     case $opt in
         g) grep_re="$OPTARG" ;;
         c) eval "color_re_${color_re_index}='${OPTARG}'"; color_re_index=$((color_re_index + 1)) ;;
         C) color_seq=1 ;;
         T) timestamp_show=0 ;;
         s) timestamp_from_start='-s' ;;
+        u) timestamp_us='.' ;;
         G) gbk2utf8=1 ;;
         f) tail_file="$OPTARG" ;;
         ?) print_usage ;;
@@ -68,11 +71,14 @@ fi
 # timestamp (`ts` tool is in moreutils package)
 if [[ "$timestamp_show" == "1" ]]; then
     if [[ -n "$timestamp_from_start" ]]; then
-        cmd="$cmd | ts $timestamp_from_start '%H:%M:%S '"
+        cmd="$cmd | ts $timestamp_from_start '%H:%M:%${timestamp_us}S '"
         timestamp_len=8
     else
-        cmd="$cmd | ts '%m/%d %H:%M:%S '"
+        cmd="$cmd | ts '%m/%d %H:%M:%${timestamp_us}S '"
         timestamp_len=14
+    fi
+    if [[ -n "$timestamp_us" ]]; then
+        timestamp_len=$(($timestamp_len+7))
     fi
 fi
 
