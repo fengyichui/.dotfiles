@@ -26,8 +26,8 @@ import time
 flash_id = 0
 flash_size = 1024*512
 flash_sector_size = 1024*4
-device_name = 'HS662X'
-device_version = 1
+device_name = 'UNKNOWN'
+device_version = 0
 debug_file = ''
 script_dir = os.path.dirname(__file__)
 
@@ -90,24 +90,29 @@ ONCE_OP_SIZE            = 32*1024
 def chip():
     global device_name
     global device_version
+    device_name = 'UNKNOWN'
+    device_version = 0
 
-    try:
-        # HS6620 / HS6621
-        device_info = int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))
-        if (device_info>>16) == 0x6620:
-            device_name = 'HS6620'
-        else:
+    chip_id = int(gdb.parse_and_eval('*0x40000004').cast(gdb.lookup_type('int')))
+    chip_major_id = chip_id & 0xFFFF
+    chip_sub_id = (chip_id >> 28) & 0xF
+
+    if chip_major_id == 0x6620:
+        device_name = 'HS6620'
+        device_version = (int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF
+
+    elif chip_major_id == 0x6621:
+        if chip_sub_id == 0x1:
             device_name = 'HS6621'
-        device_version = (device_info>>8) & 0xFF
+            device_version = (int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF
+        else:
+            device_name = 'HS6621{:X}'.format(chip_sub_id)
+            device_version = (int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>8) & 0x0F
 
-    except:
-        try:
-            # HS6621C
-            device_info = int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))
-            device_name = 'HS6621C'
-            device_version = (device_info>>8) & 0x0F
-        except:
-            raise gdb.GdbError("Can't detect supported chip!")
+    else:
+        device_name = 'HS6621D'
+        device_version = 1
+#        raise gdb.GdbError("Can't detect supported chip!")
 
     return {'name':device_name, 'version':device_version}
 
@@ -131,10 +136,10 @@ def flash_prepare_and_show():
     chip_info = chip()
 
     # FLM
-    if chip_info['name'] == 'HS6621C':
-        flash_flm = 'HS6621C.GDB.FLM'
-    else:
+    if chip_info['name']=='HS6620' or chip_info['name']=='HS6621':
         flash_flm = 'HS662X.GDB.FLM'
+    else:
+        flash_flm = 'HS6621C.GDB.FLM'
 
     # Show device name
     print('Device: {} A{}'.format(device_name, device_version))
