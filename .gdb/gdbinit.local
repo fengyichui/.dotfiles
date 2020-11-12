@@ -33,6 +33,7 @@ target remote 192.168.2.66:2331
 end
 
 define connect
+reloadfile
 #connect2remote
 connect2local
 disable_wdt
