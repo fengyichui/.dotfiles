@@ -71,7 +71,7 @@ mon device hs6621
 set $runtype = 2
 end
 
-define reconnect_hs6621c
+define reconnect_hs6621x
 reconnect
 mon device hs6621c
 # CPU div=2
