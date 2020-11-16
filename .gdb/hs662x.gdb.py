@@ -110,9 +110,7 @@ def chip():
             device_version = (int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>8) & 0x0F
 
     else:
-        device_name = 'HS6621D'
-        device_version = 1
-#        raise gdb.GdbError("Can't detect supported chip!")
+        raise gdb.GdbError("Can't detect supported chip!")
 
     return {'name':device_name, 'version':device_version}
 
