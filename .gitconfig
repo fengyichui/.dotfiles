@@ -133,7 +133,7 @@
     b = branch
     d  = diff --relative --patch --compact-summary
     dw = diff --relative --patch --compact-summary --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
-    dd = "!f() { git d "${1:-HEAD}^1..${1:-HEAD}"; } ; f"
+    dd = "!f() { git d "${1:-HEAD}^1..${1:-HEAD}" $2; } ; f"
     d-branch = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor ${1:-master} $head` ; git d $ancestor..$head ; }; f"
     d-bcompare = difftool --dir-diff --no-symlinks --tool=bcompare
     d-meld = difftool --dir-diff --tool=meld # --no-symlinks
