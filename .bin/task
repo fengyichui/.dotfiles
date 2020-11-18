@@ -15,10 +15,12 @@
 #   task -f     finish all tasks
 #
 
-if [[ -z "$OneDrive" ]]; then
-    tasks_path="$HOME/tasks"
+syncdir='/mnt/d/OneDrive'
+if [[ -d "$syncdir" ]]; then
+    tasks_path="$syncdir/Note/tasks.txt"
 else
-    tasks_path="$(cygpath "$OneDrive")/Note/tasks.txt"
+    tasks_path="$HOME/tasks"
+    echo "Can't find SYNC directory!"
 fi
 
 task_exists() {
