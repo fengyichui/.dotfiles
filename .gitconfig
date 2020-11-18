@@ -133,6 +133,7 @@
     b = branch
     d  = diff --relative --patch --compact-summary
     dw = diff --relative --patch --compact-summary --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
+    dd = "!f() { git d "${1:-HEAD}^1..${1:-HEAD}"; } ; f"
     d-branch = "!f() { head=${2:-HEAD} ; ancestor=`git oldest-ancestor ${1:-master} $head` ; git d $ancestor..$head ; }; f"
     d-bcompare = difftool --dir-diff --no-symlinks --tool=bcompare
     d-meld = difftool --dir-diff --tool=meld # --no-symlinks
@@ -157,6 +158,11 @@
     lc  = !cd -- ${GIT_PREFIX:-.} && git lg ORIG_HEAD.. --name-status
     lf  = !cd -- ${GIT_PREFIX:-.} && git lg --name-status
     lw  = !cd -- ${GIT_PREFIX:-.} && git lgb --author=liqiang --author=fengyichui --since='1 weeks ago'
+
+    # grep
+    gg = grep
+    gg-log = lg -G
+    gg-diff = lg -p -G
 
     # https://github.com/prabirshrestha/ProfilesAndSettings/blob/master/.gitconfig
     # show tags and any tag annotation (tito adds tag annotations for example)
