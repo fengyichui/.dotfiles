@@ -16,6 +16,9 @@ Usage:
      $ tmux-rcp [-t remote-tmux-pane] remote-file [local-file]
 Show tmux pane:
   $ tmux lsp [-a]
+Note:
+  If something wrong (the size of copied file is 0), in remote host execute:
+  $ bash --norc --noprofile
 EOF
     exit 0
 fi
@@ -28,7 +31,7 @@ else
     local_file=${remote_file##*/}
 fi
 
-tmux pipe-pane -o -t$pane "tail -n +2 | col -b | base64 -d > $local_file"
+tmux pipe-pane -t$pane -o "tail -n +2 | col -b | base64 -d > $local_file"
 tmux send-keys -t$pane "base64 $remote_file && read" Enter
 
 read -n1 -r -p "Is the output of the tmux pane $pane finished? [y] " answer
