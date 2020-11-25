@@ -268,7 +268,7 @@ ggg ()
 # do some commands in each sub-directory
 dirdo ()
 {
-    find . -maxdepth 1 -mindepth 1 -type d -exec sh -c "(echo -e \"\e[33m{}:\e[0m\" && cd '{}' && eval '$*'; echo)" \;
+    find . -maxdepth 1 -mindepth 1 -type d -exec bash -c "(echo -e '\e[33m{}:\e[0m' && cd '{}' && eval '$*'; echo)" \;
 }
 
 # Count the number of times a word appears in files
