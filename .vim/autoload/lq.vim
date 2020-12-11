@@ -207,6 +207,8 @@ function! lq#OpComment(op, nv)
             execute l:line . 's/^/::/'
         elseif &filetype == 'ld'
             execute l:line . 's#^#/*# | s#\s*$# */#'
+        elseif &filetype == 'xml'
+            execute l:line . 's#^#<!--# | s#\s*$# -->#'
         else
             execute l:line . 's/^/#/'
         endif
@@ -220,6 +222,9 @@ function! lq#OpComment(op, nv)
         elseif &filetype == 'ld'
             execute 'silent! ' . l:line . 's#\v^(\s*)/\*#\1#'
             execute 'silent! ' . l:line . 's#\v(\s*)\*/(\s*)$##'
+        elseif &filetype == 'xml'
+            execute 'silent! ' . l:line . 's#\v^(\s*)\<!--#\1#'
+            execute 'silent! ' . l:line . 's#\v(\s*)--\>(\s*)$##'
         else
             execute 'silent! ' . l:line . 's/\v^(\s*)#/\1/'
         endif
