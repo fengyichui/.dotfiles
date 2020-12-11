@@ -71,7 +71,6 @@ flags = [
 # For a C project, you would set this to 'c' instead of 'c++'.
 '-x', 'c',
 #Include folders
-'-ISUB', '.',
 '-I', '.',
 #'-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/include',
 #'-isystem', '/cygdrive/c/Keil_v5/ARM/ARMCLANG/lib',
@@ -108,6 +107,13 @@ else:
     flags += ['-isystem', '/usr/include']
     flags += ['-isystem', '/usr/local/include']
 
+# User flag
+compilation_flags_file = '.ycm_extra_conf'
+if os.path.exists( compilation_flags_file ):
+    flags += open(compilation_flags_file, 'r').read().splitlines()
+else:
+    flags += ['-ISUB', '.'] # include all subdir
+
 # Set this to the absolute path to the folder (NOT the file!) containing the
 # compile_commands.json file to use that instead of 'flags'. See here for
 # more details: http://clang.llvm.org/docs/JSONCompilationDatabase.html
@@ -119,7 +125,6 @@ else:
 # Most projects will NOT need to set this to anything; you can just change the
 # 'flags' list of compilation flags. Notice that YCM itself uses that approach.
 compilation_database_folder = ''
-
 if os.path.exists( compilation_database_folder ):
   database = ycm_core.CompilationDatabase( compilation_database_folder )
 else:
@@ -143,7 +148,7 @@ def IncludeFlagsOfSubdirectory( flags, working_directory ):
     return list( flags )
   new_flags = []
   make_next_include_subdir = False
-  path_flags = [ '-ISUB']
+  path_flags = ['-ISUB']
   for flag in flags:
     # include the directory of flag as well
     new_flag = [flag.replace('-ISUB', '-I')]
@@ -165,7 +170,7 @@ def IncludeFlagsOfSubdirectory( flags, working_directory ):
             new_flag.append('-I' + subdir)
         break
 
-    new_flags =new_flags + new_flag
+    new_flags = new_flags + new_flag
   return new_flags
 
 def MakeRelativePathsInFlagsAbsolute( flags, working_directory ):
