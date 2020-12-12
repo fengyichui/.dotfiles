@@ -57,6 +57,20 @@ deb http://mirrors.aliyun.com/ubuntu/ focal-proposed main restricted universe mu
 deb http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
 #deb-src http://mirrors.aliyun.com/ubuntu/ focal-backports main restricted universe multiverse
 EOF'
+elif [[ "$WSL_DISTRO_NAME" == "Ubuntu-20.10" ]]; then
+    sudo mv -f /etc/apt/sources.list /etc/apt/sources.list.bak
+    sudo bash -c 'cat >/etc/apt/sources.list <<EOF
+deb http://mirrors.aliyun.com/ubuntu/ groovy main restricted universe multiverse
+#deb-src http://mirrors.aliyun.com/ubuntu/ groovy main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ groovy-security main restricted universe multiverse
+#deb-src http://mirrors.aliyun.com/ubuntu/ groovy-security main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ groovy-updates main restricted universe multiverse
+#deb-src http://mirrors.aliyun.com/ubuntu/ groovy-updates main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ groovy-proposed main restricted universe multiverse
+#deb-src http://mirrors.aliyun.com/ubuntu/ groovy-proposed main restricted universe multiverse
+deb http://mirrors.aliyun.com/ubuntu/ groovy-backports main restricted universe multiverse
+#deb-src http://mirrors.aliyun.com/ubuntu/ groovy-backports main restricted universe multiverse
+EOF'
 else
     echo "Not support WSL version: $WSL_DISTRO_NAME"
     exit 1
