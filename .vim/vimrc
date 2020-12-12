@@ -522,19 +522,26 @@ endif
 execute 'inoremap <C-v> <C-r><C-o>'.sysclipreg
 execute 'cnoremap <C-v> <C-r><C-o>'.sysclipreg
 execute 'vnoremap <C-v> "_c<C-r><C-o>'.sysclipreg.'<esc>'
+else
+let sysclipreg='"'
+autocmd TextYankPost * call system('clipcopy &', @")
+function! SysClipPaste(p)
+    let sysclip=system('clippaste')
+    if sysclip != @"
+        let @"=sysclip
+    endif
+    return a:p
+endfunction
+noremap <expr> p SysClipPaste('p')
+noremap <expr> P SysClipPaste('P')
+inoremap <silent> <C-v> <C-o>:call SysClipPaste("")<cr><C-r><C-o>"
+cnoremap          <C-v> <C-r>=system("clippaste")<cr>
+vnoremap <silent> <C-v> "_c<C-o>:call SysClipPaste("")<cr><C-r><C-o>"<esc>
+endif
 execute 'vnoremap <C-c> "'.sysclipreg.'y'
 execute 'cnoremap <C-c> <C-f>^v$"'.sysclipreg.'y<C-c><C-e>'
 execute 'vnoremap <C-x> "'.sysclipreg.'x'
 execute 'cnoremap <C-x> <C-f>^v$"'.sysclipreg.'y<C-c><C-e><C-u>'
-else
-inoremap <silent> <C-v> <C-o>:let @"=system("clippaste")<cr><C-r><C-o>"
-cnoremap          <C-v> <C-r>=system("clippaste")<cr>
-vnoremap <silent> <C-v> "_c<C-o>:let @"=system("clippaste")<cr><C-r><C-o>"<esc>
-vnoremap <silent> <C-c> ""y:call system('clipcopy', @")<cr>
-cnoremap          <C-c> <C-f>^v$""y:call system('clipcopy', @")<cr><C-c><C-e>
-vnoremap <silent> <C-x> ""x:call system('clipcopy', @")<cr>
-cnoremap          <C-x> <C-f>^v$""y:call system('clipcopy', @")<cr><C-c><C-e><C-u>
-endif
 execute 'inoremap <C-s> <C-o>:update<cr>'
 execute 'inoremap <C-z> <C-o>u'
 execute 'inoremap <C-a> <C-o>gg<C-o>gH<C-o>G'
