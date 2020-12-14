@@ -485,9 +485,9 @@ nnoremap <C-F9> :call lq#MakeTags("")<cr>
 
 " YouCompleteMe
 nnoremap <F10> :YcmDiags<CR>
-nnoremap <F11> :YcmCompleter GoToDefinitionElseDeclaration<CR>
-vnoremap <F11> :YcmCompleter GoToDefinitionElseDeclaration<CR>
-inoremap <F11> <C-o>:YcmCompleter GoToDefinitionElseDeclaration<CR>
+nnoremap <F11> :YcmCompleter GoTo<CR>
+vnoremap <F11> :YcmCompleter GoTo<CR>
+inoremap <F11> <C-o>:YcmCompleter GoTo<CR>
 nnoremap <C-F11> :YcmCompleter GoToDefinition<CR>
 vnoremap <C-F11> :YcmCompleter GoToDefinition<CR>
 inoremap <C-F11> <C-o>:YcmCompleter GoToDefinition<CR>
