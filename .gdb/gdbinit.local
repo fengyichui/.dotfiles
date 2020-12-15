@@ -2,8 +2,9 @@
 # GDB init local file
 #
 
-set $jlink_running = 0
-set $runtype = 0
+set $__jlink_running = 0
+set $__runtype = 0
+set $__freertos = 0
 
 define hs662x
 source ~/.dotfiles/.gdb/hs662x.gdb.py
@@ -11,6 +12,10 @@ end
 
 define xx
 source ~/.dotfiles/.gdb/dashboard.gdb
+end
+
+define freertos
+set $__freertos = 1
 end
 
 define invalidate_cache
@@ -42,17 +47,21 @@ ignore-all mon exec SetAllowFlashCache = 0
 end
 
 define jlink
+if ($__freertos)
+shell gdbserver-jlink -X --retry --speed=10000 -N="0xE00" -N="0x400" --freertos
+else
 shell gdbserver-jlink -X --retry --speed=10000 -N="0xE00" -N="0x400"
-set $jlink_running = 1
+end
+set $__jlink_running = 1
 end
 
 define jlink-stop
 shell gdbserver-jlink --stop
-set $jlink_running = 0
+set $__jlink_running = 0
 end
 
 define hook-quit
-if ($jlink_running)
+if ($__jlink_running)
 ignore-all kill
 ignore-all jlink-stop
 end
@@ -62,13 +71,13 @@ define reconnect
 ignore-all kill
 jlink
 connect
-set $runtype = 0
+set $__runtype = 0
 end
 
 define reconnect_hs6621
 reconnect
 mon device hs6621
-set $runtype = 2
+set $__runtype = 2
 end
 
 define reconnect_hs6621x
@@ -77,13 +86,13 @@ mon device hs6621c
 # CPU div=2
 set *0x40001004 = 0x00c00206
 set *0x4000100C = 1
-set $runtype = 2
+set $__runtype = 2
 end
 
 define reconnect_hs6621d_otp
 reconnect
 mon device hs6621d-otp
-set $runtype = 3
+set $__runtype = 3
 end
 
 # In Windows, use UsbDriverTool.exe to install 'libusb-WinUSB' with 'J-link'
@@ -143,16 +152,16 @@ c
 end
 
 define rc
-if ($runtype == 0)
+if ($__runtype == 0)
 rc_rom
 end
-if ($runtype == 1)
+if ($__runtype == 1)
 rc_ram
 end
-if ($runtype == 2)
+if ($__runtype == 2)
 rc_flash
 end
-if ($runtype == 3)
+if ($__runtype == 3)
 rc_otp
 end
 end
