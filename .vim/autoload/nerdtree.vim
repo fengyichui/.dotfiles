@@ -10,7 +10,7 @@ let s:rootNERDTreePath = resolve(expand('<sfile>:p:h:h'))
 "  change log is shown for the current version; otherwise, only the version
 "  number is shown.
 function! nerdtree#version(...) abort
-    return '6.9.9'
+    return '6.9.10'
     let l:text = 'Unknown'
     try
         let l:changelog = readfile(join([s:rootNERDTreePath, 'CHANGELOG.md'], nerdtree#slash()))
