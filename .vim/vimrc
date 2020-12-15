@@ -416,6 +416,8 @@ augroup END
 
 " Menu {{{1
 
+if has("gui_running") && has("menu")
+
 " Misc
 menu liqiang.misc.delele-repeat-line :g/^\(.*\)$\n^\1$/d<cr>
 menu liqiang.misc.reverse-line :g/^/m0\|nohl<cr>
@@ -439,6 +441,7 @@ menu liqiang.complete-omni(ctags)<TAB>:packadd\ OmniCppComplete :Xomni<cr>
 menu liqiang.highlight<TAB>:packadd\ TagHighlight :Xhighlight<cr>
 menu liqiang.signify<TAB>:SignifyEnable :Xsignify<cr>
 
+endif
 
 " Register {{{1
 "Note: 插入寄存器x的方法是：<C-r>x 或者 <C-r><C-o>x 前一种插入方法会对原始寄存器数据进行解析并插入解析之后的数据，后一种插入寄存器的原始数据
@@ -525,18 +528,18 @@ execute 'vnoremap <C-v> "_c<C-r><C-o>'.sysclipreg.'<esc>'
 else
 let sysclipreg='"'
 autocmd TextYankPost * call system('clipcopy &', @")
-function! SysClipPaste(p)
-    let sysclip=system('clippaste')
-    if sysclip != @"
-        let @"=sysclip
+function! SysClipPaste(...)
+    let @" = system('clippaste')
+    if a:0 == 0
+        return @"
     endif
-    return a:p
+    return a:1
 endfunction
 noremap <expr> p SysClipPaste('p')
 noremap <expr> P SysClipPaste('P')
-inoremap <silent> <C-v> <C-o>:call SysClipPaste("")<cr><C-r><C-o>"
-cnoremap          <C-v> <C-r>=system("clippaste")<cr>
-vnoremap <silent> <C-v> "_c<C-o>:call SysClipPaste("")<cr><C-r><C-o>"<esc>
+inoremap <silent> <C-v> <C-o>:call SysClipPaste('')<cr><C-r><C-o>"
+cnoremap          <C-v> <C-r>=SysClipPaste()<cr>
+vnoremap <silent> <C-v> "_c<C-o>:call SysClipPaste('')<cr><C-r><C-o>"<esc>
 endif
 execute 'vnoremap <C-c> "'.sysclipreg.'y'
 execute 'cnoremap <C-c> <C-f>^v$"'.sysclipreg.'y<C-c><C-e>'
