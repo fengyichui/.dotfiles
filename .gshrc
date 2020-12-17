@@ -90,7 +90,7 @@ alias trans='translate'
 alias men='tldr'
 
 # markdown
-alias mk='typora.exe'
+alias md='daemon typora.exe'
 
 # baidu yun pan
 if [[ "$OSTYPE" == "cygwin" ]]; then
