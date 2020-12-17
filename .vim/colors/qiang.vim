@@ -235,7 +235,7 @@ hi WarningMsg       guifg=#e5786d                                   gui=none
 hi WarningMsg       ctermfg=173                                     cterm=none
 " current match in the wildmenu completion
 hi WildMenu         guifg=#000000           guibg=#cae682
-hi WildMenu         ctermfg=16              ctermbg=186
+hi WildMenu         ctermfg=0               ctermbg=186
 
 " Diff
 " ----
@@ -277,7 +277,7 @@ hi Pmenu            guifg=#f6f3e8           guibg=#444444           gui=none
 hi Pmenu            ctermfg=254             ctermbg=238             cterm=none
 " selected item in popup
 hi PmenuSel         guifg=#000000           guibg=#cae682           gui=none
-hi PmenuSel         ctermfg=16              ctermbg=186             cterm=none
+hi PmenuSel         ctermfg=0               ctermbg=186             cterm=none
 " scrollbar in popup
 hi PMenuSbar                                guibg=#607b8b           gui=none
 hi PMenuSbar                                ctermbg=66              cterm=none
@@ -292,7 +292,7 @@ hi StatusLine       guifg=#c0c0c0           guibg=#660066           gui=none
 hi StatusLine       ctermfg=7               ctermbg=53              cterm=none
 " status line for non-current windows
 hi StatusLineNC     guifg=#000000           guibg=#c0c0c0           gui=none
-hi StatusLineNC     ctermfg=16              ctermbg=247             cterm=none
+hi StatusLineNC     ctermfg=0               ctermbg=247             cterm=none
 " User1
 hi User1            guifg=#FFFFFF           guibg=#EE0000           gui=none
 hi User1            ctermfg=15              ctermbg=9               cterm=none
@@ -304,7 +304,7 @@ hi TabLine          guifg=#626262           guibg=#c0c0c0          gui=italic
 hi TabLine          ctermfg=241             ctermbg=7              cterm=italic
 " tab pages line, active tab page label
 hi TabLineSel       guifg=#000000           guibg=#c0c0c0          gui=bold
-hi TabLineSel       ctermfg=16              ctermbg=7              cterm=bold
+hi TabLineSel       ctermfg=0               ctermbg=7              cterm=bold
 " tab pages line, where there are no labels
 hi TabLineFill                              guibg=#c0c0c0
 hi TabLineFill                              ctermbg=7
