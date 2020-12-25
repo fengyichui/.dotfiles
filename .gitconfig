@@ -130,6 +130,7 @@
     coh = checkout HEAD
     cm = commit
     ca = commit -a
+    cm-detach-last-amend = !git reset --soft HEAD@{1} && git commit -C HEAD@{1}
     b = branch
     d  = diff --relative --patch --compact-summary
     dw = diff --relative --patch --compact-summary --word-diff=color --word-diff-regex=".|[_0-9a-zA-Z]+"
@@ -151,7 +152,6 @@
     lsr = ls-remote
     clone1 = clone --depth=1
     cleanthis = clean -dxf -- ./
-    undo-amend-commit = reset --soft HEAD@{1}
 
     # various pretty loggers from various places
     lg  = !cd -- ${GIT_PREFIX:-.} && LESS=$LESS' -S' git log --graph --pretty=format:'%C(yellow)%cd %C(red)%h%Creset -%C(auto)%d%Creset %s %C(blue)(%an) %C(dim)%C(white)%cr%Creset' --abbrev-commit --date=short
