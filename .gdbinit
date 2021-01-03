@@ -49,6 +49,7 @@ set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
 # source python_init and local_init
 source ~/.dotfiles/.gdb/gdbinit.py
 source ~/.dotfiles/.gdb/gdbinit.local
+ignore-all source ~/.gdbinit.local
 
 #
 # __________________USER COMMAND_________________
