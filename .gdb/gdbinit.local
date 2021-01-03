@@ -71,7 +71,16 @@ define reconnect
 ignore-all kill
 jlink
 connect
+end
+
+define reconnect_rom
+reconnect
 set $__runtype = 0
+end
+
+define reconnect_ram
+reconnect
+set $__runtype = 1
 end
 
 define reconnect_hs6621
