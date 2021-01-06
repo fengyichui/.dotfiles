@@ -48,5 +48,9 @@ sed -i -e 's#https://gitee.com/fengyichui/dotfiles.git#https://github.com/fengyi
 # install dotfiles
 ./.dotfiles/.bin/install-dotfiles
 
+# create ~/bin/termux-file-editor
+mkdir -p ~/bin
+ln -sfT /data/data/com.termux/files/usr/bin/vim ~/bin/termux-file-editor
+
 # default shell
 chsh -s zsh
