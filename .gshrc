@@ -420,6 +420,8 @@ Usage:
 Dependent:
   wrestool: Extract ico from Windows binaries. (icoutils package)
   WinRAR:   Create SFX file
+Note:
+  input_files_dirs don't add "/" suffix for directorys
 EOF
     fi
 }
