@@ -393,11 +393,11 @@ exe-sfx ()
         echo "Silent=1" >>.sfx/sfx.opt
         echo "Update=U" >>.sfx/sfx.opt
         if [[ "$mode" == "notemp_to_temp" ]]; then
-            sfxpath="%TEMP%\\RarSFX_LQ\\${exename}_${time}"
+            sfxpath="%TEMP%\\\\RarSFX_LQ\\\\${exename}_${time}"
             echo "Overwrite=2" >>.sfx/sfx.opt # skip exist files
             echo "Path=$sfxpath" >>.sfx/sfx.opt
         elif [[ "$mode" == "notemp_to_appdata" ]]; then
-            sfxpath="%APPDATA%\\RarSFX_LQ\\${exename}_${time}"
+            sfxpath="%APPDATA%\\\\RarSFX_LQ\\\\${exename}_${time}"
             echo "Overwrite=2" >>.sfx/sfx.opt # skip exist files
             echo "Path=$sfxpath" >>.sfx/sfx.opt
         else
