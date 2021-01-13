@@ -66,6 +66,7 @@ if [[ "$1" == "-i" ]] || [[ "$1" == "--install" ]]; then
         (*.tar.xz|*.txz)         sudo tar --xz -xvf   "$1" -C "$extract_dir" ;;
         (*.tar.zma|*.tlz)        sudo tar --lzma -xvf "$1" -C "$extract_dir" ;;
         (*.tar)                  sudo tar xvf         "$1" -C "$extract_dir" ;;
+        (*.zip)                  sudo unzip           "$1" -d "$extract_dir" ;;
         (*.deb)                  sudo dpkg -i         "$1" ;;
         (*) echo "extract: '$1' cannot be extracted" >&2 ;;
     esac
