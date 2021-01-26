@@ -39,6 +39,9 @@ set input-radix 0x0A
 #set height unlimited
 #set width unlimited
 
+# backtrace limit
+set backtrace limit 32
+
 # prompt
 set prompt \001\033[1;33m\002(gdb) \001\033[0m\002
 #set extended-prompt \[\e[1;33m\](gdb) \[\e[0m\]
