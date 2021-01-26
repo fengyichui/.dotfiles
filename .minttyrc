@@ -30,6 +30,8 @@ PgUpDnScroll=yes
 Language=en
 ScrollbackLines=1000000
 Scrollbar=none
+LigaturesSupport=1
+Ligatures=2
 
 # Workaround cursor not blink in Tmux [https://github.com/mintty/mintty/issues/818]
 # Fix on v3.0.1
