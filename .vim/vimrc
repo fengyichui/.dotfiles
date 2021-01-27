@@ -223,7 +223,7 @@ set shiftwidth=4                " auto indent is 4 space
 set expandtab                   " use space instead tab
 set clipboard=unnamed,unnamedplus " use system clopboard (reg:*,+)
 set list                        " show tab
-set listchars=tab:>-,trail:-,nbsp:. " show tab, trail space
+set listchars=tab:-->,trail:-,nbsp:. " show tab, trail space
 set virtualedit=block           " block select to any place
 set undofile                    " Enable undofile
 set undodir=~/.vimundo          " Set undodir
