@@ -366,6 +366,7 @@ exe-sfx ()
 {
     mode='temp'
     option=''
+    icon=''
     # Parse argument
     for i in "$@"; do
         case $i in
@@ -373,6 +374,7 @@ exe-sfx ()
             -t) mode='notemp_to_temp'; shift ;;
             -a) mode='notemp_to_appdata'; shift ;;
             -o) option="$2"; shift; shift ;;
+            -i) icon="$2"; shift; shift ;;
             *) break ;;
         esac
     done
@@ -382,7 +384,11 @@ exe-sfx ()
         time=$(date '+%Y%m%d%H%M%S')
         exeresult=${exename}_sfx.exe
         mkdir -p .sfx
-        wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
+        if [[ -n "$icon" ]]; then
+            cp $icon .sfx/sfx.ico
+        else
+            wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
+        fi
         # setup sfx.opt
         if [[ -n "$option" ]]; then
             echo "Setup=${exepath//\//\\\\} $option %sfxpar%" >.sfx/sfx.opt
@@ -417,6 +423,7 @@ Usage:
     -t: Not delete unpack files after exit, unpack to %TEMP%
     -a: Not delete unpack files after exit, unpack to %APPDATA%
     -o: Parameter option for 'setup_exe_file'
+    -i: Use this icon
 Dependent:
   wrestool: Extract ico from Windows binaries. (icoutils package)
   WinRAR:   Create SFX file
