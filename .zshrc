@@ -43,7 +43,7 @@ fi
 if [[ -f "/tmp/.notmux.tmp" ]]; then
     rm -f /tmp/.notmux.tmp
 else
-    if [[ -z "$SSH_CONNECTION" && -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
+    if [[ -z "$SSH_CONNECTION" && -n "$PS1" && -z "$NOTMUX" && -z "$TMUX" && -n ${commands[tmux]} ]]; then
         if [[ "$OSTYPE" == "cygwin" ]]; then
             # Disable pseudo console support in pty (issue with tmux)
             export CYGWIN=disable_pcon
