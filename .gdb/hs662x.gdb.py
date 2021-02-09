@@ -27,7 +27,7 @@ flash_id = 0
 flash_size = 1024*512
 flash_sector_size = 1024*4
 device_name = 'UNKNOWN'
-device_version = 0
+device_version = 'XX'
 debug_file = ''
 script_dir = os.path.dirname(__file__)
 
@@ -91,23 +91,38 @@ def chip():
     global device_name
     global device_version
     device_name = 'UNKNOWN'
-    device_version = 0
+    device_version = 'XX'
 
+    # 0x40000004:
+    # HS6621:   0x10a16621
+    # HS6621C:  0xc0a16621
+    # HS6621CB: 0xc0b16621
+    # HS6621D:  0xd0a16621
+    #
+    # 0x08000034/0x00100034:
+    # HS6621 A3:  0x66210300
+    # HS6621C A2: 0x6621c200
+    # HS6621C B1: 0x6621cb10
+    # OM6621D A1: 0x6621d100
     chip_id = int(gdb.parse_and_eval('*0x40000004').cast(gdb.lookup_type('int')))
     chip_major_id = chip_id & 0xFFFF
     chip_sub_id = (chip_id >> 28) & 0xF
+    chip_sub_b_id = (chip_id >> 20) & 0xF
 
     if chip_major_id == 0x6620:
         device_name = 'HS6620'
-        device_version = (int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF
+        device_version = 'A{}'.format((int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF)
 
     elif chip_major_id == 0x6621:
         if chip_sub_id == 0x1:
             device_name = 'HS6621'
-            device_version = (int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF
+            device_version = 'A{}'.format((int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF)
         else:
             device_name = 'HS6621{:X}'.format(chip_sub_id)
-            device_version = (int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>8) & 0x0F
+            if chip_sub_b_id == 0xb:
+                device_version = 'B{}'.format((int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>4) & 0x0F)
+            else:
+                device_version = 'A{}'.format((int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>8) & 0x0F)
 
     else:
         raise gdb.GdbError("Can't detect supported chip!")
@@ -140,7 +155,7 @@ def flash_prepare_and_show():
         flash_flm = 'HS6621C.GDB.FLM'
 
     # Show device name
-    print('Device: {} A{}'.format(device_name, device_version))
+    print('Device: {} {}'.format(device_name, device_version))
 
     # Init
     gdb.execute('mon reset 1', to_string=True)
@@ -384,7 +399,7 @@ class flash_upload_register(gdb.Command):
 
         # Get file name
         if args == '':
-            flash_file = 'FLASH_{:06X}_{}KB_{}A{}.bin'.format(flash_id, flash_size/1024, device_name, device_version)
+            flash_file = 'FLASH_{:06X}_{}KB_{}{}.bin'.format(flash_id, flash_size/1024, device_name, device_version)
         else:
             flash_file = args
 
