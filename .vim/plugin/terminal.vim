@@ -219,42 +219,37 @@ endfunction
 
 " FocusGaine
 let s:tmux_is_running = 0
-let s:tmux_vim_focus_losting_lock = '/tmp/tmux_vim_focus_losting.' . $USER
+let s:tmux_updatetime_save = 4000
+function! s:tmux_normal_cursor_restore()
+    " restore updatetime
+    let &updatetime=s:tmux_updatetime_save
+    augroup tmux_terminal
+        autocmd!
+    augroup END
+
+    " When gain focus, vim can't handle normal-mode cursor sharp
+    if mode()=~'^n' || mode()=~'^c'
+        " force cursor to normal mode
+"        silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
+        silent! normal! r
+    endif
+endfunction
 function! s:tmux_focus_gained()
     if s:tmux_is_running
-        " When gain focus, vim can't handle normal-mode cursor sharp
-        let mode = mode()
-        if mode=~'^n' || mode=~'^c'
-            " Check locking
-            let timeout = 50
-            while timeout > 0
-                " delay 20ms to wait losting-lock file create
-                sleep 20m
-                if empty(glob(s:tmux_vim_focus_losting_lock))
-                    break
-                endif
-                let timeout -= 1
-            endwhile
-            if timeout == 0
-                call delete(s:tmux_vim_focus_losting_lock)
-                echoerr "Force to delete 'tmux_vim_focus_losting_lock' file!"
-            endif
-            " force cursor to normal mode
-"            silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_normal, 0)
-            silent! normal! r
-        endif
+        " updatetime 100ms to trigger CursorHold
+        let s:tmux_updatetime_save=&updatetime
+        set updatetime=60
+        augroup tmux_terminal
+            autocmd CursorHold * call s:tmux_normal_cursor_restore()
+        augroup END
     endif
     let s:tmux_is_running = 1
 endfunction
 
 " FocusLosted
 function! s:tmux_focus_losted()
-    " Lock
-    call writefile([], s:tmux_vim_focus_losting_lock)
-    " When lost focus, vim can't handle terminal-default cursor sharp. So force cursor to insert mode
+    " cursor to insert sharp
     silent! execute '!echo -ne ' . shellescape(s:tmux_cursor_insert, 0)
-    " Unlock
-    call delete(s:tmux_vim_focus_losting_lock)
 endfunction
 
 " Fix tmux issue
