@@ -369,7 +369,7 @@ exe-sfx ()
     icon=''
     # Parse argument
     for i in "$@"; do
-        case $i in
+        case $1 in
             -d) mode='temp'; shift ;;
             -t) mode='notemp_to_temp'; shift ;;
             -a) mode='notemp_to_appdata'; shift ;;
