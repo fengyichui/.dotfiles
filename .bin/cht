@@ -24,12 +24,12 @@
 # count words in text counter
 # group elements list
 
-__CHTSH_VERSION=6
-__CHTSH_DATETIME="2019-06-05 18:00:46 +0200"
+__CHTSH_VERSION=0.0.1
+__CHTSH_DATETIME="2020-08-05 09:30:30 +0200"
 
 # cht.sh configuration loading
 #
-# configuration is stored in ~/.cht.sh/ (can be overridden by CHTSH_HOME)
+# configuration is stored in ~/.cht.sh/ (can be overridden with CHTSH env var.)
 #
 CHTSH_HOME=${CHTSH:-"$HOME"/.cht.sh}
 [ -z "$CHTSH_CONF" ] && CHTSH_CONF=$CHTSH_HOME/cht.sh.conf
@@ -80,6 +80,8 @@ cheatsh_standalone_install()
   local installdir; installdir="$1"
   local default_installdir="$HOME/.cheat.sh"
 
+  [ -z "$installdir" ] && installdir=${default_installdir}
+
   if [ "$installdir" = help ]; then
     cat <<EOF
 Install cheat.sh in the standalone mode.
@@ -95,7 +97,7 @@ cheat sheets repositories will be fetched.
 It takes approximately 1G of the disk space.
 
 Default installation location:  ~/.cheat.sh/
-It can be overriden by a command line parameter to this script:
+It can be overridden by a command line parameter to this script:
 
     ${0##*/} --standalone-install DIR
 
@@ -128,8 +130,9 @@ EOF
   [ "$_exit_code" -ne 0 ] && return "$_exit_code"
 
   while true; do
-    echo -n "Where should cheat.sh be installed [$default_installdir]? "; read -r installdir
-    [ -n "$installdir" ] || installdir="$default_installdir"
+    local _installdir
+    echo -n "Where should cheat.sh be installed [$installdir]? "; read -r _installdir
+    [ -n "$_installdir" ] && installdir=$_installdir
 
     if [ "$installdir" = y ] \
         || [ "$installdir" = Y ] \
@@ -172,18 +175,44 @@ EOF
 
   # after the repository cloned, we may have the log directory
   # and we can write our installation log into it
-  mkdir -p "$installdir/log/"
-  LOG="$installdir/log/install.log"
+  mkdir -p "log/"
+  LOG="$PWD/log/install.log"
 
   # we use tee everywhere so we should set -o pipefail
   set -o pipefail
 
+  # currently the script uses python 2,
+  # but cheat.sh supports python 3 too
+  # if you want to switch it to python 3
+  # set PYTHON2 to NO:
+  # PYTHON2=NO
+  #
+  PYTHON2=NO
+  if [[ $PYTHON2 = YES ]]; then
+    python="python2"
+    pip="pip"
+    virtualenv_python3_option=()
+  else
+    python="python3"
+    pip="pip3"
+    virtualenv_python3_option=(-p python3)
+  fi
+
   _say_what_i_do Creating virtual environment
-  python2 "$(command -v virtualenv)" ve \
+  "$python" "$(command -v virtualenv)" "${virtualenv_python3_option[@]}" ve \
       || fatal Could not create virtual environment with "python2 $(command -v virtualenv) ve"
 
+  export CHEATSH_PATH_WORKDIR=$PWD
+
+  # rapidfuzz does not support Python 2,
+  # so if we are using Python 2, install fuzzywuzzy instead
+  if [[ $PYTHON2 = YES ]]; then
+    sed -i s/rapidfuzz/fuzzywuzzy/ requirements.txt
+    echo "python-Levenshtein" >> requirements.txt
+  fi
+
   _say_what_i_do Installing python requirements into the virtual environment
-  ve/bin/pip install -r requirements.txt > "$LOG" \
+  ve/bin/"$pip" install -r requirements.txt > "$LOG" \
       || {
 
     echo "ERROR:"
@@ -191,9 +220,9 @@ EOF
     tail -n 10 "$LOG"
     echo "---"
     echo "See $LOG for more"
-    fatal Could not install python dependecies into the virtual environment
+    fatal Could not install python dependencies into the virtual environment
   }
-  echo "$(ve/bin/pip freeze | wc -l) dependencies were successfully installed"
+  echo "$(ve/bin/"$pip" freeze | wc -l) dependencies were successfully installed"
 
   _say_what_i_do Fetching the upstream cheat sheets repositories
   ve/bin/python lib/fetch.py fetch-all | tee -a "$LOG"
@@ -282,8 +311,8 @@ chtsh_mode()
       echo "Configured mode: $mode"
     fi
   else
-    echo "Uknown mode: $mode"
-    echo Suported modes:
+    echo "Unknown mode: $mode"
+    echo Supported modes:
     echo "  auto    use the standalone installation first"
     echo "  lite    use the cheat sheets server directly"
   fi
@@ -307,8 +336,8 @@ do_query()
   local b_opts=
   local uri="${CHTSH_URL}/\"\$(get_query_options $query)\""
 
-  if [ -e "$HOME/.cht.sh/id" ]; then
-    b_opts="-b \"\$HOME/.cht.sh/id\""
+  if [ -e "$CHTSH_HOME/id" ]; then
+    b_opts="-b \"\$CHTSH_HOME/id\""
   fi
 
   eval curl "$b_opts" -s "$uri" > "$TMP1"
@@ -489,7 +518,7 @@ if [ "$is_macos" != yes ]; then
 fi
 command -v rlwrap >/dev/null || { echo 'DEPENDENCY: install "rlwrap" to use cht.sh in the shell mode' >&2; exit 1; }
 
-mkdir -p "$HOME/.cht.sh/"
+mkdir -p "$CHTSH_HOME/"
 lines=$(tput lines)
 
 if command -v less >/dev/null; then
@@ -582,11 +611,11 @@ EOF
 }
 
 cmd_hush() {
-  mkdir -p "$HOME/.cht.sh/" && touch "$HOME/.cht.sh/.hushlogin" && echo "Initial 'use help' message was disabled"
+  mkdir -p "$CHTSH_HOME/" && touch "$CHTSH_HOME/.hushlogin" && echo "Initial 'use help' message was disabled"
 }
 
 cmd_id() {
-  id_file="$HOME/.cht.sh/id"
+  id_file="$CHTSH_HOME/id"
 
   if [ id = "$input" ]; then
     new_id=""
@@ -712,7 +741,7 @@ TMP1=$(mktemp /tmp/cht.sh.XXXXXXXXXXXXX)
 trap 'rm -f $TMP1 $TMP2' EXIT
 trap 'true' INT
 
-if ! [ -e "$HOME/.cht.sh/.hushlogin" ] && [ -z "$this_query" ]; then
+if ! [ -e "$CHTSH_HOME/.hushlogin" ] && [ -z "$this_query" ]; then
   echo "type 'help' for the cht.sh shell help"
 fi
 
@@ -724,7 +753,7 @@ while true; do
   fi
 
   input=$(
-    rlwrap -H "$HOME/.cht.sh/history" -pgreen -C cht.sh -S "$full_prompt" bash "$0" --read | sed 's/ *#.*//'
+    rlwrap -H "$CHTSH_HOME/history" -pgreen -C cht.sh -S "$full_prompt" bash "$0" --read | sed 's/ *#.*//'
   )
 
   cmd_name=${input%% *}
@@ -743,5 +772,5 @@ while true; do
     version)        cmd_name=version;;
     *)              cmd_name="query"; cmd_args="$input";;
   esac
-  "cmd_$cmd_name" $cmd_args 
+  "cmd_$cmd_name" $cmd_args
 done
