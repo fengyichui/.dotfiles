@@ -387,7 +387,15 @@ exe-sfx ()
         if [[ -n "$icon" ]]; then
             cp $icon .sfx/sfx.ico
         else
-            wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
+            if [[ -n ${commands[wrestool]} ]]; then
+                wrestool -x -t14 $exepath >.sfx/sfx.ico # in icoutils package
+            else
+                echo "Please install 'wrestool' tool which is in 'icoutils' package"
+            fi
+        fi
+        if [[ ! -s ".sfx/sfx.ico" ]]; then
+            echo "Can't find icon resource, use default alien.ico!"
+            cp ~/.dotfiles/.misc/alien.ico .sfx/sfx.ico
         fi
         # setup sfx.opt
         if [[ -n "$option" ]]; then
