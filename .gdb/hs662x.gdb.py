@@ -670,6 +670,7 @@ class issue_reappear_register(gdb.Command):
         if usr_axf != None:
             gdb.execute('file {}'.format(usr_axf), to_string=True)
         gdb.execute('restore {} binary 0'.format(usr_ram_bin), to_string=True) # Remaped address
+        gdb.execute('restore {} binary 0x00200000'.format(usr_ram_bin), to_string=True) # Physical address
         gdb.execute('restore {} binary 0x20000000'.format(usr_ram_bin), to_string=True) # Physical address
         if usr_em_bin != None:
             gdb.execute('restore {} binary 0x41310000'.format(usr_em_bin), to_string=True)
