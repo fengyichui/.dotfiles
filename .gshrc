@@ -313,7 +313,8 @@ diffpath ()
 # proxy enable/disable
 proxy-enable ()
 {
-    port=${1:-'8118'}
+#    port=${1:-'8118'}
+    port=${1:-'1080'}   # clash tool can MIXED http and socks
     export http_proxy="http://127.0.0.1:$port"
     export https_proxy="http://127.0.0.1:$port"
     export no_proxy="localhost, 127.0.0.1, ::1"
