@@ -35,7 +35,7 @@ elif [[ $OSTYPE == linux-android ]]; then
     termux-clipboard-get
 
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    clipdata="$(powershell.exe -Command Get-Clipboard | tr -d '\r')"
+    clipdata="$(powershell.exe -NoProfile -NonInteractive –ExecutionPolicy Bypass -Command Get-Clipboard | tr -d '\r')"
     echo -n "$clipdata"
 
 else
