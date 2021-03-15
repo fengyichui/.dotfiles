@@ -23,6 +23,7 @@ function print_usage ()
     echo "Options:"
     echo "  -a <files>  convert command.exe to command with 'linux2win -e -r -i command.exe \$*'"
     echo "  -i <input>  convert input string"
+    echo "  -x <input>  convert %XXX% windows system variable"
     echo "  -r          convert by win2linux"
     echo "  -e          execute it, if -r present, input use linux2win, ouput use win2linux"
     echo "  -p          use cygpath/wslpath to precise convert each exist paths"
@@ -42,10 +43,11 @@ function pathconvert ()
 }
 
 # Parsing params
-while getopts a:i:reshp opt; do
+while getopts a:i:x:reshp opt; do
     case $opt in
         a) autocmd="$OPTARG" ;;
         i) input="$OPTARG" ;;
+        x) winsysvar="$OPTARG" ;;
         r) win2linux=1 ;;
         e) execute=1 ;;
         p) precise=1 ;;
@@ -53,6 +55,16 @@ while getopts a:i:reshp opt; do
         ?) print_usage ;;
     esac
 done
+
+# window system var
+if [[ -n "$winsysvar" ]]; then
+    result="$(cmd.exe /c "<nul set /p=%$winsysvar%" 2>/dev/null)"
+    if [[ -n "$win2linux" ]]; then
+        result=$(pathconvert -u $result)
+    fi
+    echo $result
+    exit 0
+fi
 
 # auto generate linux2win command
 if [[ -n "$autocmd" ]]; then
