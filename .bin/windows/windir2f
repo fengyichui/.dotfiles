@@ -1,0 +1,12 @@
+#!/bin/bash
+
+f="$HOME/.f"
+
+echo "-> $f"
+
+linux2win -r -x APPDATA         >> $f
+linux2win -r -x USERPROFILE     >> $f
+linux2win -r -x APPDATA         >> $f
+linux2win -r -x LOCALAPPDATA    >> $f
+linux2win -r -x TEMP            >> $f
+
