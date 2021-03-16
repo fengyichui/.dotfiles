@@ -1,0 +1,24 @@
+#!/bin/bash
+
+outdir=$1; shift
+
+if [[ ! -d "$outdir" ]]; then
+    exit -1
+fi
+
+for av in "$@"; do
+    num=$(basename "${av%.*}")
+    echo -n "$num..."
+#    curl https://www.javbus.com/$num | awk "/404 Page Not Found/"
+    name="$(curl --connect-timeout 10 --insecure --progress-bar -A foxfire -L https://www.javbus.com/$num 2>/dev/null | awk -F'<|>' 'a==0 && /avatar-waterfall/{a=1}; a==1 && /span/{print $3; a=2}')"
+    if [[ -n "$name" ]]; then
+        echo -e "\t$name"
+        mkdir $outdir/$name 2>/dev/null
+        mv $av $outdir/$name
+    else
+        echo -e "\tNot found!"
+    fi
+done
+
+
+
