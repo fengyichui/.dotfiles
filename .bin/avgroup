@@ -7,16 +7,31 @@ if [[ ! -d "$outdir" ]]; then
 fi
 
 for av in "$@"; do
-    num=$(basename "${av%.*}")
-    echo -n "$num..."
-#    curl https://www.javbus.com/$num | awk "/404 Page Not Found/"
-    name="$(curl --connect-timeout 10 --insecure --progress-bar -A foxfire -L https://www.javbus.com/$num 2>/dev/null | awk -F'<|>' 'a==0 && /avatar-waterfall/{a=1}; a==1 && /span/{print $3; a=2}')"
-    if [[ -n "$name" ]]; then
-        echo -e "\t$name"
-        mkdir $outdir/$name 2>/dev/null
-        mv $av $outdir/$name
+    series=$(basename "${av%.*}" | sed -n 's/\([A-Za-z]\+\)-\?\([0-9]\+\).*/\1-\2/p')
+    if [[ -n "$series" ]]; then
+        echo -n "$series..."
+#        curl https://www.javbus.com/$series | awk "/404 Page Not Found/"
+#        name="$(curl --connect-timeout 10 --insecure --progress-bar -A foxfire -L https://www.javbus.com/$series 2>/dev/null | awk -F'<|>' 'a==0 && /avatar-waterfall/{a=1}; a==1 && /span/{print $3; a=2}')"
+        name="$(curl --insecure -A foxfire -L https://www.javbus.com/$series 2>/dev/null | xmllint --html --xpath '//div[@id="avatar-waterfall"]/*/span/text()' - 2>/dev/null)"
+        if [[ -n "$name" ]]; then
+            num="$(echo -e "$name" | wc -l)"
+            if [[ $num -gt 1 ]]; then
+                name="多人"
+            fi
+            echo -n -e "\t$name"
+            if [[ -f "$av" ]]; then
+                echo -n -e "\tmoving..."
+                mkdir $outdir/$name 2>/dev/null
+                mv $av $outdir/$name
+                echo -e "\tok"
+            else
+                echo ""
+            fi
+        else
+            echo -e "\tNot found!"
+        fi
     else
-        echo -e "\tNot found!"
+        echo "$av: Not found!"
     fi
 done
 
