@@ -26,7 +26,8 @@ if [[ -n "$copyfile" ]]; then
             files="$files $(cygpath -w "$path")"
         done
         # https://github.com/rostok/file2clip.git
-        file2clip.exe $files < /dev/null
+        # https://github.com/roryyorke/picellif.git
+        picellif.exe $files
         exit
 
     elif [[ -n "$WSL_DISTRO_NAME" ]]; then
@@ -35,7 +36,7 @@ if [[ -n "$copyfile" ]]; then
             [[ -z "$path" ]] && exit 1
             files="$files $(wslpath -w "$path")"
         done
-        file2clip.exe $files
+        picellif.exe $files
         exit
 
     else
