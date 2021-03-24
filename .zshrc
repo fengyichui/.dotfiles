@@ -30,7 +30,7 @@ fi
 if [[ "$OSTYPE" == "cygwin" ]]; then
     ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows:$HOME/.dotfiles/.bin/cygwin
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then
-    ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.bin.windows:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
+    ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.bin.windows:$HOME/.bin.cygtools:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/windows
 else
     ePATH=$HOME/.local/bin:$HOME/.bin:$HOME/.dotfiles/.bin:$HOME/.dotfiles/.bin/linux
 fi
