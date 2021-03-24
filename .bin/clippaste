@@ -31,7 +31,7 @@ if [[ $OSTYPE == darwin* ]]; then
 elif [[ $OSTYPE == cygwin* ]]; then
     cat /dev/clipboard
 
-elif [[ $OSTYPE == linux-android ]]; then
+elif [[ -n "$ANDROID_DATA" ]]; then
     termux-clipboard-get
 
 elif [[ -n "$WSL_DISTRO_NAME" ]]; then

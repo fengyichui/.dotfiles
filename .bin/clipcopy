@@ -83,7 +83,7 @@ elif [[ $OSTYPE == cygwin* ]]; then
         cat "$@" > /dev/clipboard
     fi
 
-elif [[ $OSTYPE == linux-android ]]; then
+elif [[ -n "$ANDROID_DATA" ]]; then
     if [[ -z "$file" ]]; then
         termux-clipboard-set
     else
