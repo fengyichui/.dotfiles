@@ -168,11 +168,11 @@ dumpbin_func ()
     while (($#!=0))
     do
         case $mode in
-            'machine')      dumpbin /HEADERS $1 | tr -d '\r' | awk "/machine \(/{print \$3 \": $1\"}"
+            'machine')      dumpbin.exe /HEADERS $1 | tr -d '\r' | awk "/machine \(/{print \$3 \": $1\"}"
             ;;
-            'dependents')   dumpbin /DEPENDENTS $1 | tr -d '\r'
+            'dependents')   dumpbin.exe /DEPENDENTS $1 | tr -d '\r'
             ;;
-            'exports')      dumpbin /EXPORTS $1 | tr -d '\r'
+            'exports')      dumpbin.exe /EXPORTS $1 | tr -d '\r'
             ;;
         esac
         shift
