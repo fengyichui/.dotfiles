@@ -27,6 +27,7 @@ alias gg-py3="gg -d /usr/lib/python3*"
 # dumpbin with windows
 alias dumpbin-machine='dumpbin_func machine'
 alias dumpbin-dependents='dumpbin_func dependents'
+alias lddw='dumpbin_func dependents'
 alias dumpbin-exports='dumpbin_func exports'
 
 # cp
@@ -703,6 +704,9 @@ bcut ()
 if [[ -n "$SSH_CONNECTION" && "$TERM" == "tmux-256color" ]]; then
     export TERM='xterm-256color'
 fi
+
+# XZ with multi threads
+export XZ_OPT=-T0
 
 #####################################
 #               Misc                #
