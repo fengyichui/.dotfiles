@@ -209,16 +209,20 @@ def mem32_write(addr, value):
 
 
 def loop_do_show_progress(prompt, size, callback, once_op_size=ONCE_OP_SIZE, param=()):
-        before_time = time.time()
-        addr = 0
-        while addr < size:
-            print("{} {:d}%\r".format(prompt, int(100*addr/size)), end='')
-            sys.stdout.flush()
-            left = size - addr
-            length = left if left<once_op_size else once_op_size
-            callback(addr, length, param)
-            addr += length
-        print("{} 100% ({:.1f}s)".format(prompt, time.time()-before_time))
+    # HS6621D only 24K SRAM
+    if device_name == 'HS6621D':
+        once_op_size = 8*1024
+    # progress
+    before_time = time.time()
+    addr = 0
+    while addr < size:
+        print("{} {:d}%\r".format(prompt, int(100*addr/size)), end='')
+        sys.stdout.flush()
+        left = size - addr
+        length = left if left<once_op_size else once_op_size
+        callback(addr, length, param)
+        addr += length
+    print("{} 100% ({:.1f}s)".format(prompt, time.time()-before_time))
 
 
 def flash_download_part(part_type, file_path, is_verify=True):
