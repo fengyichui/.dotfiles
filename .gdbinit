@@ -72,21 +72,58 @@ define hexdump
     if $argc < 1
         help hexdump
     else
+        set $bits = 8
+        if $argc == 1
+            set $bytes = 256
+        else
+            if $argc == 2
+                set $bytes = $arg1
+            else
+                set $bytes = $arg1
+                set $bits = $arg2
+            end
+        end
+        set $addr_begin = $arg0
+        set $addr_end = $addr_begin+$bytes
+        dump memory .gdbdump.bin $addr_begin $addr_end
+        if $bits == 8
+            # shell hexdump -C .gdbdump.bin
+            shell hexdump -e '"%08_ax: " 16/1 "%02x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+        else
+            if $bits == 16
+                    shell hexdump -e '"%08_ax: " 8/2 "%04x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+            else
+                if $bits == 32
+                    shell hexdump -e '"%08_ax: " 4/4 "%08x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+                else
+                    shell hexdump -e '"%08_ax: " 2/8 "%016x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+                end
+            end
+        end
+    end
+end
+document hexdump
+Syntax: hexdump <ADDR> [<BYTES>] [<BITS>]
+| Display a 16-byte hex/ASCII dump of memory starting at address ADDR.
+| if no BYTES field, BYTES = 256
+end
+
+
+define hexdump16
+    if $argc < 1
+        help hexdump16
+    else
         if $argc == 1
             set $bytes = 256
         else
             set $bytes = $arg1
         end
-        set $addr_begin = $arg0
-        set $addr_end = $addr_begin+$bytes
-        dump memory .gdbdump.bin $addr_begin $addr_end
-        # shell hexdump -e '"%08_ax: " 8/1 "%02x " "  " 8/1 "%02x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
-        shell hexdump -C .gdbdump.bin
+        hexdump $arg0 $bytes 16
     end
 end
-document hexdump
-Syntax: hexdump <ADDR> [<BYTES>]
-| Display a 16-byte hex/ASCII dump of memory starting at address ADDR.
+document hexdump16
+Syntax: hexdump16 <ADDR> [<BYTES>]
+| Display a 2-short(16bit) hex/ASCII dump of memory starting at address ADDR.
 | if no BYTES field, BYTES = 256
 end
 
@@ -100,15 +137,31 @@ define hexdump32
         else
             set $bytes = $arg1
         end
-        set $addr_begin = $arg0
-        set $addr_end = $addr_begin+$bytes
-        dump memory .gdbdump.bin $addr_begin $addr_end
-        shell hexdump -e '"%08_ax: " 4/4 "%08x " "  |"' -e '16/1 "%_p" "|\n"' .gdbdump.bin
+        hexdump $arg0 $bytes 32
     end
 end
 document hexdump32
 Syntax: hexdump32 <ADDR> [<BYTES>]
 | Display a 4-int(32bit) hex/ASCII dump of memory starting at address ADDR.
+| if no BYTES field, BYTES = 256
+end
+
+
+define hexdump64
+    if $argc < 1
+        help hexdump64
+    else
+        if $argc == 1
+            set $bytes = 256
+        else
+            set $bytes = $arg1
+        end
+        hexdump $arg0 $bytes 64
+    end
+end
+document hexdump64
+Syntax: hexdump64 <ADDR> [<BYTES>]
+| Display a 8-longlong(64bit) hex/ASCII dump of memory starting at address ADDR.
 | if no BYTES field, BYTES = 256
 end
 
