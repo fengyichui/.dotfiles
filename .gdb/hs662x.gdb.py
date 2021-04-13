@@ -98,6 +98,7 @@ def chip():
     # HS6621C:  0xc0a16621
     # HS6621CB: 0xc0b16621
     # HS6621D:  0xd0a16621
+    # HS6621P:  0x70a16621
     #
     # 0x08000034/0x00100034:
     # HS6621 A3:  0x66210300
@@ -118,8 +119,11 @@ def chip():
             device_name = 'HS6621'
             device_version = 'A{}'.format((int(gdb.parse_and_eval('*0x08000034').cast(gdb.lookup_type('int')))>>8) & 0xFF)
         else:
-            device_name = 'HS6621{:X}'.format(chip_sub_id)
-            if chip_sub_b_id == 0xb:
+            if chip_sub_id == 0x7:
+                device_name = 'HS6621P'
+            else:
+                device_name = 'HS6621{:X}'.format(chip_sub_id)
+            if chip_sub_b_id == 0xB:
                 device_version = 'B{}'.format((int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>4) & 0x0F)
             else:
                 device_version = 'A{}'.format((int(gdb.parse_and_eval('*0x00100034').cast(gdb.lookup_type('int')))>>8) & 0x0F)
