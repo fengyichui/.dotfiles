@@ -4,6 +4,8 @@
 _arguments \
   '(-l --list)'{-l,--list}'[List archive files]' \
   '(-p --plain)'{-p,--plain}'[Plain extract files]' \
+  '(-e --here)'{-e,--here}'[Extract files to current directory]' \
   '(-c --compress)'{-c,--compress}'[compress files/directories to archive file]' \
+  '(-i --install)'{-i,--install}'[Install linux package to /]' \
   "*::archive file:_files -g '(#i)*.(7z|Z|apk|bz2|deb|gz|ipsw|jar|lzma|rar|sublime-package|tar|tar.bz2|tar.gz|tar.xz|tar.zma|tbz|tbz2|tgz|tlz|txz|war|xpi|xz|zip)(-.)'" \
     && return 0
