@@ -23,7 +23,8 @@ for i in "$@"; do
         -s) slash=1; shift ;;
         -h|--help)
             echo "Create a new terminal window"
-            echo "Usage:"
+            echo "Usage: new [options] [commands]"
+            echo "Options:"
             echo "  -n  Don't attach to tmux"
             echo "  -a  Run as administrator and Don't attach to tmux"
             echo "  -m  Maximize new window"
