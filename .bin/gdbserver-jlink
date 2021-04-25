@@ -5,6 +5,7 @@ speed="auto"
 port="2331"
 rtos=""
 select=""
+logtofile="-nologtofile"
 
 NONOTIFY_PATTERN='Connected correctly'
 
@@ -27,6 +28,7 @@ Options:
   -u|--usb=*        Specifies USB SerialNo to connect
   -i|--ip=*         Specifies IP address to connect
   -N|--nonotify     Not notify (pattern)
+  -l|--log=*        Write JLink detail log to file
   -h|--help         Show this help
   --embos           Use RTOS Plugin: embOS
   --freertos        Use RTOS Plugin: FreeRTOS
@@ -56,6 +58,7 @@ do
         -i=*|--ip=*) select="-select ip=${i#*=}" ;;
         -N=*|--nonotify=*) if [[ -n $nonotifypattern ]]; then nonotifypattern="$nonotifypattern\\|${i#*=}"; else nonotifypattern="${i#*=}"; fi ;;
         -N|--nonotify) nonotify=1 ;;
+        -l=*|--log=*) logtofile="-logtofile -log ${i#*=}" ;;
 
         --embos)    rtos="-rtos GDBServer/RTOSPlugin_embOS" ;;
         --freertos) rtos="-rtos GDBServer/RTOSPlugin_FreeRTOS" ;;
@@ -262,7 +265,7 @@ if [[ -n "$daemonmode" ]]; then
 fi
 
 # add device Cortex-CM3, jlinkGdbServer will wait chip wakeuped, and then connect
-params="-device $device -speed $speed -port $port $select -if SWD -nolocalhostonly -nologtofile -halt -nosilent -vd -noir -notimeout $rtos"
+params="-device $device -speed $speed -port $port $select -if SWD -nolocalhostonly $logtofile -halt -nosilent -vd -noir -notimeout $rtos"
 
 # Segger Jlink GDB Server
 if [[ "$OSTYPE" =~ "cygwin" ]]; then
