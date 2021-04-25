@@ -21,6 +21,15 @@ for i in "$@"; do
         -a) export NOTMUX=1; touch /tmp/.notmux.tmp; administrator=1; shift ;;
         -m) window='--window max'; shift ;;
         -s) slash=1; shift ;;
+        -h|--help)
+            echo "Create a new terminal window"
+            echo "Usage:"
+            echo "  -n  Don't attach to tmux"
+            echo "  -a  Run as administrator and Don't attach to tmux"
+            echo "  -m  Maximize new window"
+            echo "  -s  Convert all '\\' to '\\\\'"
+            echo "  -h  Show this help"
+            exit 0 ;;
         *)  break ;;
     esac
 done
