@@ -50,13 +50,25 @@ fi
 
 # Stash files
 git stash push "$stash_push_opt" -m "$message"
+if [[ $? -ne 0 ]]; then
+    echo -e "\e[31mError: stash push fail, switch abort! stash list may have dummy entry.\e[0m"
+    exit 1
+fi
 
 # Switch branch
 git checkout "$branch"
+if [[ $? -ne 0 ]]; then
+     echo -e "\e[31mError: checkout fail, switch fail!\e[0m"
+     exit 1
+fi
 
 # Pop the stashed files
 stash=$(git stash list | awk -F: "/On $branch: $message/{print \$1}")
 if [[ ! -z "$stash" ]]; then
     git stash pop "$stash"
+    if [[ $? -ne 0 ]]; then
+         echo -e "\e[31mError: stash pop fail!\e[0m"
+         exit 1
+    fi
 fi
 
