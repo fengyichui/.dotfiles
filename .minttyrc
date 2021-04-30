@@ -32,7 +32,7 @@ ScrollbackLines=1000000
 Scrollbar=none
 LigaturesSupport=1
 Ligatures=2
-#ProgressBar=1
+ProgressBar=1
 SysMenuFunctions=Always on &Top:win-toggle-always-on-top;&Keep Screen On:win-toggle-keep-screen-on;Copy &Title:copy-title;&Options...:options;Ne&w:new-window
 
 # Workaround cursor not blink in Tmux [https://github.com/mintty/mintty/issues/818]
