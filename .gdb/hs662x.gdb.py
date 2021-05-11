@@ -195,8 +195,8 @@ def flash_prepare_and_show():
             flash_vendor = flash_vendor_table[flash_vendor_id]
         else:
             flash_vendor = 'Unknown'
-    print('Flash: {} {}KB (0x{:06X})'.format(flash_vendor, flash_size/1024, flash_id))
-    print('FlashExt: {} {}KB (0x{:06X})'.format(flash_vendor_ext, flash_size_ext/1024, flash_id_ext))
+    print('Flash: {} {}KB (0x{:06X})'.format(flash_vendor, int(flash_size/1024), flash_id))
+    print('FlashExt: {} {}KB (0x{:06X})'.format(flash_vendor_ext, int(flash_size_ext/1024), flash_id_ext))
 
     if flash_size==0 and flash_size_ext==0:
         flash_finish()
@@ -407,7 +407,7 @@ class flash_upload_register(gdb.Command):
 
         # Get file name
         if args == '':
-            flash_file = 'FLASH_{:06X}_{}KB_{}{}.bin'.format(flash_id, flash_size/1024, device_name, device_version)
+            flash_file = 'FLASH_{:06X}_{}KB_{}{}.bin'.format(flash_id, int(flash_size/1024), device_name, device_version)
         else:
             flash_file = args
 
@@ -458,7 +458,7 @@ class flash_download_image_register(gdb.Command):
         file_size = flash_addr_end - flash_addr
 
         # show burn application info
-        print('{}: {}kB -> 0x{:X}'.format(file_path, file_size/1024, flash_addr))
+        print('{}: {}kB -> 0x{:X}'.format(file_path, int(file_size/1024), flash_addr))
 
         # get buffer
         buf = int(gdb.parse_and_eval('FlashDevice.sectors').cast(gdb.lookup_type('int')))
@@ -506,7 +506,7 @@ class flash_erase_register(gdb.Command):
             raise gdb.GdbError('Invalid params, "help flash_erase" for more infomation')
 
         # Info
-        print("Erase begin={}kB length={}kB".format(begin/1024, length/1024))
+        print("Erase begin={}kB length={}kB".format(int(begin/1024), int(length/1024)))
 
         # Erase
         def flash_erase_handler(addr, length, param=(begin)):
