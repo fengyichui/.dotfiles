@@ -619,6 +619,7 @@ nmap <leader>pw viw<C-v>
 nmap <leader>px vi)<C-v>
 nmap <leader>pd vi}<C-v>
 nmap <leader>pz vi]<C-v>
+nmap <leader>pn gn<C-v>
 
 " Switch in opened file
 nnoremap <leader><tab> :bn<cr>
