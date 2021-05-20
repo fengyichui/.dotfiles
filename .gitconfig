@@ -32,6 +32,9 @@
     # diff-so-fancy: https://github.com/so-fancy/diff-so-fancy
     pager = diff-so-fancy | less # diff-highlight
 
+[interactive]
+    diffFilter = diff-so-fancy --patch
+
 [color]
     branch = auto
     diff = auto
