@@ -11,12 +11,12 @@
                                                              \/__/
   by Marco Hinz~
 >
-  If you use any of my plugins, please star them on github. It's a great way
+  If you use any of my plugins, please star them on GitHub. It's a great way
   of getting feedback and gives me the kick to put more time into their
   development.
 
-  If you encounter any bugs or have feature requests, just open an issue
-  report on Github.
+  If you encounter any bugs or have feature requests, just open an issue on
+  GitHub.
 
   Thank you for flying mhi^ airlines. Get the Vim on!
 <
@@ -46,29 +46,37 @@ USAGE                                                           *startify-usage*
 Startify basically provides two things:
 
 1) If you start Vim without giving any filenames to it (or pipe stuff to it so
-   it reads from STDIN), startify will show a small but pretty start screen
-   that shows recently used files (using viminfo) and sessions by default.
+   it reads from STDIN), startify will show a pretty start screen that shows
+   recently used files (using viminfo/shada) and sessions by default.
 
    Additionally, you can define bookmarks (thus entries for files) and
    commands that always should be available on the start screen.
 
-   You can either navigate to a certain menu entry and hit enter or you just
-   key in whatever is written between the square brackets on that line. You
-   can even double-click anywhere on the line now.
+   You can either navigate to a certain menu entry and hit `<cr>` or just
+   enter the index (the index is whatever is written between the square
+   brackets on that line). You can even double-click anywhere on the line.
 
-   In addition, 'e' creates an empty buffer, 'i' creates an empty buffer and
-   jumps into insert mode, 'q' quits.
+   In addition, `e` creates an empty buffer, `i` creates an empty buffer and
+   jumps into insert mode, `q` quits either the buffer or, if there is no
+   other listed buffer left, Vim itself.
 
-   Moreover, you can open several files at one go. Navigate to an entry and
-   hit either 'b' (open in same window), 's' (open in split), 'v' (open in
-   vertical split) or 't' (open in tab). You can do that for multiple entries.
+   Moreover, you can open multiple buffers at once. Navigate to an entry and
+   hit either `b` (open in same window), `s` (open in split), `v` (open in
+   vertical split) or `t` (open in tab). You can do that for multiple entries.
    You can also mix them. The order of the selections will be remembered.
-   Afterwards execute these actions via <cr>.
+   Afterwards execute these actions via `<cr>`.
+
+   The uppercase variants of b/s/v/t enable the batchmode which lets you
+   select any entries without navigating there first. Every following index
+   will be opened in the currently active mode. E.g. to open the buffers with
+   the indices 0, 2, and 4, use `B024` instead of `bjjbjjb`. To disable
+   batchmode, just use the same uppercase key again, or any of the lowercase
+   variants.
 
    When the selection is finished, Startify will close automatically. You can
    reopen the screen via :Startify.
 
-   And you can define your own custom ascii art header now!
+   And you can define your own custom ascii art header!
 
 2) The plugin eases the handling of loading and saving sessions by putting
    sessions in a central directory.
@@ -93,6 +101,7 @@ default values.
     |g:startify_bookmarks|
     |g:startify_change_to_dir|
     |g:startify_change_to_vcs_root|
+    |g:startify_change_cmd|
     |g:startify_custom_header|
     |g:startify_enable_special|
     |g:startify_list_order|
@@ -133,7 +142,11 @@ default values.
 <
 The directory to save/load sessions to/from.
 
-The default for Windows systems is '$HOME\vimfiles\session'.
+Defaults:~
+
+  Nvim:          `$XDG_DATA_HOME/nvim/session` (`:echo stdpath('data')`)
+  Vim (Unix):    `$HOME/.vim/session`
+  Vim (Windows): `$HOME/vimfiles/session`
 
 ------------------------------------------------------------------------------
                                                          *g:startify_list_order*
@@ -316,10 +329,7 @@ This is a list of commands to be executed before saving a session.
 
 Example:
 >
-    let g:startify_session_before_save = [
-        \ 'echo "Cleaning up before saving.."',
-        \ 'silent! NERDTreeTabsClose'
-        \ ]
+    let g:startify_session_before_save = [ 'silent! tabdo NERDTreeClose' ]
 <
 ------------------------------------------------------------------------------
                                                 *g:startify_session_persistence*
@@ -356,6 +366,11 @@ NOTE: Buffers with unsaved changes are silently ignored.
 <
 When opening a file or bookmark, change to its directory.
 
+You want to disable this, if you're using |'autochdir'| as well.
+
+NOTE: It defaults to 1, because that was already the behaviour at the time
+this option was introduced.
+
 ------------------------------------------------------------------------------
                                                  *g:startify_change_to_vcs_root*
 >
@@ -367,22 +382,42 @@ VCS (if there is one).
 At the moment only git, hg, bzr and svn are supported.
 
 ------------------------------------------------------------------------------
+                                                         *g:startify_change_cmd*
+>
+    let g:startify_change_cmd = 'lcd'
+<
+The default command for switching directories. Valid values:
+
+    'cd'  (|:cd|)
+    'lcd' (|:lcd|)
+    'tcd' (|:tcd|)
+
+Affects |g:startify_change_to_dir| and |g:startify_change_to_vcs_root|.
+
+------------------------------------------------------------------------------
                                                            *g:startify_skiplist*
 >
-    let g:startify_skiplist = [
-        \ 'COMMIT_EDITMSG',
-        \ escape(fnamemodify(resolve($VIMRUNTIME), ':p'), '\') .'doc',
-        \ 'bundle/.*/doc',
-        \ ]
+    let g:startify_skiplist = []
 <
 A list of Vim regular expressions that is used to filter recently used files.
 See |pattern.txt| for what patterns can be used.
 
+The following patterns are filtered by default:
+
+      'runtime/doc/.*\.txt$'
+      'bundle/.*/doc/.*\.txt$'
+      'plugged/.*/doc/.*\.txt$'
+      '/.git/'
+      'fugitiveblame$'
+      escape(fnamemodify(resolve($VIMRUNTIME), ':p'), '\') .'doc/.*\.txt$'
+
 NOTE: Due to the nature of patterns, you can't just use "~/mysecret" but have
 to use "$HOME .'/mysecret.txt'". The former would do something entirely
-different: |/\~|. When using backslashes as path separators, escape them.
-Otherwise using "C:\this\vim\path\is\problematic" would not match what you
-expect, since |/\v| is a pattern, too.
+different: |/\~|.
+
+NOTE: When using backslashes as path separators, escape them. Otherwise using
+"C:\this\vim\path\is\problematic" would not match what you would expect, since
+|/\v| is a pattern, too.
 
 Example:
 >
@@ -565,7 +600,7 @@ NOTE: There is no sanitizing going on, so you should know what you're doing!
 ------------------------------------------------------------------------------
                                                       *g:startify_custom_header*
 >
-    let g:startify_custom_header = 'startify#fortune#cowsay()'
+    let g:startify_custom_header = 'startify#pad(startify#fortune#cowsay())'
 <
 Define your own header.
 
@@ -580,6 +615,11 @@ Helper functions:~
 
 The last two functions optionally take a quote in the list of strings format.
 They also return a list of strings, suitable for this option.
+
+    startify#pad([strings])        pad strings in list according to
+                                   |g:startify_padding_left| or the default of 3
+    startify#center([strings])     center list of strings without removing
+                                   its strings indentations
 
 Example #1:~
 >
@@ -596,7 +636,7 @@ Example #1:~
 Example #2:~
 >
     let g:startify_custom_header =
-            \ map(split(system('fortune | cowsay'), '\n'), '"   ". v:val')
+            \ startify#pad(split(system('fortune | cowsay'), '\n'))
 <
 Example #3:~
 
@@ -617,7 +657,7 @@ Looks great! But it's not on the same column as the indices below which makes
 it look awkward. Let's indent the header by 3 spaces:
 >
     let g:startify_custom_header =
-          \ map(g:ascii + startify#fortune#boxed(), '"   ".v:val')
+          \ startify#pad(g:ascii + startify#fortune#boxed())
 <
 Ah, much better! There's only one issue left. If you set
 g:startify_custom_header this way, it will only be done once. Hence spamming
@@ -627,7 +667,7 @@ If you provide a string to it instead, Startify will evaluate it every time
 :Startify is run:
 >
     let g:startify_custom_header =
-          \ 'map(g:ascii + startify#fortune#boxed(), "\"   \".v:val")'
+          \ 'startify#pad(g:ascii + startify#fortune#boxed())'
 <
 Happy customizing!
 
@@ -741,10 +781,12 @@ Use `:SSave!` or `:SDelete!` to always overwrite or delete an existing session.
 
                                                                *startify-:SLoad*
 >
-    :SLoad [session]
+    :SLoad[!] [session]
 <
-Load a session. If you don't specify a session name, it will either prompt you
-for one (Windows) or load the last used session (Unix).
+Load a session. If you don't specify a session name, it will prompt you for
+one.
+
+If the `!` is given, it tries to source the last used session (only Unix).
 
 Providing only a part of the session name works too, if you complete the
 argument with either <c-d> or <tab> afterwards.
@@ -875,6 +917,7 @@ FAQ                                                               *startify-faq*
     |startify-faq-15|  Startify is cluttered with help files!
     |startify-faq-16|  How to disable single mappings?
     |startify-faq-17|  Run Startify for each new tab!
+    |startify-faq-18|  Files from remote file system slow down startup!
 
 ------------------------------------------------------------------------------
                                                                *startify-faq-01*
@@ -967,16 +1010,9 @@ Do you have NERDTree installed by any chance? If so, try this:
 ------------------------------------------------------------------------------
                                                                *startify-faq-08*
 How do I center my header/footer?~
-
-Try something along these lines:
 >
-    function! s:filter_header(lines) abort
-        let longest_line   = max(map(copy(a:lines), 'strwidth(v:val)'))
-        let centered_lines = map(copy(a:lines),
-            \ 'repeat(" ", (&columns / 2) - (longest_line / 2)) . v:val')
-        return centered_lines
-    endfunction
-    let g:startify_custom_header = s:filter_header(startify#fortune#cowsay())
+    let g:startify_custom_header =
+          \ 'startify#center(startify#fortune#cowsay())'
 <
 ------------------------------------------------------------------------------
                                                                *startify-faq-09*
@@ -1096,13 +1132,34 @@ Run Startify for each new tab!~
     if has('nvim')
       autocmd TabNewEntered * Startify
     else
-      autocmd VimEnter * let t:startify_new_tab = 1
-      autocmd BufEnter *
-            \ if !exists('t:startify_new_tab') && empty(expand('%')) |
+      autocmd BufWinEnter *
+            \ if !exists('t:startify_new_tab')
+            \     && empty(expand('%'))
+            \     && empty(&l:buftype)
+            \     && &l:modifiable |
             \   let t:startify_new_tab = 1 |
             \   Startify |
             \ endif
     endif
+<
+NOTE: I do not recommend this. It can lead to all kinds of issues, so you
+should know exactly what the above code does. E.g. any plugin using |:tabnew|
+is probably expecting an empty buffer afterwards, but it won't be empty, it
+will be filled with the Startify buffer and fail. I suggest mapping
+`:Startify` to something convenient instead.
+
+------------------------------------------------------------------------------
+                                                               *startify-faq-18*
+Files from remote file system slow down startup!~
+
+I/O actions like resolving symbolic links or checking if a file is readable
+can be very slow on some remote file systems (Samba, NFS, FUSE, etc.) Even
+more so when done for many files.
+
+In that case it is often better to add the mount point of the remote file
+system to |g:startify_skiplist|:
+>
+    let g:startify_skiplist = ['^/mnt/nfs']
 <
 ==============================================================================
 EXAMPLE                                                       *startify-example*

@@ -22,13 +22,18 @@ endfunction
 
 " Function: #quote {{{1
 function! startify#fortune#quote() abort
-  return s:quotes[s:get_random_offset(len(s:quotes))]
+  return g:startify_custom_header_quotes[s:get_random_offset(len(g:startify_custom_header_quotes))]
 endfunction
 
 " Function: #boxed {{{1
 function! startify#fortune#boxed(...) abort
   let wrapped_quote = []
-  let quote = a:0 && type(a:1) == type([]) ? a:1 : startify#fortune#quote()
+  if a:0 && type(a:1) == type([])
+    let quote = a:1
+  else
+    let Quote = startify#fortune#quote()
+    let quote = type(Quote) == type(function('tr')) ? Quote() : Quote
+  endif
   for line in quote
     let wrapped_quote += split(line, '\%50c.\{-}\zs\s', 1)
   endfor
@@ -50,8 +55,7 @@ function! startify#fortune#cowsay(...) abort
     let quote = startify#fortune#quote()
   endif
   let boxed_quote = startify#fortune#boxed(quote)
-  let boxed_quote += s:cow
-  return map(boxed_quote, '"   ". v:val')
+  return boxed_quote + s:cow
 endfunction
 
 " Function: #predefined_quotes {{{1
@@ -69,14 +73,14 @@ let s:cow = [
       \ '                ||     ||',
       \ ]
 
-let s:unicode = &encoding == 'utf-8' && get(g:, 'startify_fortune_use_unicode')
+let g:startify_fortune_use_unicode = &encoding == 'utf-8' && get(g:, 'startify_fortune_use_unicode')
 
-let s:char_top_bottom   = ['-', '─'][s:unicode]
-let s:char_sides        = ['|', '│'][s:unicode]
-let s:char_top_left     = ['*', '╭'][s:unicode]
-let s:char_top_right    = ['*', '╮'][s:unicode]
-let s:char_bottom_right = ['*', '╯'][s:unicode]
-let s:char_bottom_left  = ['*', '╰'][s:unicode]
+let s:char_top_bottom   = ['-', '─'][g:startify_fortune_use_unicode]
+let s:char_sides        = ['|', '│'][g:startify_fortune_use_unicode]
+let s:char_top_left     = ['*', '╭'][g:startify_fortune_use_unicode]
+let s:char_top_right    = ['*', '╮'][g:startify_fortune_use_unicode]
+let s:char_bottom_right = ['*', '╯'][g:startify_fortune_use_unicode]
+let s:char_bottom_left  = ['*', '╰'][g:startify_fortune_use_unicode]
 
 let s:predefined_quotes = [
       \ ["Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.", '', '- Brian Kernighan'],
@@ -234,6 +238,6 @@ let s:predefined_quotes = [
       \ ['What one programmer can do in one month, two programmers can do in two months.', '', '- Frederick P. Brooks'],
       \ ]
 
-let s:quotes = exists('g:startify_custom_header_quotes')
+let g:startify_custom_header_quotes = exists('g:startify_custom_header_quotes')
       \ ? g:startify_custom_header_quotes
       \ : startify#fortune#predefined_quotes()

@@ -10,7 +10,8 @@ endif
 let g:loaded_startify = 1
 let g:startify_locked = 0
 
-if !get(g:, 'startify_disable_at_vimenter')
+if !get(g:, 'startify_disable_at_vimenter') && (!has('nvim') || has('nvim-0.3.5'))
+  " Only for Nvim v0.3.5+: https://github.com/neovim/neovim/issues/9885
   set shortmess+=I
 endif
 
@@ -37,7 +38,7 @@ function! s:on_vimenter()
     if get(g:, 'startify_session_autoload') && filereadable('Session.vim')
       source Session.vim
     elseif !get(g:, 'startify_disable_at_vimenter')
-      call startify#insane_in_the_membrane()
+      call startify#insane_in_the_membrane(1)
     endif
   endif
   if get(g:, 'startify_update_oldfiles')
@@ -56,11 +57,11 @@ function! s:on_vimleavepre()
   endif
 endfunction
 
-command! -nargs=? -bar       -complete=customlist,startify#session_list SLoad   call startify#session_load(<f-args>)
+command! -nargs=? -bar -bang -complete=customlist,startify#session_list SLoad   call startify#session_load(<bang>0, <f-args>)
 command! -nargs=? -bar -bang -complete=customlist,startify#session_list SSave   call startify#session_save(<bang>0, <f-args>)
 command! -nargs=? -bar -bang -complete=customlist,startify#session_list SDelete call startify#session_delete(<bang>0, <f-args>)
 command! -nargs=0 -bar SClose call startify#session_close()
-command! -nargs=0 -bar Startify call startify#insane_in_the_membrane()
+command! -nargs=0 -bar Startify call startify#insane_in_the_membrane(0)
 command! -nargs=0 -bar StartifyDebug call startify#debug()
 
 nnoremap <silent><plug>(startify-open-buffers) :<c-u>call startify#open_buffers()<cr>
