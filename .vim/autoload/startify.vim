@@ -659,7 +659,8 @@ function! s:filter_oldfiles_unsafe(path_prefix, path_format, use_env) abort
       continue
     endif
 
-    let absolute_path = fname "liqiang<>
+    let absolute_path = glob(fnamemodify(fname, ":p"))
+    " let absolute_path = fname "liqiang<>
     if empty(absolute_path)
           \ || has_key(entries, absolute_path)
           \ || (absolute_path =~ is_dir)
@@ -668,10 +669,12 @@ function! s:filter_oldfiles_unsafe(path_prefix, path_format, use_env) abort
       continue
     endif
 
-    let entry_path              = absolute_path "liqiang<>
+    let entry_path              = fnamemodify(absolute_path, a:path_format)
+    " let entry_path              = absolute_path "liqiang<>
     let entries[absolute_path]  = 1
     let counter                -= 1
-    let oldfiles               += [[absolute_path, entry_path]] "liqiang<>
+    let oldfiles               += [[fnameescape(absolute_path), entry_path]]
+    " let oldfiles               += [[absolute_path, entry_path]] "liqiang<>
   endfor
 
   return oldfiles
