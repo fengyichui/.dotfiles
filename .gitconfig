@@ -90,6 +90,9 @@
     # not show any source or destination prefix
     #noprefix = true
 
+    # The number of files to consider when performing the copy/rename detection
+    renameLimit = 999999
+
 [difftool]
     # Not prompt before each invocation of the diff tool.
     prompt = false
