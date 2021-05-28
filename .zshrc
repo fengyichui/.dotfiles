@@ -21,7 +21,10 @@ if [[ -n "$WSL_DISTRO_NAME" ]]; then
         export WSL=1
         export DISPLAY=':0.0'
     fi
+    # Force rendering GUI to happen on the Windows side of things
     export LIBGL_ALWAYS_INDIRECT=1
+    # Prevent: "WARNING **: Couldn't connect to accessibility bus", https://unix.stackexchange.com/questions/230238/x-applications-warn-couldnt-connect-to-accessibility-bus-on-stderr
+    export NO_AT_BRIDGE=1
 else
     export DISPLAY=':0.0'
 fi
