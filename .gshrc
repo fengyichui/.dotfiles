@@ -37,8 +37,9 @@ alias cpx='rsync --info=progress2'
 alias cdg='git_root_dir=$(git rev-parse --show-toplevel) && [[ $git_root_dir ]] && cd $git_root_dir'
 alias cdr='cd $(PWD);'
 
-# vim stdin
+# vim stdin, vim crypt
 alias vim-='vim -c "silent file stdin | set nomodified" -'
+alias vimc='vim --cmd "let g:tmux_focus_disable=1"'
 
 # diff
 alias diff='diff --color=auto'

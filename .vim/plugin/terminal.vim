@@ -170,7 +170,10 @@ let s:disable_focus_reporting = "\e[?1004l"
 let s:tmux_cursor_normal  = s:tmux_wrap(s:cursor_normal)
 let s:tmux_cursor_insert  = s:tmux_wrap(s:cursor_insert)
 let s:tmux_cursor_replace = s:tmux_wrap(s:cursor_replace)
+let s:tmux_cursor_t_ti = &t_ti
+let s:tmux_cursor_t_te = &t_te
 
+" autocmd
 function s:do_autocmd(event)
     let cmd = getcmdline()
     let pos = getcmdpos()
@@ -262,4 +265,14 @@ autocmd TermChanged * call <SID>tmux_fix()
 " restore vim 'autoread' functionality
 autocmd FocusGained * call s:tmux_focus_gained()
 autocmd FocusLost   * call s:tmux_focus_losted()
+
+" Disable Focus
+function! TmuxFocusDisable()
+    " Vim termcap
+    let &t_ti = s:tmux_cursor_normal . s:save_screen . s:tmux_cursor_t_ti
+    let &t_te = s:restore_screen . s:tmux_cursor_t_te
+endfunction
+if exists('g:tmux_focus_disable')
+    call TmuxFocusDisable()
+endif
 
