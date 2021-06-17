@@ -3,9 +3,9 @@ var WshShell = new ActiveXObject("WScript.Shell");
 LOCALAPPDATA = WshShell.ExpandEnvironmentStrings("%LOCALAPPDATA%");
 APPDATA      = WshShell.ExpandEnvironmentStrings("%APPDATA%")
 
-WslIcon      = LOCALAPPDATA + "\\wsltty\\wsl.ico"
-WslVimCmd    = LOCALAPPDATA + "\\wsltty\\bin\\mintty.exe --WSL --configdir=" + APPDATA + "\\wsltty --exec bash -c \"vim \\\"$(wslpath '%1')\\\"\""
-WslVimBinCmd = LOCALAPPDATA + "\\wsltty\\bin\\mintty.exe --WSL --configdir=" + APPDATA + "\\wsltty --exec bash -c \"vim -b \\\"$(wslpath '%1')\\\"\""
+WslIcon      = "\"" + LOCALAPPDATA + "\\wsltty\\wsl.ico\""
+WslVimCmd    = "\"" + LOCALAPPDATA + "\\wsltty\\bin\\mintty.exe\" --WSL --configdir=\"" + APPDATA + "\\wsltty\" --title \"[vim] %1\"    --exec bash -c \"vim    \\\"$(wslpath \\\"$(echo -E '%1' | sed 's/\\\\\\\\/\\\\\\\\\\\\\\\\/g')\\\")\\\"\""
+WslVimBinCmd = "\"" + LOCALAPPDATA + "\\wsltty\\bin\\mintty.exe\" --WSL --configdir=\"" + APPDATA + "\\wsltty\" --title \"[vim -b] %1\" --exec bash -c \"vim -b \\\"$(wslpath \\\"$(echo -E '%1' | sed 's/\\\\\\\\/\\\\\\\\\\\\\\\\/g')\\\")\\\"\""
 
 WshShell.RegWrite("HKCU\\Software\\Classes\\*\\shell\\vim-in-wsl\\", "Edit with &Vim in WSL", "REG_SZ");
 WshShell.RegWrite("HKCU\\Software\\Classes\\*\\shell\\vim-in-wsl\\icon", WslIcon, "REG_SZ");
