@@ -522,6 +522,9 @@ let sysclipreg='+'
 else
 let sysclipreg='*'
 endif
+if empty($DISPLAY)
+    let $DISPLAY = ":0.0"
+endif
 execute 'inoremap <C-v> <C-r><C-o>'.sysclipreg
 execute 'cnoremap <C-v> <C-r><C-o>'.sysclipreg
 execute 'vnoremap <C-v> "_c<C-r><C-o>'.sysclipreg.'<esc>'
@@ -843,6 +846,7 @@ let g:startify_skiplist = [
             \ 'COMMIT_EDITMSG', 'MERGE_MSG',
             \ 'NERD_tree_*', '__Tagbar__*', 'undotree_*', 'diffpanel_*',
             \ 'Temp/*', '^/tmp/*',
+            \ '/mnt/net/*',
             \ ]
 let g:startify_bookmarks = [
             \ {'v': fnamemodify(expand($MYVIMRC), ':p:~')},
