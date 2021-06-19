@@ -75,9 +75,9 @@ function torrent_magnet_hash ()
 # $2,$3... = foreach data
 function foreach_do ()
 {
-    cmd=$1; shift
+    cmd="$1"; shift
     for i; do
-        $cmd $i
+        $cmd "$i"
     done
 }
 
@@ -169,7 +169,7 @@ do
                 misc_cfg="$misc_cfg --max-connection-per-server=${i#*-}"
                 shift
             else
-                dlthing=$@
+                dlthing="$@"
                 break
             fi
             ;;
@@ -196,31 +196,31 @@ fi
 
 # list torrent
 if [[ -n "$list_torrent" ]]; then
-    foreach_do 'aria2c --show-files' $dlthing
+    foreach_do 'aria2c --show-files' "$dlthing"
     exit
 fi
 
 # list torrent name
 if [[ -n "$list_torrent_name" ]]; then
-    foreach_do torrent_name $dlthing
+    foreach_do torrent_name "$dlthing"
     exit
 fi
 
 # list torrent size
 if [[ -n "$list_torrent_size" ]]; then
-    foreach_do torrent_size $dlthing
+    foreach_do torrent_size "$dlthing"
     exit
 fi
 
 # list torrent magnet
 if [[ -n "$list_torrent_magnet" ]]; then
-    foreach_do torrent_magnet $dlthing
+    foreach_do torrent_magnet "$dlthing"
     exit
 fi
 
 # list torrent magnet min
 if [[ -n "$list_torrent_magnet_hash" ]]; then
-    foreach_do torrent_magnet_hash $dlthing
+    foreach_do torrent_magnet_hash "$dlthing"
     exit
 fi
 
@@ -243,7 +243,7 @@ if [[ -z "$norpc" ]]; then
         if [[ "$answer" != "N" ]]; then
             if [[ -n "$dlthing" ]]; then
                 if [[ "$dlthing" == *.torrent ]]; then
-                    dlthing=$(base64 -w0 $dlthing)
+                    dlthing="$(base64 -w0 "$dlthing")"
                     aria2c_rpc_curl addTorrent '"'$dlthing'"'
                 else
                     aria2c_rpc_curl addUri '["'$dlthing'"]'
@@ -313,7 +313,7 @@ if [[ -z "$dlthing" ]]; then
         fi
     fi
 elif [[ -f "$dlthing" ]]; then
-    dlthing=$(realpath $dlthing)
+    dlthing="$(realpath "$dlthing")"
     if [[ "$dlthing" != *.torrent ]]; then
         inputfile_cfg="--input-file='$dlthing'"
         dlthing=""
