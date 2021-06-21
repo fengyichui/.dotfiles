@@ -1,10 +1,14 @@
 var WshShell = new ActiveXObject("WScript.Shell");
 
-LOCALAPPDATA = WshShell.ExpandEnvironmentStrings("%LOCALAPPDATA%");
+//LOCALAPPDATA = WshShell.ExpandEnvironmentStrings("%LOCALAPPDATA%");
+//WslVimIcon   = "\"" + LOCALAPPDATA + "\\wsltty\\vim.ico\""
+//WslVimCmd    = "\"" + LOCALAPPDATA + "\\wsltty\\vim.exe\"    \"%1\""
+//WslVimBinCmd = "\"" + LOCALAPPDATA + "\\wsltty\\vim.exe\" -b \"%1\""
 
-WslVimIcon   = "\"" + LOCALAPPDATA + "\\wsltty\\vim.ico\""
-WslVimCmd    = "\"" + LOCALAPPDATA + "\\wsltty\\vim.exe\"    \"%1\""
-WslVimBinCmd = "\"" + LOCALAPPDATA + "\\wsltty\\vim.exe\" -b \"%1\""
+WshShell.CurrentDirectory = ".";
+WslVimIcon   = "\"" + WshShell.CurrentDirectory + "\\vim.ico\""
+WslVimCmd    = "\"" + WshShell.CurrentDirectory + "\\vim.exe\"    \"%1\""
+WslVimBinCmd = "\"" + WshShell.CurrentDirectory + "\\vim.exe\" -b \"%1\""
 
 WshShell.RegWrite("HKCU\\Software\\Classes\\*\\shell\\vim-in-wsl\\", "Edit with &Vim in WSL", "REG_SZ");
 WshShell.RegWrite("HKCU\\Software\\Classes\\*\\shell\\vim-in-wsl\\icon", WslVimIcon, "REG_SZ");
