@@ -199,7 +199,7 @@ function! lq#OpComment(op, nv)
         endif
     endif
     if a:op == 'add'
-        if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
+        if &filetype == 'c' || &filetype == 'cpp' || &filetype =~ 'java'
             execute l:line . 's/^/\/\//'
         elseif &filetype == 'vim'
             execute l:line . 's/^/"/'
@@ -213,7 +213,7 @@ function! lq#OpComment(op, nv)
             execute l:line . 's/^/#/'
         endif
     elseif a:op == 'del'
-        if &filetype == 'c' || &filetype == 'cpp' || &filetype == 'java'
+        if &filetype == 'c' || &filetype == 'cpp' || &filetype =~ 'java'
             execute 'silent! ' . l:line . 's/\v^(\s*)\/\//\1/'
         elseif &filetype == 'vim'
             execute 'silent! ' . l:line . 's/\v^(\s*)"/\1/'
