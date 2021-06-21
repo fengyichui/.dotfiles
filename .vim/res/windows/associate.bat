@@ -23,7 +23,7 @@ echo ---------------------------------------------
 reg add HKLM\SOFTWARE\Classes\Applications\gvim.exe\DefaultIcon /ve /d %icon% /f
 
 :: Extension
-set extensions=(c,cc,cpp,h,hpp, asm,s, java, bin,hex, map,dis,sct,symdefs, mk,mak, ini, log, md, vim, xml, diff,patch, sh, gdb)
+set extensions=(c,cc,cpp,h,hpp, asm,s, java, bin,hex, map,dis,sct,symdefs, mk,mak, ini, log, md, vim, xml, diff,patch, sh, gdb, json)
 :: Do Extension
 for %%e in %extensions% do (
     ftype vim.%%e=%app%
