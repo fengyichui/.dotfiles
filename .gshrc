@@ -184,7 +184,11 @@ dumpbin_func ()
 # du&sort: Stats directorys size and sort it
 ds ()
 {
-    du -h --max-depth=1 $1 | sort -rh
+    if [[ -n "$1" ]]; then
+        du -h --max-depth=0 $@ | sort -rh
+    else
+        du -h --max-depth=1 . | sort -rh
+    fi
 }
 
 # vim directory diff

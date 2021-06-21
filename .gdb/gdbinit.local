@@ -93,8 +93,8 @@ define reconnect_hs6621x
 reconnect
 mon device hs6621c
 # CPU div=2
-set *0x40001004 = 0x00c00206
-set *0x4000100C = 1
+#set *0x40001004 = 0x00c00206
+#set *0x4000100C = 1
 set $__runtype = 2
 end
 
