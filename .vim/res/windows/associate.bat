@@ -8,9 +8,10 @@
 @echo off
 
 :: APP and ICON
-set app="C:\Program Files (x86)\Vim\vim81\gvim.exe" "%%1"
+::set app="C:\Program Files\Vim\vim82\gvim.exe" "%%1"
+set app="%~dp0vim.exe" "%%1"
 ::set icon="%%SystemRoot%%\system32\imageres.dll,97"
-set icon="%~dp0vim.ico,0"
+set icon="%~dp0vimfile.ico,0"
 
 :: print info
 echo ---------------------------------------------
