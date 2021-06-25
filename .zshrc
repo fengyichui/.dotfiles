@@ -173,8 +173,12 @@ export LESS='-i -R -M -x4 -j.3'
 
 # default open with $EDITER
 alias -s {c,cc,cpp,h,hpp,asm,s,java,bin,hex,map,dis,sct,symdefs,mk,mak,ini,log,md,xml,txt}=$EDITOR
-# .bat/.cmd use cmd.exe open
-_wslbatch() { eval cmd.exe /c "$(wslpath -m "$1")"; } && alias -s {cmd,bat}=_wslbatch
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+    # .bat/.cmd use cmd.exe open
+    _wslbatch() { eval cmd.exe /c "$(wslpath -m "$1" | sed 's/\//\\\\/g')"; } && alias -s {cmd,bat}=_wslbatch
+    # .js/.vbs use cscript.exe open
+    _wslwinscript() { eval cscript.exe "$(wslpath -m "$1" | sed 's/\//\\\\/g')"; } && alias -s {js,vbs}=_wslwinscript
+fi
 
 # General shell config
 source ~/.dotfiles/.gshrc
