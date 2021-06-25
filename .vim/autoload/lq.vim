@@ -48,7 +48,7 @@ endfunction
 " NOTE: grep option and params must be use "" and not '', window version gvim not support ''
 function! lq#GrepAuto(pattern, path, ignorecase)
     if a:ignorecase
-        let l:opt = '-i'
+        let l:opt = '-S' " smart case: some version ag '-i' option has issue: can't search chinese
     else
         let l:opt = '-s'
     endif
