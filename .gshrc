@@ -54,7 +54,7 @@ alias gbk2utf8='iconv -f GBK -t UTF8'
 # web
 #alias dict="webx 'http://dict.youdao.com/search?q='"
 #alias dict="webx 'http://cn.bing.com/dict/search?q='"
-alias dict="webx 'http://dict.cn/'"
+alias dict="webx 'http://dict.cn/search?q='"
 alias wiki="webx 'http://en.wikipedia.org/wiki/'"
 alias rfc="webx 'https://tools.ietf.org/rfc/rfc'"
 
